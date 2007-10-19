@@ -1,0 +1,25 @@
+<!ELEMENT tables (table+)>
+<!ELEMENT table (comment?,property*,col+)>
+<!ELEMENT comment (#PCDATA)>
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	key CDATA #REQUIRED
+	value CDATA #REQUIRED
+	>
+
+<!ELEMENT col (comment?,property*,reference?)>
+<!ATTLIST col
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	primary_key CDATA "false"
+	default_value CDATA #IMPLIED
+	allow_null CDATA "true"
+	unique CDATA "false"
+	>
+	
+<!ELEMENT refernce EMPTY>
+<!ATTLIST reference
+	table CDATA #REQUIRED
+	column CDATA #REQUIRED
+	id CDATA #IMPLIED
+	>

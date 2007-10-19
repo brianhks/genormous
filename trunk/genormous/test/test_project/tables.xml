@@ -1,0 +1,16 @@
+<tables>
+	<table name="author">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="author_id" type="integer" primary_key="true"/>
+		<col name="name" type="string"/>
+	</table>
+	
+	<table name="book">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="author" type="integer">
+			<reference table="author" column="author_id"/>
+		</col>
+		<col name="title" type="string"/>
+		<col name="isbn" type="string"/>
+	</table>
+</tables>
