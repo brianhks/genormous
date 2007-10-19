@@ -1,0 +1,92 @@
+
+<tables>
+	<table name="segment">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="segment_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="source" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="next_segment" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+		<col name="prev_segment" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+	</table>
+	
+	<table name="translation">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="segment" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+		<col name="language" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="language" column="language_id"/>
+		</col>
+	</table>
+	
+	<table name="note">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="note_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="translation" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="translation" column="segment"/>
+		</col>
+		<col name="language" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="translation" column="language"/>
+		</col>
+		<col name="phase" type="integer" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="note" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+	</table>
+	
+	<table name="target">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="phase" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="segment" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="translation" column="segment"/>
+		</col>
+		<col name="language" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="translation" column="language"/>
+		</col>
+		<col name="flags" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="text" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+	</table>
+	
+	<table name="language">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="language_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="language_code" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="country_code" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+	</table>
+</tables>

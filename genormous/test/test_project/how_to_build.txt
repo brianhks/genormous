@@ -1,0 +1,11 @@
+This project is built using CPMake.  (www.cpmake.org)
+Building requires JDK 1.5 or later.
+
+To build set the two jar files in the tools directory in your CLASSPATH
+ex.
+>set CLASSPATH=tools\cpmake.jar;tools\bsh-2.0b4.jar
+
+Then from the root directory type
+>java make
+
+

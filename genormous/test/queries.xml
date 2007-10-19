@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+<queries>
+	<query name="latest_translation">
+		<input>
+			<param name="language_code" type="String" test="en"/>
+			<param name="country_code" type="String" test="US"/>
+		</input>
+<!-- 		<replace>
+			<param name="sort_column" type="String" tag="sort_column"/>
+		</replace> -->
+		<return>
+			<param name="source" type="String"/>
+			<param name="segment_id" type="int"/>
+			<param name="text" type="String"/>
+		</return>
+		<sql>
+			select s.source, s.segment_id, t.text
+			from
+			segment s, target t, language l
+			where
+			l.language_code = ? and l.country_code = ? and
+			l.language_id = t.language and
+			s.segment_id = t.segment
+		</sql>
+	</query>
+	
+	<!-- query with no input -->
+	<!-- <query name="language_list">
+		<input></input>
+		<return>
+			<param name="language_id" type="int"/>
+			<param name="code" type="String"/>
+			<param name="description" type="String"/>
+		</return>
+		<sql>
+			select language_id, language_code as code, description from language
+		</sql>
+	</query>
+	
+	<query name="figure_it_out">
+		<input></input>
+		<return>
+			<param name="id" type="int"/>
+			<param name="name" type="String"/>
+		</return>
+		<sql>
+			select c.client_id as id, c.name
+			from client c
+			where client_id = ?
+		</sql>
+	</query> -->
+	
+</queries>

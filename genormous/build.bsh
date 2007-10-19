@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2004, Brian Hawkins
+ * Permission is granted to use this code without restriction as long
+ * as this copyright notice appears in all source files.
+ */
+ 
+import cpmake.*;
+
+print("===============================================================");
+
+make.includeCPMakeScript("java.bsh");
+
+source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
+
+bldoutdir = "build";
+javadocdir = bldoutdir+"/doc";
+classoutdir = bldoutdir+"/classes";
+jaroutdir = bldoutdir+"/jar";
+gendir = bldoutdir+"/gen";
+gensrcdir = gendir+"/src";
+genbuilddir = gendir+"/build";
+gentestdir = gensrcdir+"/test";
+srcdir = "src";
+targetjar = jaroutdir+"/genormous.jar";
+extdir = "lib";
+distdir = bldoutdir+"/dist";
+templatedir = "templates";
+
+testsrc = "test/src";
+testbuilddir = bldoutdir+"/test";
+
+make.setProperty(make.PROP_MULTI_THREAD_OUTPUT, "true");
+
+extJarFiles = make.createFileList(extdir, ".*\\.jar", (make.INCLUDE_PATH | make.RECURSE));
+templateFiles = make.createFileList(templatedir, ".*", (make.INCLUDE_PATH | make.RECURSE));
+propertyFiles = make.createFileList(srcdir, ".*\\.properties");
+
+classpath = new ClassPath(extJarFiles);
+classpath.addPath(classoutdir);
+
+//-------------------------------------------------------------------
+//==-- CREATES RULE FOR COMPILING --==
+JavaCompiler jc = new JavaCompiler(srcdir, classoutdir, classpath);
+classFiles = jc.getClassFiles();
+//jc.getDefinition().setOption("unchecked");
+
+//-------------------------------------------------------------------
+//==-- SET SEARCH PATHS --==
+//make.addSearchPath(srcdir);
+make.addSearchPath(".*\\.java", testsrc);
+
+//-------------------------------------------------------------------
+//==-- RULE FOR CREATING DIRECTORIES --==
+make.createDirectoryRule(bldoutdir, null, true);
+make.createDirectoryRule(jaroutdir, null, true);
+make.createDirectoryRule(distdir, null, true);
+make.createDirectoryRule(gentestdir, null, true);
+make.createDirectoryRule(javadocdir, null, true);
+make.createDirectoryRule(genbuilddir, null, true);
+make.createDirectoryRule(gensrcdir, null, true);
+make.createDirectoryRule(testbuilddir, null, true);
+
+//-------------------------------------------------------------------
+//==-- CREATE JAR FILE --==
+make.createExplicitDependency(targetjar, jaroutdir);
+make.createExplicitDependency(targetjar, classFiles);
+make.createExplicitDependency(targetjar, templateFiles);
+make.createExplicitDependency(targetjar, propertyFiles);
+jf = new JarFile(targetjar);
+jf.addFiles(classoutdir, ".");
+jf.addFiles(".", templatedir);
+jf.addFiles(srcdir, propertyFiles);
+jf.addFiles("etc", ".");
+
+//-------------------------------------------------------------------
+//==-- CREATE JAVADOCS --==
+make.createPhonyRule("javadoc", javadocdir, "javadoc");
+void javadoc(String target, String[] prereqs)
+	{
+	make.exec(srcdir, "javadoc -public -d ../doc "+make.arrayToString(sourceFiles), true);
+	}
+
+//-------------------------------------------------------------------
+//==-- TEST GENERATOR --==
+make.createPhonyRule("gensrc_test", new String[] {targetjar, gentestdir}, "genSrc");
+void genSrc(CPMakeRule rule)
+	{
+	print("Generating GenORM source");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s");
+	
+	print("Generating Query source");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.QueryGen -s test/queries.xml -d "+gentestdir+" -p test");
+	}
+
+//-------------------------------------------------------------------
+//==-- COMPILE GEN TEST --==
+make.createPhonyRule("compile_gen", new String[] {"gensrc_test",genbuilddir}, "compileGen");
+void compileGen(CPMakeRule rule)
+	{
+	print("Compiling generated source");
+	compilerDef = Definition.getDefinition("javac");
+	compilerDef.setMode("debug");
+	compilerDef.setOption("builddir", genbuilddir);
+	compilerDef.setOption("classpath", classpath.getFormattedPath());
+	
+	sourceFiles = make.createFileList(gensrcdir, ".*\\.java", 
+				make.INCLUDE_PATH | make.RECURSE);
+	
+	for (file : sourceFiles)
+		compilerDef.addOption("sourcefile", file);
+	
+	cmd = compilerDef.getCommand("compile");
+	make.exec(cmd, true);
+	}
+
+//-------------------------------------------------------------------
+//==-- COMPILE TEST FILES --==
+classpath.addPath(genbuilddir);
+jctest = new JavaCompiler(testsrc, testbuilddir, classpath);
+testClassFiles = jctest.getClassFiles();
+jctest.addDependency("compile_gen");
+
+
+//-------------------------------------------------------------------
+//==-- TEST --==
+classpath.addPath(testbuilddir);
+depTest = new DepUnitTest("test", testClassFiles, classpath);
+depTest.setReportFile("build/report.xml");
+depTest.setXMLInputFile("test/test.xml");
+
+
+make.setDefaultTarget(targetjar);
+
+

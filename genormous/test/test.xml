@@ -1,0 +1,107 @@
+<!DOCTYPE suite SYSTEM "http://depunit.googlecode.com/svn/trunk/doc/depunit_1_0.dtd">
+
+<!--
+Needed test cases
+One method loops
+Loop at the beginning
+Loop at the end
+-->
+<suite name="Genormous Test Suite" verbose="1">
+	<!-- <classGroup name="login_group">
+		<class name="LoginTest"/>
+		<class name="LoginTestPart2"/>
+	</classGroup> -->
+	
+	<!-- <run name="Data Driver Run">
+		<classes>
+			<class name="DataDriverTest">
+				<driver class="TestDataDriver"/>
+			</class>
+		</classes>
+	</run> -->
+	
+	<run name="First Run">
+		<classes>
+			<!-- <includeGroup>login_group</includeGroup> -->
+			
+			<class name="Database">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="Create"/>
+			<class name="QueryTest">
+				<driver class="genorm.unittest.QueryDataDriver">
+					<value name="QueryFile">test/queries.xml</value>
+				</driver>
+			</class>
+		</classes>
+	</run>
+	
+	<!-- <run name="Cleanup Run">
+		<classes>
+			<class name="CleanupTest"/>
+		</classes>
+	</run>
+	
+	<run name="Fail run">
+		<classes>
+			<class name="UnitTest"/>
+		</classes>
+	</run>
+	
+	<run name="Second Run">
+		<classes>
+			<class name="LoginTest">
+				<value name="UserName">MyUserName</value>
+				<value name="Password">mysecret</value>
+			</class>
+		</classes>
+		
+		<tests>
+			<method>LoginTest.login</method>
+		</tests>
+	</run>
+	
+	
+	<run name="Repeat run">
+		<classes>
+			<includeGroup>login_group</includeGroup>
+			
+			<class name="LoginTest">
+				<value name="UserName">Sammy</value>
+				<value name="Password">secret</value>
+				<value name="test">4</value>
+			</class>
+			
+			<class name="LoginTestPart2">
+				<driver>
+					<data>
+						<value name="MyData">Here is my data</value>
+					</data>
+					<data>
+						<value name="MyData">Here is my data2</value>
+					</data>
+				</driver>
+			</class>
+		</classes>
+		
+	</run>
+	
+	<run name="fail login">
+		<classes>
+			<class name="LoginTest" >
+				<value name="UserName">Sammy</value>
+				<value name="Password">secret</value>
+				<value name="Fail">true</value>
+			</class>
+			<class name="Project">
+				<driver>
+					<data>
+						<value name="ProjectName">my project</value>
+					</data>
+				</driver>
+			</class>
+		</classes>
+	</run> -->
+	
+</suite>
