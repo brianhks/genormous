@@ -1,0 +1,10 @@
+#Quick tutorial to setup a project
+
+= Introduction =
+
+This tutorial is designed to show you how simple Genormous is to use.  In this tutorial we will setup a simple data base application that will keep track of authors and books.  The code used for this tutorial is in the source tree under test/test_project.
+
+
+= Setting up the tables.xml =
+
+The magic of Genormous all comes from an XML file that defines what your database looks like.
