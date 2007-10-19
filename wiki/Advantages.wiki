@@ -1,4 +1,4 @@
-Advantages of using GenORMous.
+#summary Advantages of using GenORMous.
 
 = Speed =
 
