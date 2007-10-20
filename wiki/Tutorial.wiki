@@ -41,3 +41,15 @@ Again this should be pretty self explanatory.  All of the data types can be what
 There that was it.  That wasn't so bad now was it?
 
 Next up generating the code...
+
+= Generating Code =
+
+To generate the ORM code you need to specify three things:
+  # The XML file that contains the table definition
+  # The directory to where the code will be placed
+  # The name of the package into which the code will be placed.
+
+In the sample project we will generate the code into the genorm.test.orm package.  The command looks like this:
+{{{
+java -cp <classpath> genorm.Genormous -o tables.xml -d src/genorm/test/orm -p genorm.test.orm
+}}}
