@@ -1,5 +1,9 @@
 <!ELEMENT tables (table+)>
 <!ELEMENT table (comment?,property*,col+)>
+<!ATTLIST table
+	name CDATA #REQUIRED
+	>
+
 <!ELEMENT comment (#PCDATA)>
 <!ELEMENT property EMPTY>
 <!ATTLIST property

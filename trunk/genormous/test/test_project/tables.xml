@@ -1,3 +1,5 @@
+<!DOCTYPE tables SYSTEM "http://genormous.googlecode.com/svn/trunk/genormous/doc/tables_1.0.dtd">
+
 <tables>
 	<table name="author">
 		<property key="hsqldb_tableType" value="CACHED"/>
