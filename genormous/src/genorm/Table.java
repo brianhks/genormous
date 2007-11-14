@@ -55,7 +55,8 @@ public class Table
 		
 	public boolean isGeneratedKey()
 		{
-		return (m_primaryKeys.size() == 1);
+		return ((m_primaryKeys.size() == 1) && ((m_primaryKeys.get(0).getType().equals("int")) 
+				|| (m_primaryKeys.get(0).getType().equals("long"))));
 		}
 		
 	private void addForeignTable(String table)

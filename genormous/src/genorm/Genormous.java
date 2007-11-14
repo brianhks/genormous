@@ -31,6 +31,7 @@ public class Genormous extends TemplateHelper
 	private Format m_formatter;
 	private String m_packageName;
 	private boolean m_includeStringSets;
+	private String m_graphVizFile;
 	
 	
 	//===========================================================================
@@ -42,6 +43,7 @@ public class Genormous extends TemplateHelper
 		public boolean includeStringSets;
 		public String customTypeProperties;
 		public String customDBTypeProperties;
+		public String graphVizFile;
 		
 		public CommandLine()
 			{
@@ -51,6 +53,7 @@ public class Genormous extends TemplateHelper
 			includeStringSets = false;
 			customTypeProperties = null;
 			customDBTypeProperties = null;
+			graphVizFile = null;
 			}
 		}
 		
@@ -62,7 +65,8 @@ public class Genormous extends TemplateHelper
 		new StringDef('p', "targetPackage"),
 		new BoolDef('s', "includeStringSets"),
 		new StringDef('c', "customTypeProperties"),
-		new StringDef('b', "customDBTypeProperties")
+		new StringDef('b', "customDBTypeProperties"),
+		new StringDef('g', "graphVizFile")
 		};
 		
 	
@@ -91,7 +95,7 @@ public class Genormous extends TemplateHelper
 		proc.processArgs(args, cl);
 		
 		Genormous gen = new Genormous(cl.source, cl.destination, cl.targetPackage,
-				cl.includeStringSets);
+				cl.includeStringSets, cl.graphVizFile);
 		
 		try
 			{
@@ -104,7 +108,7 @@ public class Genormous extends TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
-	public Genormous(String source, String destDir, String packageName, boolean includeStringSets)
+	public Genormous(String source, String destDir, String packageName, boolean includeStringSets, String graphVizFile)
 		{
 		super(destDir);
 		m_source = source;
@@ -112,6 +116,7 @@ public class Genormous extends TemplateHelper
 		m_formatter = new DefaultFormat();
 		m_packageName = packageName;
 		m_includeStringSets = includeStringSets;
+		m_graphVizFile = graphVizFile;
 		}
 		
 //------------------------------------------------------------------------------
@@ -129,6 +134,8 @@ public class Genormous extends TemplateHelper
 		Queue<Table> tables = new LinkedList<Table>();
 		//Table table;
 		Map<String, Table> tableNames = new HashMap<String, Table>();
+		
+		new File(m_destDir).mkdirs();
 		
 		try
 			{
@@ -194,6 +201,7 @@ public class Genormous extends TemplateHelper
 				tables.offer(table);
 				}
 			
+			PrintWriter dotFile = new PrintWriter(new FileWriter("tables.dot"));
 			
 			Iterator<Table> it = tables.iterator();
 			while (it.hasNext())
@@ -245,12 +253,14 @@ public class Genormous extends TemplateHelper
 				
 				baseTemplate.setAttributes(attributes);
 				
+				m_generatedFileCount ++;
 				FileWriter fw = new FileWriter(m_destDir+"/"+className+"_base.java");
 				fw.write(baseTemplate.toString());
 				fw.close();
 				
 				derivedTemplate.setAttributes(attributes);
 				
+				m_generatedFileCount ++;
 				fw = new FileWriter(m_destDir+"/"+className+".java");
 				fw.write(derivedTemplate.toString());
 				fw.close();
@@ -311,7 +321,8 @@ public class Genormous extends TemplateHelper
 					}
 				}
 				
-			//Write out the create.sql file	
+			//Write out the create.sql file
+			m_generatedFileCount ++;
 			FileWriter fw = new FileWriter(m_destDir+"/create.sql");
 			Iterator<String> crIt = createList.iterator();
 			while (crIt.hasNext())
@@ -346,6 +357,13 @@ public class Genormous extends TemplateHelper
 			writeTemplate("GenOrmDouble.java", attributes);
 			writeTemplate("Pair.java", attributes);
 			writeTemplate("GenOrmDSEnvelope.java", attributes);
+			writeTemplate("GenOrmException.java", attributes);
+			writeTemplate("GenOrmResultSet.java", attributes);
+			writeTemplate("GenOrmQueryResultSet.java", attributes);
+			writeTemplate("GenOrmQueryRecord.java", attributes);
+			
+			if (m_graphVizFile != null)
+				writeTemplate(m_graphVizFile, "templates/tables.dot", attributes);
 			}
 		catch (Exception e)
 			{
@@ -353,5 +371,7 @@ public class Genormous extends TemplateHelper
 			e.printStackTrace();
 			return;
 			}
+			
+		System.out.println("Generated "+m_generatedFileCount+" files.");
 		}
 	}

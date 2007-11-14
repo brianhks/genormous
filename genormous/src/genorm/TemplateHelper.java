@@ -7,9 +7,11 @@ import java.util.*;
 public class TemplateHelper
 	{
 	protected String m_destDir;
+	protected int m_generatedFileCount;
 	
 	public TemplateHelper(String destDir)
 		{
+		m_generatedFileCount = 0;
 		m_destDir = destDir;
 		}
 	
@@ -42,6 +44,7 @@ public class TemplateHelper
 	protected void writeTemplate(String fileName, String templateName, Map<String, Object> attrs)
 			throws IOException
 		{
+		m_generatedFileCount ++;
 		StringTemplate template = new StringTemplate("",
 				org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
 				

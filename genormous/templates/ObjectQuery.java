@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.sql.*;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import $package$.genorm.*;
@@ -34,7 +33,6 @@ public class $query.className$Query extends SQLQuery
 			s_attributeIndex.put(s_attributeNames[I], I);
 		}
 	
-	private List<Data> m_lastQuery;
 	private boolean m_serializable;
 	
 	public $query.className$Query()
@@ -42,8 +40,33 @@ public class $query.className$Query extends SQLQuery
 		super();
 		}
 		
-	private void doQuery(boolean serializable$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
-			throws SQLException
+	//---------------------------------------------------------------------------
+	public void setSerializable(boolean serializable)
+		{
+		m_serializable = serializable;
+		}
+		
+	//---------------------------------------------------------------------------
+	public void serializeQuery(ContentHandler ch, String tagName$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+			throws java.sql.SQLException, org.xml.sax.SAXException
+		{
+		boolean prevSerializeState = m_serializable;
+		m_serializable = true;
+		ResultSet rs = runQuery($[query.inputs,query.replacements]:{ p | $p.parameterName$}; separator=", "$);
+		
+		while (rs.hasNext())
+			{
+			Record rec = rs.getRecord();
+			ch.startElement("", tagName, tagName, rec);
+			ch.endElement("", tagName, tagName);
+			}
+			
+		m_serializable = prevSerializeState;
+		}
+	
+	//---------------------------------------------------------------------------
+	public ResultSet runQuery($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+			throws java.sql.SQLException
 		{
 		String query = QUERY;
 		$if(query.replaceQuery)$
@@ -52,65 +75,143 @@ public class $query.className$Query extends SQLQuery
 		query = replaceText(query, replaceMap);
 		$endif$
 		
-		PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
+		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
 		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
 		
-		ResultSet resultSet = statement.executeQuery();
+		java.sql.ResultSet resultSet = statement.executeQuery();
 		
-		m_lastQuery = new ArrayList<Data>();
-		
-		while (resultSet.next())
-			m_lastQuery.add(new Data(resultSet, serializable));
+		ResultSet ret = new ResultSet(resultSet, query);
 		
 		statement.close();
+		return (ret);
 		}
-		
-	public void setSerializable(boolean serializable)
-		{
-		m_serializable = serializable;
-		}
-		
-	public void serializeQuery(ContentHandler ch, String tagName$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
-			throws SQLException, org.xml.sax.SAXException
-		{
-		doQuery(true$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.parameterName$}; separator=", "$);
-		
-		Iterator<Data> it = m_lastQuery.iterator();
-		while (it.hasNext())
-			{
-			Data data = it.next();
-			ch.startElement("", tagName, tagName, data);
-			ch.endElement("", tagName, tagName);
-			}
-		}
-	
-	public List<Data> runQuery($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
-			throws SQLException
-		{
-		doQuery(m_serializable$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.parameterName$}; separator=", "$);
-		
-		return (m_lastQuery);
-		}
-		
-	public List<Data> getLastQueryData()
-		{
-		return (m_lastQuery);
-		}
-		
 		
 	//===========================================================================
-	public class Data implements Attributes
+	public class ResultSet 
+			implements GenOrmQueryResultSet
+		{
+		private java.sql.ResultSet m_resultSet;
+		private String m_query;
+		
+		//------------------------------------------------------------------------
+		protected ResultSet(java.sql.ResultSet resultSet, String query)
+			{
+			m_resultSet = resultSet;
+			m_query = query;
+			}
+		
+		//------------------------------------------------------------------------
+		public void close()
+			{
+			try
+				{
+				m_resultSet.close();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+			}
+			
+		//------------------------------------------------------------------------
+		public ArrayList<Record> getArrayList(int maxRows)
+			{
+			ArrayList<Record> results = new ArrayList<Record>();
+			int count = 0;
+			
+			try
+				{
+				while (m_resultSet.next() && (count < maxRows))
+					{
+					count ++;
+					results.add(new Record(m_resultSet));
+					}
+					
+				if (m_resultSet.next())
+					throw new GenOrmException("Bound of "+maxRows+" is too small for query ["+m_query+"]");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			return (results);
+			}
+			
+		//------------------------------------------------------------------------
+		public java.sql.ResultSet getResultSet()
+			{
+			return (m_resultSet);
+			}
+			
+		//------------------------------------------------------------------------
+		public Record getRecord()
+			{
+			Record ret = null;
+			try
+				{
+				ret = new Record(m_resultSet);
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			return (ret);
+			}
+			
+		//------------------------------------------------------------------------
+		public Record getOnlyRecord()
+			{
+			Record ret = null;
+			
+			try
+				{
+				if (m_resultSet.next())
+					ret = new Record(m_resultSet);
+					
+				if (m_resultSet.next())
+					throw new GenOrmException("Multiple rows returned in call from $query.className$Query.ResultSet.getOnlyRecord");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			close();
+			return (ret);
+			}
+			
+		//------------------------------------------------------------------------
+		public boolean hasNext()
+			{
+			boolean ret = false;
+			try
+				{
+				ret = m_resultSet.next();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+			
+			return (ret);
+			}
+		}
+		
+	//===========================================================================
+	public class Record implements Attributes, GenOrmQueryRecord
 		{
 		$query.outputs:{ o | private $o.type$ m_$o.parameterName$;
 }$
 		private String[] m_attrValues;
 		
-		public Data(ResultSet rs, boolean serializable)
-				throws SQLException
+		protected Record(java.sql.ResultSet rs)
+				throws java.sql.SQLException
 			{
 			$query.outputs:{ o | m_$o.parameterName$ = rs.get$javaToJDBCMap.(o.type)$($i$);
 }$
-			if (serializable)
+			if (m_serializable)
 				{
 				m_attrValues = new String[ATTRIBUTE_COUNT];
 				

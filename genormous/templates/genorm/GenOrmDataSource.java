@@ -21,49 +21,41 @@ public class GenOrmDataSource
 			};
 			
 	public static void setDataSource(DataSource ds)
-			throws SQLException
 		{
 		s_dsEnvelope = new GenOrmDSEnvelope(ds);
 		}
 		
 	public static void setDataSource(String key, DataSource ds)
-			throws SQLException
 		{
 		s_dataSourceMap.put(key, new GenOrmDSEnvelope(ds));
 		}
-
+		
 	public static void begin(String source)
-			throws SQLException
 		{
 		s_tlConnection.get().begin(s_dataSourceMap.get(source));
 		}
 		
-	/* public static void begin(DataSource source)
-			throws SQLException
+	public static void begin(GenOrmDSEnvelope source)
 		{
 		s_tlConnection.get().begin(source);
-		} */
+		}
 
 	public static void begin()
-			throws SQLException
 		{
 		s_tlConnection.get().begin(s_dsEnvelope);
 		}
 		
 	public static void commit()
-			throws SQLException
 		{
 		s_tlConnection.get().commit();
 		}
 		
 	public static void close()
-			throws SQLException
 		{
 		s_tlConnection.get().close();
 		}
 		
 	public static void rollback()
-			throws SQLException
 		{
 		s_tlConnection.get().rollback();
 		}

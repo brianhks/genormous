@@ -9,7 +9,6 @@ public class GenOrmDSEnvelope
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
 	
 	public GenOrmDSEnvelope(DataSource ds)
-			throws java.sql.SQLException
 		{
 		m_dataSource = ds;
 		m_keyGenMap = new HashMap<String, GenOrmKeyGenerator>();
