@@ -13,20 +13,18 @@ protected void set$col.methodName$_base($col.type$ data)
 >>
 	
 declarMetaFields(col) ::= <<
-private static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", $col.dirtyFlag$, $col.primaryKey$);
+private static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", $col.dirtyFlag$, $col.primaryKey$, $col.foreignKey$);
 
 >>
 
 foreignGetAndSetMethods(foreignKeys) ::= <<
 //---------------------------------------------------------------------------
 protected $foreignKeys.table.className$ get$foreignKeys.methodName$_base()
-		throws java.sql.SQLException
 	{
 	return ($foreignKeys.table.className$.factory.find($foreignKeys.keys:{key | m_$key.parameterName$.getValue()}; separator=", "$));
 	}
 	
 protected void set$foreignKeys.methodName$_base($foreignKeys.table.className$ table)
-		throws java.sql.SQLException
 	{
 	$foreignKeys.keys:{key | m_$key.parameterName$.setValue(table.get$key.foreignTableColumnMethodName$());m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
 }; separator="\n"$
@@ -44,9 +42,11 @@ import $package$.genorm.*;
 
 public class $table.className$_base extends GenOrmRecord
 	{
+	//Change this value to true to turn on warning messages
+	private static final boolean WARNINGS = false;
 	private static final String QUERY = "SELECT $columns:{col | $col.name$}; separator=", "$ FROM $table.name$ ";
 	private static final String WHERE = "WHERE ";
-	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $key.name$ = ?}; separator=", "$";
+	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $key.name$ = ?}; separator=" AND "$";
 	
 	private static final String TABLE_NAME = "$table.name$";
 	
@@ -62,7 +62,6 @@ public class $table.className$_base extends GenOrmRecord
 		private volatile long m_nextKey;
 		
 		public $table.className$KeyGenerator(javax.sql.DataSource ds)
-				throws java.sql.SQLException
 			{
 			m_nextKey = 1;
 			try
@@ -81,7 +80,8 @@ public class $table.className$_base extends GenOrmRecord
 			catch (java.sql.SQLException sqle)
 				{
 				//The exception may occur if the table does not yet exist
-				System.out.println(sqle);
+				if (WARNINGS)
+					System.out.println(sqle);
 				}
 			}
 			
@@ -105,8 +105,7 @@ public class $table.className$_base extends GenOrmRecord
 			{
 			}
 			
-		private $table.className$ new$table.className$(java.sql.ResultSet rs)
-				throws java.sql.SQLException
+		protected $table.className$ new$table.className$(java.sql.ResultSet rs)
 			{
 			$table.className$ rec = new $table.className$();
 			(($table.className$_base)rec).initialize(rs);
@@ -135,7 +134,6 @@ public class $table.className$_base extends GenOrmRecord
 		$endif$
 		//---------------------------------------------------------------------------
 		public $table.className$ create()
-				throws java.sql.SQLException
 			{
 			$table.className$ rec = new $table.className$();
 			rec.m_isNewRecord = true;
@@ -146,7 +144,6 @@ public class $table.className$_base extends GenOrmRecord
 			
 		//---------------------------------------------------------------------------
 		public $table.className$ createWithGeneratedKey()
-				throws java.sql.SQLException
 			{
 			$if(!table.generatedKey)$
 			throw new UnsupportedOperationException("$table.className$ does not support a generated primary key");
@@ -164,7 +161,6 @@ public class $table.className$_base extends GenOrmRecord
 			
 		//---------------------------------------------------------------------------
 		public $table.className$ find(Object keys)
-				throws java.sql.SQLException
 			{
 			$if(table.hasPrimaryKey)$
 			$if(table.multiplePrimaryKeys)$
@@ -181,30 +177,34 @@ public class $table.className$_base extends GenOrmRecord
 		$if(table.hasPrimaryKey)$
 		//---------------------------------------------------------------------------
 		public $table.className$ find($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
-				throws java.sql.SQLException
 			{
 			$table.className$ rec = null;
-			
-			//TODO: Look for the object on the current transaction first
-			java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(QUERY+KEY_WHERE);
-			$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
+			try
+				{
+				//TODO: Look for the object on the current transaction first
+				java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(QUERY+KEY_WHERE);
+				$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
 }$
-			if (DEBUG)
-				System.out.println(ps);
-				
-			java.sql.ResultSet rs = ps.executeQuery();
-			if (rs.next())
-				rec = new$table.className$(rs);
-				
-			rs.close();
-			ps.close();
+				if (DEBUG)
+					System.out.println(ps);
+					
+				java.sql.ResultSet rs = ps.executeQuery();
+				if (rs.next())
+					rec = new$table.className$(rs);
+					
+				rs.close();
+				ps.close();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
 				
 			return (rec);
 			}
 		
 		//---------------------------------------------------------------------------
 		public $table.className$ findOrCreate($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
-				throws java.sql.SQLException
 			{
 			$table.className$ rec = find($primaryKeys:{key | $key.parameterName$}; separator=", "$);
 			if (rec == null)
@@ -215,68 +215,143 @@ public class $table.className$_base extends GenOrmRecord
 			
 		$endif$
 		//---------------------------------------------------------------------------
-		public ArrayList<$table.className$> select(String where)
-				throws java.sql.SQLException
+		public ResultSet select(String where)
 			{
 			return (select(where, null));
 			}
 			
 		//---------------------------------------------------------------------------
-		public ArrayList<$table.className$> select(String where, String orderBy)
-				throws java.sql.SQLException
+		public ResultSet select(String where, String orderBy)
 			{
-			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
+			ResultSet rs = null;
 			
-			java.sql.Statement stmnt = GenOrmDataSource.createStatement();
-			StringBuilder sb = new StringBuilder();
-			sb.append(QUERY);
-			sb.append(WHERE);
-			sb.append(where);
-			if (orderBy != null)
+			try
 				{
-				sb.append(" ");
-				sb.append(orderBy);
+				java.sql.Statement stmnt = GenOrmDataSource.createStatement();
+				StringBuilder sb = new StringBuilder();
+				sb.append(QUERY);
+				sb.append(WHERE);
+				sb.append(where);
+				if (orderBy != null)
+					{
+					sb.append(" ");
+					sb.append(orderBy);
+					}
+				
+				String query = sb.toString();
+				rs = new ResultSet(stmnt.executeQuery(query), query);
+				stmnt.close();
 				}
-			
-			java.sql.ResultSet rs = stmnt.executeQuery(sb.toString());
-			while (rs.next())
+			catch (java.sql.SQLException sqle)
 				{
-				results.add(new$table.className$(rs));
+				throw new GenOrmException(sqle);
 				}
 				
-			rs.close();
-			stmnt.close();
-			return (results);
+			return (rs);
 			}
 		}
 		
 	//===========================================================================
-	//This does not allow for multiple database instances
-	//TODO: Change it.
-	/* private static int s_newClientId = 0;
-	
-	private static synchronized int getNewClientId()
-			throws java.sql.SQLException
+	public static class ResultSet 
+			implements GenOrmResultSet
 		{
-		if (s_newClientId == 0)
+		private java.sql.ResultSet m_resultSet;
+		private String m_query;
+		
+		//------------------------------------------------------------------------
+		protected ResultSet(java.sql.ResultSet resultSet, String query)
 			{
-			GenOrmConnection goc = new GenOrmConnection();
-			goc.begin(GenOrmDataSource.s_dataSource);
-			java.sql.Connection c = goc.getConnection();
-			java.sql.Statement stmnt = c.createStatement();
-			
-			java.sql.ResultSet rs = stmnt.executeQuery("select max(client_id) as max_id from client");
-			rs.first();
-			s_newClientId = rs.getInt(1);
-			
-			rs.close();
-			stmnt.close();
-			goc.commit();
-			goc.close();
+			m_resultSet = resultSet;
+			m_query = query;
+			}
+		
+		//------------------------------------------------------------------------
+		public void close()
+			{
+			try
+				{
+				m_resultSet.close();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
 			}
 			
-		return (++s_newClientId);
-		} */
+		//------------------------------------------------------------------------
+		public ArrayList<$table.className$> getArrayList(int maxRows)
+			{
+			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
+			int count = 0;
+			
+			try
+				{
+				while (m_resultSet.next() && (count < maxRows))
+					{
+					count ++;
+					results.add(factory.new$table.className$(m_resultSet));
+					}
+					
+				if (m_resultSet.next())
+					throw new GenOrmException("Bound of "+maxRows+" is too small for query ["+m_query+"]");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			return (results);
+			}
+			
+		//------------------------------------------------------------------------
+		public java.sql.ResultSet getResultSet()
+			{
+			return (m_resultSet);
+			}
+			
+		//------------------------------------------------------------------------
+		public $table.className$ getRecord()
+			{
+			return (factory.new$table.className$(m_resultSet));
+			}
+			
+		//------------------------------------------------------------------------
+		public $table.className$ getOnlyRecord()
+			{
+			$table.className$ ret = null;
+			
+			try
+				{
+				if (m_resultSet.next())
+					ret = factory.new$table.className$(m_resultSet);
+					
+				if (m_resultSet.next())
+					throw new GenOrmException("Multiple rows returned in call from $table.className$.getOnlyRecord");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			return (ret);
+			}
+			
+		//------------------------------------------------------------------------
+		public boolean hasNext()
+			{
+			boolean ret = false;
+			try
+				{
+				ret = m_resultSet.next();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+			
+			return (ret);
+			}
+		}
 		
 	//===========================================================================
 		
@@ -289,9 +364,15 @@ public class $table.className$_base extends GenOrmRecord
 	
 	//---------------------------------------------------------------------------
 	private void initialize(java.sql.ResultSet rs)
-			throws java.sql.SQLException
 		{
-		$columns:{col | m_$col.parameterName$.setValue(rs, $i$);$\n$}$
+		try
+			{
+			$columns:{col | m_$col.parameterName$.setValue(rs, $i$);$\n$}$
+			}
+		catch (java.sql.SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
 		}
 	
 	//---------------------------------------------------------------------------

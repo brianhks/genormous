@@ -1,6 +1,7 @@
 package $package$.genorm;
 
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 public class GenOrmInt extends GenOrmField
 	{
@@ -26,6 +27,12 @@ public class GenOrmInt extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getInt(pos);
+		}
+		
+	public void placeValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
+		{
+		ps.setInt(pos, m_value);
 		}
 		
 	public String getSQLValue()

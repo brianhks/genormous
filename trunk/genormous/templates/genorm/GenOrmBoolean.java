@@ -2,6 +2,7 @@ package $package$.genorm;
 
 import java.sql.ResultSet;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 
 public class GenOrmBoolean extends GenOrmField
 	{
@@ -27,6 +28,12 @@ public class GenOrmBoolean extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getBoolean(pos);
+		}
+		
+	public void placeValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
+		{
+		ps.setBoolean(pos, m_value);
 		}
 		
 	public String getSQLValue()

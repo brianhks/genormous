@@ -1,6 +1,7 @@
 package $package$.genorm;
 
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 public abstract class GenOrmField
 	{
@@ -14,6 +15,7 @@ public abstract class GenOrmField
 	public GenOrmFieldMeta getFieldMeta() { return (m_fieldMeta); }
 	
 	public abstract void setValue(ResultSet rs, int pos) throws java.sql.SQLException;
-	public abstract String getSQLValue();
+	public abstract void placeValue(PreparedStatement ps, int pos) throws java.sql.SQLException;
+	//public abstract String getSQLValue();
 	public abstract String toString();
 	}

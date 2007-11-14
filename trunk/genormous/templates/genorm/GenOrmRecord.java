@@ -16,11 +16,14 @@ public abstract class GenOrmRecord
 	protected String                   m_tableName;     //Name of the table
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
 	
+	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
+	
 	public GenOrmRecord(String tableName)
 		{
 		m_tableName = tableName;
 		m_fields = new ArrayList<GenOrmField>();
 		m_isNewRecord = false;
+		m_queryFields = new ArrayList<GenOrmField>();
 		}
 		
 	public Iterator<GenOrmField> getFieldIterator()
@@ -46,6 +49,7 @@ public abstract class GenOrmRecord
 	private String createInsertStatement()
 		{
 		StringBuilder sb = new StringBuilder();
+		m_queryFields.clear();
 		
 		sb.append("INSERT INTO ");
 		sb.append(m_tableName);
@@ -58,8 +62,10 @@ public abstract class GenOrmRecord
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
+			if (!meta.isForeignKey())
+			//if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
 				{
+				m_dirtyFlags ^= meta.getDirtyFlag(); //Clear dirty flag on key
 				if (!first)
 					{
 					sb.append(",");
@@ -68,7 +74,8 @@ public abstract class GenOrmRecord
 					
 				first = false;
 				sb.append(meta.getFieldName());
-				valuesSB.append(gof.getSQLValue());
+				m_queryFields.add(gof);
+				valuesSB.append("?");
 				}
 			}
 			
@@ -99,7 +106,8 @@ public abstract class GenOrmRecord
 				first = false;
 				sb.append(meta.getFieldName());
 				sb.append(" = ");
-				sb.append(gof.getSQLValue());
+				sb.append("?");
+				m_queryFields.add(gof);
 				}
 			}
 		}
@@ -108,6 +116,7 @@ public abstract class GenOrmRecord
 	private String createUpdateStatement()
 		{
 		StringBuilder sb = new StringBuilder();
+		m_queryFields.clear();
 		
 		sb.append("UPDATE ");
 		sb.append(m_tableName);
@@ -118,7 +127,7 @@ public abstract class GenOrmRecord
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
+			if ((!meta.isPrimaryKey()) && (m_dirtyFlags & meta.getDirtyFlag()) != 0)
 				{
 				if (!first)
 					sb.append(", ");
@@ -128,7 +137,8 @@ public abstract class GenOrmRecord
 				first = false;
 				sb.append(meta.getFieldName());
 				sb.append(" = ");
-				sb.append(gof.getSQLValue());
+				sb.append("?");
+				m_queryFields.add(gof);
 				}
 			}
 			
@@ -141,6 +151,7 @@ public abstract class GenOrmRecord
 	private String createDeleteStatement()
 		{
 		StringBuilder sb = new StringBuilder();
+		m_queryFields.clear();
 		
 		sb.append("DELETE FROM ");
 		sb.append(m_tableName);
@@ -154,12 +165,28 @@ public abstract class GenOrmRecord
 	private void runStatement(String statement)
 			throws SQLException
 		{
-		Statement stmt = GenOrmDataSource.createStatement();
 		if (DEBUG)
 			System.out.println("SQL Querry: "+statement);
 			
-		stmt.execute(statement);
+		PreparedStatement stmt = GenOrmDataSource.prepareStatement(statement);
+		
+		for (int I = 0; I < m_queryFields.size(); I++)
+			m_queryFields.get(I).placeValue(stmt, I+1);
+			
+		stmt.execute();
 		stmt.close();
+		}
+		
+	//---------------------------------------------------------------------------
+	public void createIfNew()
+			throws SQLException
+		{
+		if ((m_isNewRecord) && (!m_isDeleted))
+			{
+			setCTS();
+			setMTS();
+			runStatement(createInsertStatement());
+			}
 		}
 		
 	//---------------------------------------------------------------------------
@@ -182,15 +209,7 @@ public abstract class GenOrmRecord
 			//System.out.println("it is dirty");
 			setMTS();
 			
-			if (m_isNewRecord)
-				{
-				setCTS();
-				runStatement(createInsertStatement());
-				}
-			else
-				{
-				runStatement(createUpdateStatement());
-				}
+			runStatement(createUpdateStatement());
 			}
 		}
 		
@@ -198,6 +217,7 @@ public abstract class GenOrmRecord
 	public void flush()
 			throws SQLException
 		{
+		createIfNew();
 		commitChanges();
 		m_dirtyFlags = 0;
 		m_isNewRecord = false;

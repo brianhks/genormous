@@ -2,6 +2,7 @@ package $package$.genorm;
 
 import java.sql.ResultSet;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 
 public class GenOrmBigDecimal extends GenOrmField
 	{
@@ -27,6 +28,12 @@ public class GenOrmBigDecimal extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getBigDecimal(pos);
+		}
+		
+	public void placeValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
+		{
+		ps.setBigDecimal(pos, m_value);
 		}
 		
 	public String getSQLValue()

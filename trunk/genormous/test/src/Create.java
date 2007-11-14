@@ -105,7 +105,7 @@ public class Create
 		
 		GenOrmDataSource.begin();
 		
-		ArrayList<Segment> list = Segment.factory.select("source = 'Segment5'");
+		ArrayList<Segment> list = Segment.factory.select("source = 'Segment5'").getArrayList(10);
 		
 		assertEquals(1, list.size());
 		assertEquals(key, seg.getSegmentId());
@@ -141,6 +141,23 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
+	@Test(hardDependencyOn = { "Database.createDatabase" })
+	public void circularDependencyTest()
+			throws Exception
+		{
+		GenOrmDataSource.begin();
+		
+		Segment seg1 = Segment.factory.createWithGeneratedKey();
+		Segment seg2 = Segment.factory.createWithGeneratedKey();
+		
+		seg1.setNextSegmentRef(seg2);
+		seg2.setPrevSegmentRef(seg1);
+		
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
+		}
+		
 	//---------------------------------------------------------------------------
 	//---------------------------------------------------------------------------
 	}

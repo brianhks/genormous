@@ -1,6 +1,6 @@
 package $package$.genorm;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.sql.SQLException;
 
 public interface GenOrmRecordFactory
@@ -9,7 +9,7 @@ public interface GenOrmRecordFactory
 	public GenOrmRecord find(Object keys) throws SQLException;
 	public GenOrmRecord create() throws SQLException;
 	public GenOrmRecord createWithGeneratedKey() throws SQLException;
-	public Collection<? extends GenOrmRecord> select(String where) throws SQLException;
-	public Collection<? extends GenOrmRecord> select(String where, String orderBy) throws SQLException;
+	public GenOrmResultSet select(String where) throws SQLException;
+	public GenOrmResultSet select(String where, String orderBy) throws SQLException;
 	}
 	
