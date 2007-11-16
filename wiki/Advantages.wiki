@@ -29,7 +29,7 @@ From this GenORMous creates an object that represents this query.  The SQL is un
 
 In an ideal world the database would be designed perfect the first time and never need to be changes.  Unfortunately requirements change along with customer needs that require changes to the database.  
 
-Why is database changes so bad?  Database changes break code.  Even worse it breaks code in a way that is only runtime detectable.  The testing required to find such breakages are costly to any organization.  The reason these breakages are so insidious is because of SQL strings in the code.  Because all access to the database is done via strings of SQL queries embedded in the code the compiler cannot detect them automatically.  They only fail during runtime when the query string is sent to the database and fails.
+Why are database changes so bad?  Database changes break code.  Even worse it breaks code in a way that is only runtime detectable.  The testing required to find such breakages are costly to any organization.  The reason these breakages are so insidious is because of SQL strings in the code.  Because all access to the database is done via strings of SQL queries embedded in the code the compiler cannot detect them automatically.  They only fail during runtime when the query string is sent to the database and fails.
 
 == How does GenORMous fix this problem? ==
 
