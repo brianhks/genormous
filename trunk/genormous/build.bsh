@@ -128,6 +128,8 @@ depTest = new DepUnitTest("test", testClassFiles, classpath);
 depTest.setReportFile("build/report.xml");
 depTest.setXMLInputFile("test/test.xml");
 
+make.createExplicitDependency("test", "compile_gen");
+
 
 make.setDefaultTarget(targetjar);
 

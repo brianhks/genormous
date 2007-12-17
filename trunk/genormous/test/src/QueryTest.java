@@ -11,10 +11,14 @@ public class QueryTest
 	
 	private Database m_database;
 	
-	public QueryTest(RunContext context)
+	public QueryTest()
 		{
-		//Get the Database object off of the context.
-		m_database = (Database)context.getParam("Database");
+		}
+		
+	//This gets set from the context
+	public void setDatabase(Database db)
+		{
+		m_database = db;
 		}
 		
 	//Set methods for each query

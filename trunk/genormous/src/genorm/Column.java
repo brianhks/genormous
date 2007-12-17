@@ -17,6 +17,7 @@ public class Column
 	private String m_default;
 	private boolean m_allowNull;
 	private Format m_formatter;
+	private boolean m_unique;
 	
 	
 	public Column(String name, String type, String customType, Format format)
@@ -32,8 +33,17 @@ public class Column
 		m_dirtyFlag = 0;
 		m_default = "";
 		m_allowNull = true;
+		m_unique = false;
 		}
 		
+	@Override
+	public boolean equals(Object obj)
+		{
+		if (obj instanceof Column)
+			return (((Column)obj).m_name.equals(m_name));
+		else
+			return (false);
+		}
 		
 	public String getDefault() { return (m_default); }
 	public String getName() { return (m_name); }
@@ -46,6 +56,7 @@ public class Column
 	public boolean isPrimaryKey() { return (m_primaryKey); }
 	public boolean isForeignKey() { return (m_foreignKey); }
 	public boolean isKey() { return (m_primaryKey || m_foreignKey); }
+	public boolean isUnique() { return (m_unique); }
 	public Table getForeignTable() { return (m_foreignTable); }
 	public String getForeignTableName() { return (m_foreignTableName); }
 	public String getForeignTableColumnName() { return (m_foreignTableColumnName); }
@@ -64,4 +75,5 @@ public class Column
 	public void setForeignTableColumnName(String column) { m_foreignTableColumnName = column; }
 	public void setComment(String comment) { m_comment = comment; }
 	public void setDirtyFlag(int flag) { m_dirtyFlag = flag; }
+	public void setUnique() { m_unique = true; }
 	}

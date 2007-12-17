@@ -16,6 +16,7 @@ public class Genormous extends TemplateHelper
 	public static final String COMMENT = "comment";
 	public static final String TYPE = "type";
 	public static final String PRIMARY_KEY = "primary_key";
+	public static final String UNIQUE = "unique";
 	public static final String COL = "col";
 	public static final String TABLE = "table";
 	public static final String COLUMN = "column";
@@ -24,6 +25,7 @@ public class Genormous extends TemplateHelper
 	public static final String PROPERTY = "property";
 	public static final String KEY = "key";
 	public static final String VALUE = "value";
+	public static final String QUERY = "query";
 	
 	private String m_source;
 	//private String m_destDir;
@@ -180,6 +182,9 @@ public class Genormous extends TemplateHelper
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					
+					if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
+						col.setUnique();
+					
 					if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
 						col.setPrimaryKey();
 						
@@ -195,6 +200,13 @@ public class Genormous extends TemplateHelper
 					col.setComment(cole.elementText(COMMENT));
 					
 					table.addColumn(col);
+					}
+					
+				Iterator queries = e.elementIterator(QUERY);
+				while (queries.hasNext())
+					{
+					Query q = new Query((Element)queries.next(), m_formatter, m_typeMap);
+					table.addQuery(q);
 					}
 					
 				tableNames.put(tableName, table);
@@ -238,6 +250,7 @@ public class Genormous extends TemplateHelper
 				attributes.put("columns", columns);
 				attributes.put("primaryKeys", t.getPrimaryKeys());
 				attributes.put("foreignKeys", t.getForeignKeys());
+				attributes.put("uniqueColumns", t.getUniqueColumnSets());
 				attributes.putAll(t.getProperties());
 				
 				/* replaceMap.put("TableName", t.getName());
@@ -261,7 +274,18 @@ public class Genormous extends TemplateHelper
 				derivedTemplate.setAttributes(attributes);
 				
 				m_generatedFileCount ++;
-				fw = new FileWriter(m_destDir+"/"+className+".java");
+				File derivedFile = new File(m_destDir+"/"+className+".java");
+				if (derivedFile.exists())
+					{
+					BufferedReader derivedbr = new BufferedReader(new FileReader(derivedFile));
+					String firstLine = derivedbr.readLine();
+					if (!firstLine.contains("NOPRESERVE"))
+						derivedFile = new File(m_destDir+"/"+className+".java.dif");
+						
+					derivedbr.close();
+					}
+					
+				fw = new FileWriter(derivedFile);
 				fw.write(derivedTemplate.toString());
 				fw.close();
 				}
@@ -361,6 +385,7 @@ public class Genormous extends TemplateHelper
 			writeTemplate("GenOrmResultSet.java", attributes);
 			writeTemplate("GenOrmQueryResultSet.java", attributes);
 			writeTemplate("GenOrmQueryRecord.java", attributes);
+			writeTemplate("GenOrmUnitTest.java", attributes);
 			
 			if (m_graphVizFile != null)
 				writeTemplate(m_graphVizFile, "templates/tables.dot", attributes);

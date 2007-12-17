@@ -16,6 +16,19 @@ public class Create
 	//---------------------------------------------------------------------------
 	@Test(
 		hardDependencyOn = { "Database.createDatabase" })
+	public void ormUnitTests()
+		{
+		GenOrmDataSource.begin();
+		
+		GenOrmUnitTest.performUnitTests();
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
+		}
+		
+	//---------------------------------------------------------------------------
+	@Test(
+		hardDependencyOn = { "Database.createDatabase" })
 	public void createTest()
 			throws Exception
 		{
@@ -159,5 +172,25 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
+	/**
+		This test is for updating a table where the primary key is also a foriegn key
+	*/
+	@Test(hardDependencyOn = { "Database.createDatabase" })
+	public void foreignPrimaryKeyTest()
+			throws Exception
+		{
+		GenOrmDataSource.begin();
+		
+		Segment seg = Segment.factory.createWithGeneratedKey();
+		Language lang = Language.factory.createWithGeneratedKey();
+		lang.setLanguageCode("en");
+		lang.setCountryCode("US");
+		
+		//Target target = Target.factory.create(1, seg.getSegmentId(), lang.getLanguageId());
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
+		}
+		
 	//---------------------------------------------------------------------------
 	}
