@@ -1,5 +1,5 @@
 <!ELEMENT tables (table+)>
-<!ELEMENT table (comment?,property*,col+)>
+<!ELEMENT table (comment?,property*,col+,query*)>
 <!ATTLIST table
 	name CDATA #REQUIRED
 	>
@@ -27,3 +27,22 @@
 	column CDATA #REQUIRED
 	id CDATA #IMPLIED
 	>
+	
+<!ELEMENT query (input?,replace?,sql)>
+<!ATTLIST query
+	name CDATA #REQUIRED
+	return_type (single|multi) #REQUIRED
+	>
+	
+<!ELEMENT input (param*)>
+
+<!ELEMENT replace (param*)>
+
+<!ELEMENT param (EMPTY)>
+<!ATTLIST param
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	test CDATA #REQUIRED
+	>
+	
+<!ELEMENT sql (#PCDATA)>

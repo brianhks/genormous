@@ -9,12 +9,13 @@ public class Query
 	//XML elements and attribute names
 	public static final String NAME = "name";
 	public static final String QUERY = "query";
-	public static final String TYPE = "type";
-	public static final String TAG = "tag";
 	public static final String INPUT = "input";
 	public static final String REPLACE = "replace";
 	public static final String RETURN = "return";
 	public static final String PARAM = "param";
+	public static final String RESULT_TYPE = "result_type";
+	public static final String RESULT_SINGLE = "single";
+	public static final String RESULT_MULTI = "multi";
 	
 	
 	private Format m_formatter;
@@ -23,11 +24,27 @@ public class Query
 	private ArrayList<Parameter> m_replacements;
 	private ArrayList<Parameter> m_outputs;
 	private String m_sqlQuery;
+	private boolean m_resultTypeSingle;
+	private Properties m_typeMap;
 	
 	public Query(Element queryRoot, Format formatter)
 		{
+		this(queryRoot, formatter, null);
+		}
+	
+	public Query(Element queryRoot, Format formatter, Properties typeMap)
+		{
+		m_typeMap = typeMap;
 		m_formatter = formatter;
 		m_queryName = queryRoot.attributeValue(NAME);
+		String resultType = queryRoot.attributeValue(RESULT_TYPE);
+		if ((resultType != null) && (!resultType.equals(RESULT_SINGLE)) &&
+				(!resultType.equals(RESULT_MULTI)))
+			{
+			System.out.println("result_type value \""+resultType+"\" must be \"single\" or \"multi\"");
+			}
+			
+		m_resultTypeSingle = RESULT_SINGLE.equals(resultType);
 		
 		m_inputs = getParameters(queryRoot.element(INPUT));
 		m_replacements = getParameters(queryRoot.element(REPLACE));
@@ -92,10 +109,14 @@ public class Query
 			while (it.hasNext())
 				{
 				Element p = (Element)it.next();
+				params.add(new Parameter(p, m_formatter, m_typeMap));
+				/* String type = p.attributeValue(TYPE);
+				if (m_typeMap != null)
+					type = (String)m_typeMap.get(type);
 				if (p.attribute(TAG) != null)
-					params.add(new Parameter(p.attributeValue(NAME), p.attributeValue(TYPE), p.attributeValue(TAG), m_formatter));
+					params.add(new Parameter(p.attributeValue(NAME), type, p.attributeValue(TAG), m_formatter));
 				else
-					params.add(new Parameter(p.attributeValue(NAME), p.attributeValue(TYPE), m_formatter));
+					params.add(new Parameter(p.attributeValue(NAME), type, m_formatter)); */
 				}
 			}
 			
@@ -109,6 +130,8 @@ public class Query
 	public int getOutputsCount() { return (m_outputs.size()); }
 	public boolean isReplaceQuery() { return (m_replacements.size() > 0); }
 	public String getSqlQuery() { return (m_sqlQuery.replaceAll("\\n+", "\\\\n")); }
+	
+	public boolean isSingleResult() { return (m_resultTypeSingle); }
 	
 	public boolean isParamQuery()
 		{

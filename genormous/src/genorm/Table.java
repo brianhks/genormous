@@ -16,6 +16,8 @@ public class Table
 	private ArrayList<ForeignKeySet> m_foreignKeys;
 	private Format m_formatter;
 	private String m_createSQL;
+	private ArrayList<Query> m_queries;
+	private ArrayList<Set<Column>> m_uniqueColumns;
 	
 	public Table(String tableName, Format format)
 		{
@@ -31,6 +33,18 @@ public class Table
 		m_properties = new HashMap<String, String>();
 		m_foreignKeys = new ArrayList<ForeignKeySet>();
 		m_createSQL = "";
+		m_queries = new ArrayList<Query>();
+		m_uniqueColumns = new ArrayList<Set<Column>>();
+		}
+		
+	public void addQuery(Query q)
+		{
+		m_queries.add(q);
+		}
+		
+	public ArrayList<Query> getQueries()
+		{
+		return (m_queries);
 		}
 		
 	public String getName()
@@ -84,6 +98,16 @@ public class Table
 		return (m_primaryKeyCount);
 		}
 		
+	public boolean getHasUniqueColumns()
+		{
+		return (m_uniqueColumns.size() != 0);
+		}
+		
+	public ArrayList<Set<Column>> getUniqueColumnSets()
+		{
+		return (m_uniqueColumns);
+		}
+		
 	public void addColumn(Column col)
 		{
 		m_columns.add(col);
@@ -118,6 +142,13 @@ public class Table
 				}
 				
 			addForeignTable(col.getForeignTableName());
+			}
+			
+		if (col.isUnique())
+			{
+			Set<Column> uniqueSet = new HashSet<Column>();
+			uniqueSet.add(col);
+			m_uniqueColumns.add(uniqueSet); 
 			}
 		}
 		

@@ -62,7 +62,9 @@ public abstract class GenOrmRecord
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if (!meta.isForeignKey())
+			if (meta.isPrimaryKey() || (!meta.isForeignKey() && 
+					((m_dirtyFlags & meta.getDirtyFlag()) != 0)))
+			//if (!meta.isForeignKey())
 			//if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
 				{
 				m_dirtyFlags ^= meta.getDirtyFlag(); //Clear dirty flag on key
@@ -99,7 +101,7 @@ public abstract class GenOrmRecord
 			if (meta.isPrimaryKey())
 				{
 				if (!first)
-					sb.append(", ");
+					sb.append(" AND ");
 				else
 					sb.append(" ");
 					
@@ -171,7 +173,15 @@ public abstract class GenOrmRecord
 		PreparedStatement stmt = GenOrmDataSource.prepareStatement(statement);
 		
 		for (int I = 0; I < m_queryFields.size(); I++)
+			{
+			if (DEBUG)
+				{
+				GenOrmField field = m_queryFields.get(I);
+				System.out.println(field.getFieldMeta().getFieldName()+" : "+field.toString());
+				}
+				
 			m_queryFields.get(I).placeValue(stmt, I+1);
+			}
 			
 		stmt.execute();
 		stmt.close();

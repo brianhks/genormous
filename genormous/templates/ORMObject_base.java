@@ -6,6 +6,11 @@ protected $col.type$ get$col.methodName$_base() { return (m_$col.parameterName$.
 protected void set$col.methodName$_base($col.type$ data)
 	{
 	m_$col.parameterName$.setValue(data);
+	
+	//Add the now dirty record to the transaction only if it is not previously dirty
+	if (m_dirtyFlags == 0)
+		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+		
 	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
 	}
 
@@ -24,13 +29,57 @@ protected $foreignKeys.table.className$ get$foreignKeys.methodName$_base()
 	return ($foreignKeys.table.className$.factory.find($foreignKeys.keys:{key | m_$key.parameterName$.getValue()}; separator=", "$));
 	}
 	
+//--------------------------------------------------------------------------
 protected void set$foreignKeys.methodName$_base($foreignKeys.table.className$ table)
 	{
-	$foreignKeys.keys:{key | m_$key.parameterName$.setValue(table.get$key.foreignTableColumnMethodName$());m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
+	//Add the now dirty record to the transaction only if it is not previously dirty
+	if ((!m_isNewRecord) && (m_dirtyFlags == 0))
+		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+		
+	$foreignKeys.keys:{key | m_$key.parameterName$.setValue(table.get$key.foreignTableColumnMethodName$());
+m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
 }; separator="\n"$
 	
 	}
 
+
+>>
+
+addQueryMethods(query) ::= <<
+//---------------------------------------------------------------------------
+public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+	{
+	String query = SELECT+"$query.sqlQuery$";
+	$if(query.replaceQuery)$
+	HashMap<String, String> replaceMap = new HashMap<String, String>();
+	$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
+	query = replaceText(query, replaceMap);
+	$endif$
+	
+	try
+		{
+		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
+		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+		
+		if (DEBUG)
+			System.out.println(statement);
+		
+		ResultSet rs = new ResultSet(statement.executeQuery(), query);
+		statement.close();
+		
+		$if(query.singleResult)$
+		return (rs.getOnlyRecord());
+		$else$
+		return (rs);
+		$endif$
+		}
+	catch (java.sql.SQLException sqle)
+		{
+		if (DEBUG)
+			sqle.printStackTrace();
+		throw new GenOrmException(sqle);
+		}
+	}
 
 >>
 
@@ -44,7 +93,8 @@ public class $table.className$_base extends GenOrmRecord
 	{
 	//Change this value to true to turn on warning messages
 	private static final boolean WARNINGS = false;
-	private static final String QUERY = "SELECT $columns:{col | $col.name$}; separator=", "$ FROM $table.name$ ";
+	private static final String SELECT = "SELECT $columns:{col | this.$col.name$}; separator=", "$ ";
+	private static final String FROM = "FROM $table.name$ this ";
 	private static final String WHERE = "WHERE ";
 	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $key.name$ = ?}; separator=" AND "$";
 	
@@ -109,7 +159,6 @@ public class $table.className$_base extends GenOrmRecord
 			{
 			$table.className$ rec = new $table.className$();
 			(($table.className$_base)rec).initialize(rs);
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
 			return (rec);
 			}
 	
@@ -128,7 +177,7 @@ public class $table.className$_base extends GenOrmRecord
 }$
 			rec.m_isNewRecord = true;
 			
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
+			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
 			return (rec);
 			}
 		$endif$
@@ -138,7 +187,7 @@ public class $table.className$_base extends GenOrmRecord
 			$table.className$ rec = new $table.className$();
 			rec.m_isNewRecord = true;
 			
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
+			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
 			return (rec);
 			}
 			
@@ -154,7 +203,7 @@ public class $table.className$_base extends GenOrmRecord
 			rec.set$table.primaryKey.methodName$_base(
 					($table.primaryKey.type$)GenOrmDataSource.getKeyGenerator("$table.name$").generateKey());
 			
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
+			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
 			return (rec);
 			$endif$
 			}
@@ -182,7 +231,7 @@ public class $table.className$_base extends GenOrmRecord
 			try
 				{
 				//TODO: Look for the object on the current transaction first
-				java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(QUERY+KEY_WHERE);
+				java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
 				$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
 }$
 				if (DEBUG)
@@ -229,7 +278,8 @@ public class $table.className$_base extends GenOrmRecord
 				{
 				java.sql.Statement stmnt = GenOrmDataSource.createStatement();
 				StringBuilder sb = new StringBuilder();
-				sb.append(QUERY);
+				sb.append(SELECT);
+				sb.append(FROM);
 				sb.append(WHERE);
 				sb.append(where);
 				if (orderBy != null)
@@ -248,6 +298,17 @@ public class $table.className$_base extends GenOrmRecord
 				}
 				
 			return (rs);
+			}
+			
+		$table.queries:addQueryMethods()$
+		
+		//---------------------------------------------------------------------------
+		public void testQueryMethods()
+			{
+			ResultSet rs;
+			$table.queries:{ query | $if(!query.singleResult)$rs = $endif$get$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
+$if(!query.singleResult)$rs.close();$endif$
+}$
 			}
 		}
 		

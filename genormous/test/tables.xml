@@ -27,20 +27,18 @@
 		<col name="mergeable" type="boolean">
 			<comment>Identifies this segment as being mergeable</comment>
 		</col>
+		<query name="next_segment_on_source" result_type="single">
+			<input>
+				<param name="source" type="string" test="test value"/>
+			</input>
+			<sql>
+				from segment this, segment prev
+				where this.prev_segment = prev.segment_id and
+				prev.source = ?
+			</sql>
+		</query>
 	</table>
 	
-	<table name="translation">
-		<comment></comment>
-		<property key="hsqldb_tableType" value="CACHED"/>
-		<col name="segment" type="integer" primary_key="true">
-			<comment></comment>
-			<reference table="segment" column="segment_id"/>
-		</col>
-		<col name="language" type="integer" primary_key="true">
-			<comment></comment>
-			<reference table="language" column="language_id"/>
-		</col>
-	</table>
 	
 	<table name="note">
 		<comment></comment>
@@ -50,11 +48,11 @@
 		</col>
 		<col name="translation" type="integer" primary_key="false">
 			<comment></comment>
-			<reference table="translation" column="segment"/>
+			<reference table="segment" column="segment_id"/>
 		</col>
 		<col name="language" type="integer" primary_key="false">
 			<comment></comment>
-			<reference table="translation" column="language"/>
+			<reference table="language" column="language_id"/>
 		</col>
 		<col name="phase" type="integer" primary_key="false">
 			<comment></comment>
@@ -72,11 +70,11 @@
 		</col>
 		<col name="segment" type="integer" primary_key="true">
 			<comment></comment>
-			<reference table="translation" column="segment"/>
+			<reference table="segment" column="segment_id"/>
 		</col>
 		<col name="language" type="integer" primary_key="true">
 			<comment></comment>
-			<reference table="translation" column="language"/>
+			<reference table="language" column="language_id"/>
 		</col>
 		<col name="flags" type="string" primary_key="false">
 			<comment></comment>
@@ -94,15 +92,25 @@
 		</col>
 		<col name="language_code" type="string" primary_key="false">
 			<comment></comment>
-			<reference table="language_code" column="language_code"/>
+			<!-- <reference table="language_code" column="language_code"/> -->
 		</col>
 		<col name="country_code" type="string" primary_key="false">
 			<comment></comment>
-			<reference table="language_code" column="country_code"/>
+			<!-- <reference table="language_code" column="country_code"/> -->
 		</col>
 	</table>
 	
-	<table name="language_code">
+	<table name="unique_sentence">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="sentence_id" type="integer" primary_key="true"/>
+		<col name="sentence" type="string" unique="true">
+			<comment></comment>
+		</col>
+		
+	</table>
+	
+	<!-- <table name="language_code">
 		<property key="hsqldb_tableType" value="CACHED"/>
 		<col name="language_code" type="string" primary_key="true">
 			<comment></comment>
@@ -110,5 +118,5 @@
 		<col name="country_code" type="string" primary_key="true">
 			<comment></comment>
 		</col>
-	</table>
+	</table> -->
 </tables>
