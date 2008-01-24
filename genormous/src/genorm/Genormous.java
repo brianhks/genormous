@@ -26,6 +26,8 @@ public class Genormous extends TemplateHelper
 	public static final String KEY = "key";
 	public static final String VALUE = "value";
 	public static final String QUERY = "query";
+	public static final String DEFAULT_VALUE = "default_value";
+	public static final String ALLOW_NULL = "allow_null";
 	
 	private String m_source;
 	//private String m_destDir;
@@ -181,6 +183,12 @@ public class Genormous extends TemplateHelper
 					Column col = new Column(colName, (String)m_typeMap.get(type), type, m_formatter);
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
+					
+					if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
+						col.setAllowNull(false);
+						
+					if (cole.attribute(DEFAULT_VALUE) != null)
+						col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
 					
 					if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
 						col.setUnique();
