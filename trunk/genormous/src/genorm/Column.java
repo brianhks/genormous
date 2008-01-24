@@ -15,6 +15,7 @@ public class Column
 	private String m_comment;
 	private int m_dirtyFlag;
 	private String m_default;
+	private boolean m_isDefaultSet;
 	private boolean m_allowNull;
 	private Format m_formatter;
 	private boolean m_unique;
@@ -32,6 +33,7 @@ public class Column
 		m_comment = "";
 		m_dirtyFlag = 0;
 		m_default = "";
+		m_isDefaultSet = false;
 		m_allowNull = true;
 		m_unique = false;
 		}
@@ -45,6 +47,13 @@ public class Column
 			return (false);
 		}
 		
+	public boolean isDefaultSet() { return (m_isDefaultSet); }
+	public void setDefault(String def) 
+		{
+		m_isDefaultSet = true;
+		m_default = def; 
+		}
+	
 	public String getDefault() { return (m_default); }
 	public String getName() { return (m_name); }
 	public String getNameCaps() { return (m_formatter.formatStaticName(m_name)); }
@@ -63,6 +72,7 @@ public class Column
 	public String getForeignTableColumnMethodName() { return (m_formatter.formatMethodName(m_foreignTableColumnName)); }
 	public String getComment() { return (m_comment); }
 	public boolean getAllowNull() { return (m_allowNull); }
+	public void setAllowNull(boolean allowNull) { m_allowNull = allowNull; }
 	
 	public void setPrimaryKey() 
 		{ 

@@ -24,7 +24,7 @@
 			<comment></comment>
 			<reference table="segment" column="segment_id"/>
 		</col>
-		<col name="mergeable" type="boolean">
+		<col name="mergeable" type="boolean" default_value="false" allow_null="false">
 			<comment>Identifies this segment as being mergeable</comment>
 		</col>
 		<query name="next_segment_on_source" result_type="single">

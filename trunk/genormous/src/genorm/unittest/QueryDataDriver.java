@@ -7,7 +7,7 @@ import java.util.*;
 import java.io.*;
 import genorm.TextReplace;
 
-public class QueryDataDriver implements DataDriver
+public class QueryDataDriver extends DataDriver
 	{
 	private static final String QUERY_NAME = "QueryName";
 	private static final String QUERY = "Query";
