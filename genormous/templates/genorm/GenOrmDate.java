@@ -41,6 +41,16 @@ public class GenOrmDate extends GenOrmField
 		return (String.valueOf(m_value));
 		}
 		
+	public int hashCode()
+		{
+		return (m_value.hashCode());
+		}
+		
+	public boolean equals(Object obj)
+		{
+		return (m_value.equals(obj));
+		}
+		
 	public String toString()
 		{
 		return (String.valueOf(m_value));

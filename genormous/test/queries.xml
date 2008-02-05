@@ -26,19 +26,18 @@
 	</query>
 	
 	<!-- query with no input -->
-	<!-- <query name="language_list">
+	<query name="language_list">
 		<input></input>
 		<return>
 			<param name="language_id" type="int"/>
 			<param name="code" type="String"/>
-			<param name="description" type="String"/>
 		</return>
 		<sql>
-			select language_id, language_code as code, description from language
+			select language_id, language_code as code from language
 		</sql>
 	</query>
 	
-	<query name="figure_it_out">
+	<!-- <query name="figure_it_out">
 		<input></input>
 		<return>
 			<param name="id" type="int"/>
@@ -50,5 +49,18 @@
 			where client_id = ?
 		</sql>
 	</query> -->
+	
+	<!-- Query with no return types (an update) -->
+	<query name="delete_data">
+		<input>
+			<param name="language_code" type="String" test="en"/>
+		</input>
+		<return>
+		</return>
+		<sql>
+			delete from language
+			where language_code = ?
+		</sql>
+	</query>
 	
 </queries>

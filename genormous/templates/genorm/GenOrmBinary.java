@@ -3,6 +3,7 @@ package $package$.genorm;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.Date;
+import java.util.Arrays;
 
 public class GenOrmBinary extends GenOrmField
 	{
@@ -39,6 +40,19 @@ public class GenOrmBinary extends GenOrmField
 	public String getSQLValue()
 		{
 		return ("");
+		}
+		
+	public int hashCode()
+		{
+		return (Arrays.hashCode(m_value));
+		}
+		
+	public boolean equals(Object obj)
+		{
+		if (obj instanceof byte[])
+			return (Arrays.equals(m_value, (byte[])obj));
+		else
+			return (false);
 		}
 		
 	public String toString()

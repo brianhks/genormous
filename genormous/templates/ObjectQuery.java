@@ -45,10 +45,37 @@ public class $query.className$Query extends SQLQuery
 		{
 		m_serializable = serializable;
 		}
-		
+
+$if(query.update)$
+	public int runUpdate($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+		{
+		try
+			{
+			String query = QUERY;
+			$if(query.replaceQuery)$
+			HashMap<String, String> replaceMap = new HashMap<String, String>();
+			$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
+			query = replaceText(query, replaceMap);
+			$endif$
+			
+			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
+			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+			
+			int ret = statement.executeUpdate();
+			
+			statement.close();
+			return (ret);
+			}
+		catch (java.sql.SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
+		}
+$else$
+
 	//---------------------------------------------------------------------------
 	public void serializeQuery(ContentHandler ch, String tagName$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
-			throws java.sql.SQLException, org.xml.sax.SAXException
+			throws org.xml.sax.SAXException
 		{
 		boolean prevSerializeState = m_serializable;
 		m_serializable = true;
@@ -66,24 +93,30 @@ public class $query.className$Query extends SQLQuery
 	
 	//---------------------------------------------------------------------------
 	public ResultSet runQuery($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
-			throws java.sql.SQLException
 		{
-		String query = QUERY;
-		$if(query.replaceQuery)$
-		HashMap<String, String> replaceMap = new HashMap<String, String>();
-		$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
-		query = replaceText(query, replaceMap);
-		$endif$
-		
-		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
-		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
-		
-		java.sql.ResultSet resultSet = statement.executeQuery();
-		
-		ResultSet ret = new ResultSet(resultSet, query);
-		
-		statement.close();
-		return (ret);
+		try
+			{
+			String query = QUERY;
+			$if(query.replaceQuery)$
+			HashMap<String, String> replaceMap = new HashMap<String, String>();
+			$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
+			query = replaceText(query, replaceMap);
+			$endif$
+			
+			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
+			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+			
+			java.sql.ResultSet resultSet = statement.executeQuery();
+			
+			ResultSet ret = new ResultSet(resultSet, query);
+			
+			statement.close();
+			return (ret);
+			}
+		catch (java.sql.SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
 		}
 		
 	//===========================================================================
@@ -326,5 +359,8 @@ sb.append("\"");
 			}
 			
 		}
+		
+$endif$
+
 	}
 >>

@@ -41,6 +41,16 @@ public class GenOrmBoolean extends GenOrmField
 		return (String.valueOf(m_value));
 		}
 		
+	public int hashCode()
+		{
+		return (new Boolean(m_value).hashCode());
+		}
+		
+	public boolean equals(Object obj)
+		{
+		return (new Boolean(m_value).equals(obj));
+		}
+		
 	public String toString()
 		{
 		return (String.valueOf(m_value));
