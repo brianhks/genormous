@@ -17,5 +17,7 @@ public abstract class GenOrmField
 	public abstract void setValue(ResultSet rs, int pos) throws java.sql.SQLException;
 	public abstract void placeValue(PreparedStatement ps, int pos) throws java.sql.SQLException;
 	//public abstract String getSQLValue();
+	public abstract int hashCode();
+	public abstract boolean equals(Object obj);
 	public abstract String toString();
 	}

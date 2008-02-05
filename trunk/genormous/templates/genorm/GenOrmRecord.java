@@ -232,4 +232,32 @@ public abstract class GenOrmRecord
 		m_dirtyFlags = 0;
 		m_isNewRecord = false;
 		}
+		
+	//---------------------------------------------------------------------------
+	/**
+		Returns the combined hash code of all primary keys of this record
+	*/
+	public int hashCode()
+		{
+		Iterator<GenOrmField> it = m_fields.iterator();
+		int hashCode = 1;
+		while (it.hasNext())
+			{
+			GenOrmField gof = it.next();
+			GenOrmFieldMeta meta = gof.getFieldMeta();
+			if (meta.isPrimaryKey())
+				{
+				//Same hash code calculation as used in a java.util.List
+				hashCode = 31 * hashCode + gof.hashCode();
+				}
+			}
+			
+		return (hashCode);
+		}
+		
+	//---------------------------------------------------------------------------
+	/**
+		Equality is based on the values of the primary keys only
+	*/
+	public abstract boolean equals(Object obj);
 	}

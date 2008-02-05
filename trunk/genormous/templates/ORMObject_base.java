@@ -68,7 +68,8 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		statement.close();
 		
 		$if(query.singleResult)$
-		return (rs.getOnlyRecord());
+		//return (rs.getOnlyRecord());
+		return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rs.getOnlyRecord()));
 		$else$
 		return (rs);
 		$endif$
@@ -178,7 +179,7 @@ public class $table.className$_base extends GenOrmRecord
 			rec.m_isNewRecord = true;
 			
 			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
-			return (rec);
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			}
 		$endif$
 		//---------------------------------------------------------------------------
@@ -188,7 +189,7 @@ public class $table.className$_base extends GenOrmRecord
 			rec.m_isNewRecord = true;
 			
 			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
-			return (rec);
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			}
 			
 		//---------------------------------------------------------------------------
@@ -204,7 +205,7 @@ public class $table.className$_base extends GenOrmRecord
 					($table.primaryKey.type$)GenOrmDataSource.getKeyGenerator("$table.name$").generateKey());
 			
 			//GenOrmDataSource.getGenOrmConnection().addToTransaction(rec);
-			return (rec);
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			$endif$
 			}
 			
@@ -350,7 +351,8 @@ $if(!query.singleResult)$rs.close();$endif$
 				while (m_resultSet.next() && (count < maxRows))
 					{
 					count ++;
-					results.add(factory.new$table.className$(m_resultSet));
+					results.add(($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(
+							factory.new$table.className$(m_resultSet)));
 					}
 					
 				if (m_resultSet.next())
@@ -373,7 +375,8 @@ $if(!query.singleResult)$rs.close();$endif$
 		//------------------------------------------------------------------------
 		public $table.className$ getRecord()
 			{
-			return (factory.new$table.className$(m_resultSet));
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(
+					factory.new$table.className$(m_resultSet)));
 			}
 			
 		//------------------------------------------------------------------------
@@ -394,7 +397,7 @@ $if(!query.singleResult)$rs.close();$endif$
 				throw new GenOrmException(sqle);
 				}
 				
-			return (ret);
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(ret));
 			}
 			
 		//------------------------------------------------------------------------
@@ -471,6 +474,22 @@ m_fields.add(m_$col.parameterName$);$\n$}$
 		//setCTS_base(new Timestamp(System.currentTimeMillis()));
 		}
 		
+	//---------------------------------------------------------------------------
+	/**
+		Returns true of the primary keys have the same value as those in obj
+	*/
+	public boolean equals(Object obj)
+		{
+		if (!(obj instanceof $table.className$_base))
+			return (false);
+			
+		$table.className$_base other = ($table.className$_base)obj;
+		if ($primaryKeys:{key | m_$key.parameterName$.equals(other.m_$key.parameterName$)}; separator=" &&\n\t\t\t\t "$)
+			return (true);
+		else
+			return (false);
+		}
+	
 	//---------------------------------------------------------------------------
 	public String toString()
 		{
