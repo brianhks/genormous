@@ -5,7 +5,8 @@ import org.depunit.annotations.*;
 import org.depunit.RunContext;
 import java.io.*;
 
-import test.genorm.*;
+import genorm.runtime.*;
+import test.*;
 
 import static org.junit.Assert.*;
 
@@ -42,7 +43,7 @@ public class Database
 		c.close();
 		
 		m_dataSource = ds;
-		GenOrmDataSource.setDataSource(m_dataSource);
+		GenOrmDataSource.setDataSource(new DSEnvelope(m_dataSource));
 		}
 		
 	@Test(

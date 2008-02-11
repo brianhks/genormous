@@ -88,7 +88,7 @@ baseClass(package,table,columns,primaryKeys,foreignKeys,createSQL) ::= <<
 package $package$;
 
 import java.util.*;
-import $package$.genorm.*;
+import genorm.runtime.*;
 
 public class $table.className$_base extends GenOrmRecord
 	{

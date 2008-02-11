@@ -366,13 +366,16 @@ public class Genormous extends TemplateHelper
 			
 			fw.close();
 				
-			new File(m_destDir+"/genorm").mkdir();
+			//new File(m_destDir+"/genorm").mkdir();
 				
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			attributes.put("package", m_packageName);
 			attributes.put("tables", savedTableList);
 			
-			writeTemplate("GenOrmKeyGenerator.java", attributes);
+			writeTemplate("DSEnvelope.java", attributes);
+			writeTemplate("GenOrmUnitTest.java", attributes);
+			
+			/* writeTemplate("GenOrmKeyGenerator.java", attributes);
 			writeTemplate("GenOrmConnection.java", attributes);
 			writeTemplate("GenOrmDataSource.java", attributes);
 			writeTemplate("GenOrmField.java", attributes);
@@ -388,12 +391,12 @@ public class Genormous extends TemplateHelper
 			writeTemplate("GenOrmBigDecimal.java", attributes);
 			writeTemplate("GenOrmDouble.java", attributes);
 			writeTemplate("Pair.java", attributes);
-			writeTemplate("GenOrmDSEnvelope.java", attributes);
+			
 			writeTemplate("GenOrmException.java", attributes);
 			writeTemplate("GenOrmResultSet.java", attributes);
 			writeTemplate("GenOrmQueryResultSet.java", attributes);
 			writeTemplate("GenOrmQueryRecord.java", attributes);
-			writeTemplate("GenOrmUnitTest.java", attributes);
+			 */
 			
 			if (m_graphVizFile != null)
 				writeTemplate(m_graphVizFile, "templates/tables.dot", attributes);

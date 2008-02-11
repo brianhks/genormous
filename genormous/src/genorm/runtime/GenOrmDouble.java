@@ -1,26 +1,24 @@
-package $package$.genorm;
+package genorm.runtime;
 
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-import java.sql.Date;
-import java.util.Arrays;
 
-public class GenOrmBinary extends GenOrmField
+public class GenOrmDouble extends GenOrmField
 	{
-	private byte[] m_value;
+	private double m_value;
 	
-	public GenOrmBinary(GenOrmFieldMeta fieldMeta)
+	public GenOrmDouble(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
+		m_value = 0.0;
 		}
 		
-	public void setValue(byte[] value)
+	public void setValue(double value)
 		{
 		m_value = value;
 		}
 		
-	public byte[] getValue()
+	public double getValue()
 		{
 		return (m_value);
 		}
@@ -28,35 +26,32 @@ public class GenOrmBinary extends GenOrmField
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
-		m_value = rs.getBytes(pos);
+		m_value = rs.getDouble(pos);
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setBytes(pos, m_value);
+		ps.setDouble(pos, m_value);
 		}
 		
 	public String getSQLValue()
 		{
-		return ("");
+		return (String.valueOf(m_value));
 		}
 		
 	public int hashCode()
 		{
-		return (Arrays.hashCode(m_value));
+		return (new Double(m_value).hashCode());
 		}
 		
 	public boolean equals(Object obj)
 		{
-		if (obj instanceof byte[])
-			return (Arrays.equals(m_value, (byte[])obj));
-		else
-			return (false);
+		return (new Double(m_value).equals(obj));
 		}
 		
 	public String toString()
 		{
-		return ("");
+		return (String.valueOf(m_value));
 		}
 	}

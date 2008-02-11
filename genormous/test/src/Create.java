@@ -6,7 +6,7 @@ import org.depunit.RunContext;
 import java.io.*;
 import java.util.ArrayList;
 
-import test.genorm.*;
+import genorm.runtime.*;
 import test.*;
 
 import static org.junit.Assert.*;

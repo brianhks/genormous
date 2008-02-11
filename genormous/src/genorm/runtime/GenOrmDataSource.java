@@ -1,4 +1,4 @@
-package $package$.genorm;
+package genorm.runtime;
 
 import java.sql.*;
 import javax.sql.DataSource;
@@ -20,14 +20,14 @@ public class GenOrmDataSource
 				}
 			};
 			
-	public static void setDataSource(DataSource ds)
+	public static void setDataSource(GenOrmDSEnvelope ds)
 		{
-		s_dsEnvelope = new GenOrmDSEnvelope(ds);
+		s_dsEnvelope = ds;
 		}
 		
-	public static void setDataSource(String key, DataSource ds)
+	public static void setDataSource(String key, GenOrmDSEnvelope ds)
 		{
-		s_dataSourceMap.put(key, new GenOrmDSEnvelope(ds));
+		s_dataSourceMap.put(key, ds);
 		}
 		
 	public static void begin(String source)

@@ -1,25 +1,24 @@
-package $package$.genorm;
+package genorm.runtime;
 
 import java.sql.ResultSet;
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 
-public class GenOrmBigDecimal extends GenOrmField
+public class GenOrmInt extends GenOrmField
 	{
-	private BigDecimal m_value;
+	private int m_value;
 	
-	public GenOrmBigDecimal(GenOrmFieldMeta fieldMeta)
+	public GenOrmInt(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
+		m_value = 0;
 		}
 		
-	public void setValue(BigDecimal value)
+	public void setValue(int value)
 		{
 		m_value = value;
 		}
 		
-	public BigDecimal getValue()
+	public int getValue()
 		{
 		return (m_value);
 		}
@@ -27,13 +26,13 @@ public class GenOrmBigDecimal extends GenOrmField
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
-		m_value = rs.getBigDecimal(pos);
+		m_value = rs.getInt(pos);
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setBigDecimal(pos, m_value);
+		ps.setInt(pos, m_value);
 		}
 		
 	public String getSQLValue()
@@ -43,12 +42,12 @@ public class GenOrmBigDecimal extends GenOrmField
 		
 	public int hashCode()
 		{
-		return (m_value.hashCode());
+		return (new Integer(m_value).hashCode());
 		}
 		
 	public boolean equals(Object obj)
 		{
-		return (m_value.equals(obj));
+		return (new Integer(m_value).equals(obj));
 		}
 		
 	public String toString()

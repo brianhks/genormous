@@ -1,4 +1,4 @@
-package $package$.genorm;
+package genorm.runtime;
 
 public class Pair<A, B>
 	{

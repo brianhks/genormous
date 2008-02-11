@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
-import $package$.genorm.*;
+import genorm.runtime.*;
 
 public class $query.className$Query extends SQLQuery
 	{

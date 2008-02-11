@@ -1,6 +1,4 @@
-package $package$.genorm;
-
-import $package$.*;
+package $package$;
 
 public class GenOrmUnitTest
 	{
