@@ -37,7 +37,7 @@ public class TemplateHelper
 	protected void writeTemplate(String templateName, Map<String, Object> attrs)
 			throws IOException
 		{
-		writeTemplate(m_destDir+"/genorm/"+templateName, "templates/genorm/"+templateName, attrs);
+		writeTemplate(m_destDir+"/"+templateName, "templates/"+templateName, attrs);
 		}
 		
 	//------------------------------------------------------------------------------

@@ -1,14 +1,16 @@
-package $package$.genorm;
+package $package$;
 
 import java.util.*;
 import javax.sql.*;
 
-public class GenOrmDSEnvelope
+import genorm.runtime.*;
+
+public class DSEnvelope implements GenOrmDSEnvelope
 	{
 	private DataSource m_dataSource;
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
 	
-	public GenOrmDSEnvelope(DataSource ds)
+	public DSEnvelope(DataSource ds)
 		{
 		m_dataSource = ds;
 		m_keyGenMap = new HashMap<String, GenOrmKeyGenerator>();

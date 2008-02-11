@@ -145,14 +145,14 @@ public class QueryGen extends TemplateHelper
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			attributes.put("package", m_packageName);
 			
-			genfiles++;
+			/* genfiles++;
 			writeTemplate("SQLQuery.java", attributes);
 			
 			genfiles++;
 			writeTemplate("Formatter.java", attributes);
 			
 			genfiles++;
-			writeTemplate("DefaultFormatter.java", attributes);
+			writeTemplate("DefaultFormatter.java", attributes); */
 			
 				
 			System.out.println("Generated "+genfiles+" class files");

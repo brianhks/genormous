@@ -1,46 +1,45 @@
-package $package$.genorm;
+package genorm.runtime;
 
-import java.sql.Timestamp;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 
-public class GenOrmTimestamp extends GenOrmField
+public class GenOrmString extends GenOrmField
 	{
-	private Timestamp m_value;
+	private String m_value;
 	
-	public GenOrmTimestamp(GenOrmFieldMeta fieldMeta)
+	public GenOrmString(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
 		m_value = null;
 		}
 		
-	public void setValue(Timestamp value)
+	public void setValue(String value)
 		{
 		m_value = value;
 		}
 		
-	public Timestamp getValue()
+	public String getValue()
 		{
 		return (m_value);
 		}
-	
+		
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
-		m_value = rs.getTimestamp(pos);
+		m_value = rs.getString(pos);
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setTimestamp(pos, m_value);
+		ps.setString(pos, m_value);
 		}
 		
 	public String getSQLValue()
 		{
 		StringBuilder sb = new StringBuilder();
 		sb.append('\'');
-		sb.append(m_value.toString());
+		sb.append(m_value);
 		sb.append('\'');
 		return (sb.toString());
 		}
@@ -57,6 +56,6 @@ public class GenOrmTimestamp extends GenOrmField
 		
 	public String toString()
 		{
-		return (m_value.toString());
+		return (m_value);
 		}
 	}

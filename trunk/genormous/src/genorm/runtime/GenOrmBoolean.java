@@ -1,25 +1,25 @@
-package $package$.genorm;
+package genorm.runtime;
 
 import java.sql.ResultSet;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 
-public class GenOrmDate extends GenOrmField
+public class GenOrmBoolean extends GenOrmField
 	{
-	private Date m_value;
+	private boolean m_value;
 	
-	public GenOrmDate(GenOrmFieldMeta fieldMeta)
+	public GenOrmBoolean(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
+		m_value = false;
 		}
 		
-	public void setValue(Date value)
+	public void setValue(boolean value)
 		{
 		m_value = value;
 		}
 		
-	public Date getValue()
+	public boolean getValue()
 		{
 		return (m_value);
 		}
@@ -27,13 +27,13 @@ public class GenOrmDate extends GenOrmField
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
-		m_value = rs.getDate(pos);
+		m_value = rs.getBoolean(pos);
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setDate(pos, m_value);
+		ps.setBoolean(pos, m_value);
 		}
 		
 	public String getSQLValue()
@@ -43,12 +43,12 @@ public class GenOrmDate extends GenOrmField
 		
 	public int hashCode()
 		{
-		return (m_value.hashCode());
+		return (new Boolean(m_value).hashCode());
 		}
 		
 	public boolean equals(Object obj)
 		{
-		return (m_value.equals(obj));
+		return (new Boolean(m_value).equals(obj));
 		}
 		
 	public String toString()

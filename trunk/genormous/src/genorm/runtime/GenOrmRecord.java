@@ -1,4 +1,4 @@
-package $package$.genorm;
+package genorm.runtime;
 
 import java.util.*;
 import java.sql.*;
