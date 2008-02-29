@@ -160,7 +160,7 @@ public class $table.className$_base extends GenOrmRecord
 			{
 			$table.className$ rec = new $table.className$();
 			(($table.className$_base)rec).initialize(rs);
-			return (rec);
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			}
 	
 		//---------------------------------------------------------------------------
@@ -183,7 +183,7 @@ public class $table.className$_base extends GenOrmRecord
 			}
 		$endif$
 		//---------------------------------------------------------------------------
-		public $table.className$ create()
+		public $table.className$ createRecord()
 			{
 			$table.className$ rec = new $table.className$();
 			rec.m_isNewRecord = true;
@@ -210,7 +210,7 @@ public class $table.className$_base extends GenOrmRecord
 			}
 			
 		//---------------------------------------------------------------------------
-		public $table.className$ find(Object keys)
+		public $table.className$ findRecord(Object keys)
 			{
 			$if(table.hasPrimaryKey)$
 			$if(table.multiplePrimaryKeys)$
@@ -450,18 +450,6 @@ m_fields.add(m_$col.parameterName$);$\n$}$
 		}
 	
 	//---------------------------------------------------------------------------	
-	public boolean isDirty()
-		{
-		return (m_dirtyFlags != 0);
-		}
-		
-	//---------------------------------------------------------------------------
-	public void setDirty()
-		{
-		//This will mark all attributes as dirty
-		m_dirtyFlags = -1;
-		}
-		
 	//---------------------------------------------------------------------------
 	public void setMTS()
 		{

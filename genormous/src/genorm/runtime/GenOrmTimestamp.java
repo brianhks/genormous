@@ -52,7 +52,11 @@ public class GenOrmTimestamp extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		return (m_value.equals(obj));
+		if (!(obj instanceof GenOrmTimestamp))
+			return (false);
+			
+		GenOrmTimestamp other = (GenOrmTimestamp)obj;
+		return (m_value.equals(other.m_value));
 		}
 		
 	public String toString()

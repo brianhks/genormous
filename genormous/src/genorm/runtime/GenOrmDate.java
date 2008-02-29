@@ -48,7 +48,11 @@ public class GenOrmDate extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		return (m_value.equals(obj));
+		if (!(obj instanceof GenOrmDate))
+			return (false);
+			
+		GenOrmDate other = (GenOrmDate)obj;
+		return (m_value.equals(other.m_value));
 		}
 		
 	public String toString()

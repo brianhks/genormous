@@ -193,4 +193,43 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
+	/**
+		This tests creating two of the same entries in a single transaction
+	*/
+	@Test(hardDependencyOn = { "Database.createDatabase" })
+	public void duplicateCreateTest()
+			throws Exception
+		{
+		GenOrmDataSource.begin();
+		
+		Language lang1 = Language.factory.create(42);
+		Language lang2 = Language.factory.create(42);
+		
+		assertTrue(lang1 == lang2);  //They should be the same object
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
+		}
+		
+	//---------------------------------------------------------------------------
+	/**
+		This tests creating two of the same entries in a single transaction
+	*/
+	@Test(hardDependencyOn = { "duplicateCreateTest" })
+	public void duplicateFindTest()
+			throws Exception
+		{
+		GenOrmDataSource.begin();
+		
+		Language lang1 = Language.factory.find(42);
+		lang1.setLanguageCode("xx");
+		Language lang2 = Language.factory.find(42);
+		
+		assertTrue(lang1 == lang2);  //They should be the same object
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
+		}
+		
+	//---------------------------------------------------------------------------
 	}

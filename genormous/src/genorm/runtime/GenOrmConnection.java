@@ -11,12 +11,14 @@ public class GenOrmConnection
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
 	private Map<GenOrmRecord, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
 	private boolean m_committed;
+	private boolean m_initializedConnection;
 	
 	public GenOrmConnection()
 		{
 		m_connection = null;
 		m_transactionList = new ArrayList<GenOrmRecord>();
 		m_uniqueRecordMap = new HashMap<GenOrmRecord, GenOrmRecord>();
+		m_initializedConnection = false;
 		}
 		
 	public void begin(GenOrmDSEnvelope dse)
@@ -29,6 +31,7 @@ public class GenOrmConnection
 			m_keyGenMap = dse.getKeyGeneratorMap();
 			m_connection.setAutoCommit(false);
 			m_committed = false;
+			m_initializedConnection = true;
 			}
 		catch (SQLException sqle)
 			{
@@ -47,12 +50,19 @@ public class GenOrmConnection
 			urec = rec;
 			m_uniqueRecordMap.put(rec, rec);
 			}
+		else
+			{ //Need to ignore the new one
+			rec.setIgnored(true);
+			}
 			
 		return (urec);
 		}
 		
 	public void commit()
 		{
+		if (!m_initializedConnection)
+			return;
+			
 		try
 			{
 			Iterator<GenOrmRecord> it = m_transactionList.iterator();
@@ -76,6 +86,9 @@ public class GenOrmConnection
 		
 	public void close()
 		{
+		if (!m_initializedConnection)
+			return;
+			
 		try
 			{
 			if (!m_committed)
@@ -92,6 +105,9 @@ public class GenOrmConnection
 		
 	public void rollback()
 		{
+		if (!m_initializedConnection)
+			return;
+			
 		try
 			{
 			m_transactionList.clear();

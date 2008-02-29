@@ -35,6 +35,9 @@ Loop at the end
 				</driver>
 			</class>
 		</classes>
+		<!-- <tests>
+			<method>Create.duplicateFindTest</method>
+		</tests -->>
 	</run>
 	
 	<!-- <run name="Cleanup Run">

@@ -48,7 +48,11 @@ public class GenOrmBigDecimal extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		return (m_value.equals(obj));
+		if (!(obj instanceof GenOrmBigDecimal))
+			return (false);
+			
+		GenOrmBigDecimal other = (GenOrmBigDecimal)obj;
+		return (m_value.equals(other.m_value));
 		}
 		
 	public String toString()

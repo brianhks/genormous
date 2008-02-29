@@ -48,7 +48,11 @@ public class GenOrmBoolean extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		return (new Boolean(m_value).equals(obj));
+		if (!(obj instanceof GenOrmBoolean))
+			return (false);
+			
+		GenOrmBoolean other = (GenOrmBoolean)obj;
+		return (new Boolean(m_value).equals(other.m_value));
 		}
 		
 	public String toString()

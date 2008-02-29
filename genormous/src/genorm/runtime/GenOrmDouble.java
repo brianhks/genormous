@@ -47,7 +47,11 @@ public class GenOrmDouble extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		return (new Double(m_value).equals(obj));
+		if (!(obj instanceof GenOrmDouble))
+			return (false);
+			
+		GenOrmDouble other = (GenOrmDouble)obj;
+		return (new Double(m_value).equals(other.m_value));
 		}
 		
 	public String toString()
