@@ -15,6 +15,7 @@ public abstract class GenOrmRecord
 	protected int                      m_dirtyFlags;    //Identifies which field is dirty
 	protected String                   m_tableName;     //Name of the table
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
+	protected boolean                  m_isIgnored;     //This record should not be committed in this transaction
 	
 	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
 	
@@ -45,6 +46,27 @@ public abstract class GenOrmRecord
 		m_isDeleted = true;
 		}
 		
+	//---------------------------------------------------------------------------
+	public boolean isDeleted() { return (m_isDeleted); }
+	
+	//---------------------------------------------------------------------------
+	public boolean isDirty()
+		{
+		return (m_dirtyFlags != 0);
+		}
+		
+	//---------------------------------------------------------------------------
+	public void setDirty()
+		{
+		//This will mark all attributes as dirty
+		m_dirtyFlags = -1;
+		}
+	//---------------------------------------------------------------------------
+	public void setIgnored(boolean ignore) { m_isIgnored = ignore; }
+	
+	//---------------------------------------------------------------------------
+	public boolean isIgnored() { return (m_isIgnored); }
+	
 	//---------------------------------------------------------------------------
 	private String createInsertStatement()
 		{
@@ -191,7 +213,7 @@ public abstract class GenOrmRecord
 	public void createIfNew()
 			throws SQLException
 		{
-		if ((m_isNewRecord) && (!m_isDeleted))
+		if ((m_isNewRecord) && (!m_isDeleted) && (!m_isIgnored))
 			{
 			setCTS();
 			setMTS();
@@ -203,8 +225,10 @@ public abstract class GenOrmRecord
 	public void commitChanges()
 			throws SQLException
 		{
-		//System.out.println("Committing changes");
 		String query;
+		
+		if (m_isIgnored)
+			return;
 		
 		if (m_isDeleted)
 			{
@@ -237,6 +261,7 @@ public abstract class GenOrmRecord
 	/**
 		Returns the combined hash code of all primary keys of this record
 	*/
+	@Override
 	public int hashCode()
 		{
 		Iterator<GenOrmField> it = m_fields.iterator();
@@ -259,5 +284,6 @@ public abstract class GenOrmRecord
 	/**
 		Equality is based on the values of the primary keys only
 	*/
+	@Override
 	public abstract boolean equals(Object obj);
 	}

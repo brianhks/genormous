@@ -49,10 +49,11 @@ public class GenOrmBinary extends GenOrmField
 		
 	public boolean equals(Object obj)
 		{
-		if (obj instanceof byte[])
-			return (Arrays.equals(m_value, (byte[])obj));
-		else
+		if (!(obj instanceof GenOrmBinary))
 			return (false);
+			
+		GenOrmBinary other = (GenOrmBinary)obj;
+		return (Arrays.equals(m_value, other.m_value));
 		}
 		
 	public String toString()
