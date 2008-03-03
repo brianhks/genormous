@@ -1,0 +1,9 @@
+#summary Overview of the Genormous system.
+
+= Simple Overview =
+
+Here is a simple overview of how you use Genormous in your project.
+  #Create a tables definition file
+  #Generate the code into the source tree of your project
+  #Add a call to the unit test class from your unit test framework
+  #Include genormous.jar in your runtime classpath
