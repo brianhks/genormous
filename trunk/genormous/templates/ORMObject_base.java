@@ -68,8 +68,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		statement.close();
 		
 		$if(query.singleResult)$
-		//return (rs.getOnlyRecord());
-		return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rs.getOnlyRecord()));
+		return (rs.getOnlyRecord());
 		$else$
 		return (rs);
 		$endif$
@@ -351,8 +350,7 @@ $if(!query.singleResult)$rs.close();$endif$
 				while (m_resultSet.next() && (count < maxRows))
 					{
 					count ++;
-					results.add(($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(
-							factory.new$table.className$(m_resultSet)));
+					results.add(factory.new$table.className$(m_resultSet));
 					}
 					
 				if (m_resultSet.next())
@@ -375,8 +373,7 @@ $if(!query.singleResult)$rs.close();$endif$
 		//------------------------------------------------------------------------
 		public $table.className$ getRecord()
 			{
-			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(
-					factory.new$table.className$(m_resultSet)));
+			return (factory.new$table.className$(m_resultSet));
 			}
 			
 		//------------------------------------------------------------------------
@@ -397,7 +394,7 @@ $if(!query.singleResult)$rs.close();$endif$
 				throw new GenOrmException(sqle);
 				}
 				
-			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(ret));
+			return (ret);
 			}
 			
 		//------------------------------------------------------------------------
