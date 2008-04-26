@@ -31,7 +31,7 @@
 <!ELEMENT query (input?,replace?,sql)>
 <!ATTLIST query
 	name CDATA #REQUIRED
-	return_type (single|multi) #REQUIRED
+	result_type (single|multi) #REQUIRED
 	>
 	
 <!ELEMENT input (param*)>
