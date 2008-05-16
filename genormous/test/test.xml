@@ -20,6 +20,25 @@ Loop at the end
 		</classes>
 	</run> -->
 	
+	<run name="Table Creator">
+		<tag>creator</tag>
+		<classes>
+			<!-- <includeGroup>login_group</includeGroup> -->
+			
+			<class name="Database">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="Create"/>
+			<class name="TableCreatorTest">
+			</class>
+		</classes>
+		
+		<tests>
+			<method>TableCreatorTest.testTableCreator</method>
+		</tests>
+	</run>
+	
 	<run name="First Run">
 		<classes>
 			<!-- <includeGroup>login_group</includeGroup> -->
@@ -35,9 +54,9 @@ Loop at the end
 				</driver>
 			</class>
 		</classes>
-		<!-- <tests>
-			<method>Create.duplicateFindTest</method>
-		</tests -->>
+		<tests>
+			<!-- <method>Create.duplicateFindTest</method> -->
+		</tests>
 	</run>
 	
 	<!-- <run name="Cleanup Run">

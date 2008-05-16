@@ -36,39 +36,5 @@ javaToJDBCMap ::= [
 	default:"null"
 	]
 
-typeToGenOrmMap ::= [
-	"integer":"GenOrmInt",
-	"date":"GenOrmDate",
-	"boolean":"GenOrmBoolean",
-	"string":"GenOrmString",
-	"timestamp":"GenOrmTimestamp",
-	"binary":"GenOrmBinary",
-	"money":"GenOrmBigDecimal",
-	"version":"GenOrmDouble",
-	default:"null"
-	]
-	
-typeToJavaTypeMap ::= [
-	"integer":"int",
-	"date":"java.sql.Date",
-	"boolean":"boolean",
-	"string":"String",
-	"timestamp":"java.sql.Timestamp",
-	"binary":"byte[]",
-	"money":"java.math.BigDecimal",
-	"version":"double",
-	default:"null"
-	]
-	
-typeToJDBCTypeMap ::= [
-	"integer":"Int",
-	"date":"Date",
-	"boolean":"Boolean",
-	"string":"String",
-	"timestamp":"Timestamp",
-	"binary":"Bytes",
-	"money":"BigDecimal",
-	"version":"Double",
-	default:"null"
-	]
+
 	
