@@ -318,12 +318,14 @@ $if(!query.singleResult)$rs.close();$endif$
 		{
 		private java.sql.ResultSet m_resultSet;
 		private String m_query;
+		private boolean m_onFirstResult;
 		
 		//------------------------------------------------------------------------
 		protected ResultSet(java.sql.ResultSet resultSet, String query)
 			{
 			m_resultSet = resultSet;
 			m_query = query;
+			m_onFirstResult = false;
 			}
 		
 		//------------------------------------------------------------------------
@@ -347,6 +349,12 @@ $if(!query.singleResult)$rs.close();$endif$
 			
 			try
 				{
+				if (m_onFirstResult)
+					{
+					count ++;
+					results.add(factory.new$table.className$(m_resultSet));
+					}
+					
 				while (m_resultSet.next() && (count < maxRows))
 					{
 					count ++;
@@ -358,6 +366,7 @@ $if(!query.singleResult)$rs.close();$endif$
 				}
 			catch (java.sql.SQLException sqle)
 				{
+				sqle.printStackTrace();
 				throw new GenOrmException(sqle);
 				}
 				
@@ -398,9 +407,10 @@ $if(!query.singleResult)$rs.close();$endif$
 			}
 			
 		//------------------------------------------------------------------------
-		public boolean hasNext()
+		public boolean next()
 			{
 			boolean ret = false;
+			m_onFirstResult = true;
 			try
 				{
 				ret = m_resultSet.next();

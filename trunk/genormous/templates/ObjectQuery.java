@@ -81,7 +81,7 @@ $else$
 		m_serializable = true;
 		ResultSet rs = runQuery($[query.inputs,query.replacements]:{ p | $p.parameterName$}; separator=", "$);
 		
-		while (rs.hasNext())
+		while (rs.next())
 			{
 			Record rec = rs.getRecord();
 			ch.startElement("", tagName, tagName, rec);
@@ -125,12 +125,14 @@ $else$
 		{
 		private java.sql.ResultSet m_resultSet;
 		private String m_query;
+		private boolean m_onFirstResult;
 		
 		//------------------------------------------------------------------------
 		protected ResultSet(java.sql.ResultSet resultSet, String query)
 			{
 			m_resultSet = resultSet;
 			m_query = query;
+			m_onFirstResult = false;
 			}
 		
 		//------------------------------------------------------------------------
@@ -154,6 +156,12 @@ $else$
 			
 			try
 				{
+				if (m_onFirstResult)
+					{
+					count ++;
+					results.add(new Record(m_resultSet));
+					}
+					
 				while (m_resultSet.next() && (count < maxRows))
 					{
 					count ++;
@@ -216,9 +224,10 @@ $else$
 			}
 			
 		//------------------------------------------------------------------------
-		public boolean hasNext()
+		public boolean next()
 			{
 			boolean ret = false;
+			m_onFirstResult = true;
 			try
 				{
 				ret = m_resultSet.next();

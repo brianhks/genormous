@@ -27,6 +27,7 @@
 		<col name="mergeable" type="boolean" default_value="false" allow_null="false">
 			<comment>Identifies this segment as being mergeable</comment>
 		</col>
+		<col name="double_value" type="double"/>
 		<query name="next_segment_on_source" result_type="single">
 			<input>
 				<param name="source" type="string" test="test value"/>

@@ -10,5 +10,5 @@ public interface GenOrmQueryResultSet
 	public java.sql.ResultSet getResultSet();
 	public GenOrmQueryRecord getRecord();
 	public GenOrmQueryRecord getOnlyRecord();
-	public boolean hasNext();
+	public boolean next();
 	}

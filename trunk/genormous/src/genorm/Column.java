@@ -20,6 +20,10 @@ public class Column
 	private Format m_formatter;
 	private boolean m_unique;
 	
+	public Column(String name)
+		{
+		m_name = name;
+		}
 	
 	public Column(String name, String type, String customType, Format format)
 		{
@@ -86,4 +90,29 @@ public class Column
 	public void setComment(String comment) { m_comment = comment; }
 	public void setDirtyFlag(int flag) { m_dirtyFlag = flag; }
 	public void setUnique() { m_unique = true; }
+	public void setCustomType(String type) { m_customType = type; }
+	
+	public String getXML()
+		{
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("\t\t<col name=\""+m_name.toLowerCase()+"\" type=\""+m_customType+"\" ");
+		if (m_primaryKey)
+			sb.append("primary_key=\""+m_primaryKey+"\" ");
+		
+		if (isDefaultSet())
+			sb.append("default_value=\""+m_default+"\" ");
+			
+		sb.append("allow_null=\""+m_allowNull+"\">\n");
+		sb.append("\t\t\t<comment></comment>\n");
+		if (isForeignKey())
+			{
+			sb.append("\t\t\t<reference table=\""+m_foreignTableName.toLowerCase()+"\" column=\""+
+					m_foreignTableColumnName.toLowerCase()+"\"/>\n");
+			}
+			
+		sb.append("\t\t</col>\n");
+		
+		return (sb.toString());
+		}
 	}
