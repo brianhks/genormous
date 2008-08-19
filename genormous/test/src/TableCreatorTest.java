@@ -14,14 +14,14 @@ public class TableCreatorTest
 	private Database m_database;
 	
 	//This gets set from the context
-	public void setDatabase(Database db)
+	public void setDatabase(MySQLDatabase db)
 		{
 		m_database = db;
 		}
 		
 	
 	@Test(
-		hardDependencyOn = { "Database.createDatabase" } )
+		hardDependencyOn = { "MySQLDatabase.createDataSource" } )
 	public void testTableCreator()
 			throws Exception
 		{

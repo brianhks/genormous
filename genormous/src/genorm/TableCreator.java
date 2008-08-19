@@ -93,8 +93,12 @@ public class TableCreator
 				String defValue = columns.getString("COLUMN_DEF");
 				String typeName = columns.getString("TYPE_NAME");
 				int type = columns.getInt("DATA_TYPE");
+				if ((type == java.sql.Types.CHAR) || (type == java.sql.Types.VARCHAR))
+					typeName += "("+columns.getString("CHAR_OCTET_LENGTH")+")";
+					
 				boolean allowNull = columns.getString("IS_NULLABLE").equals("YES");
-				//printResults(columns);
+				if (tableName.equals("documents_9"))
+					printResults(columns);
 				
 				Column c = new Column(columnName);
 				table.addColumn(columnName, c);

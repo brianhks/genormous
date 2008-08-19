@@ -7,27 +7,39 @@ import java.sql.*;
 public class GenOrmConnection
 	{
 	private Connection m_connection;
+	private boolean m_closeConnection;
 	private ArrayList<GenOrmRecord> m_transactionList;
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
 	private Map<GenOrmRecord, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
 	private boolean m_committed;
 	private boolean m_initializedConnection;
 	
-	public GenOrmConnection()
+	public GenOrmConnection(GenOrmDSEnvelope dse)
+		{
+		this(dse, null);
+		}
+	
+	public GenOrmConnection(GenOrmDSEnvelope dse, Connection con)
 		{
 		m_connection = null;
 		m_transactionList = new ArrayList<GenOrmRecord>();
 		m_uniqueRecordMap = new HashMap<GenOrmRecord, GenOrmRecord>();
 		m_initializedConnection = false;
-		}
 		
-	public void begin(GenOrmDSEnvelope dse)
-		{
 		try
 			{
 			//Check to see if the connection is already open
 			//Grab a stack trace here and store it.
-			m_connection = dse.getDataSource().getConnection();
+			if (con != null)
+				{
+				m_connection = con;
+				m_closeConnection = false;
+				}
+			else
+				{
+				m_connection = dse.getDataSource().getConnection();
+				m_closeConnection = true;
+				}
 			m_keyGenMap = dse.getKeyGeneratorMap();
 			m_connection.setAutoCommit(false);
 			m_committed = false;
@@ -73,7 +85,8 @@ public class GenOrmConnection
 			while (it.hasNext())
 				it.next().commitChanges();
 				
-			m_connection.commit();
+			if (m_closeConnection)
+				m_connection.commit();
 			m_transactionList.clear();
 			m_uniqueRecordMap.clear();
 			m_committed = true;
@@ -94,7 +107,8 @@ public class GenOrmConnection
 			if (!m_committed)
 				rollback();
 				
-			m_connection.close();
+			if (m_closeConnection)
+				m_connection.close();
 			m_connection = null;
 			}
 		catch (SQLException sqle)
