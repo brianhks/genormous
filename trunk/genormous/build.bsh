@@ -86,7 +86,8 @@ make.createPhonyRule("gensrc_test", new String[] {targetjar, gentestdir}, "genSr
 void genSrc(CPMakeRule rule)
 	{
 	print("Generating GenORM source");
-	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s");
+	//make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
 	
 	print("Generating Query source");
 	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.QueryGen -s test/queries.xml -d "+gentestdir+" -p test");

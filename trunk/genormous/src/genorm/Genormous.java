@@ -124,6 +124,12 @@ public class Genormous extends TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
+	public void setTypesFile(String typeFile)
+		{
+		m_typeMap = new PropertiesFile(typeFile);
+		}
+		
+//------------------------------------------------------------------------------
 	public void setFormat(Format formatter)
 		{
 		m_formatter = formatter;
@@ -180,7 +186,7 @@ public class Genormous extends TemplateHelper
 					Element cole = (Element)cols.next();
 					String colName = cole.attribute(NAME).getValue();
 					String type = cole.attribute(TYPE).getValue();
-					Column col = new Column(colName, (String)m_typeMap.get(type), type, m_formatter);
+					Column col = new Column(colName, m_typeMap.getString(type), type, m_formatter);
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					

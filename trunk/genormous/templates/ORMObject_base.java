@@ -91,6 +91,8 @@ import genorm.runtime.*;
 
 public class $table.className$_base extends GenOrmRecord
 	{
+	$columns:{col | public static final String COL_$col.nameCaps$ = "$col.name$";
+}$
 	//Change this value to true to turn on warning messages
 	private static final boolean WARNINGS = false;
 	private static final String SELECT = "SELECT $columns:{col | this.$col.name$}; separator=", "$ ";
