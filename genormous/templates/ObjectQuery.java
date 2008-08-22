@@ -61,7 +61,8 @@ $if(query.update)$
 			$endif$
 			
 			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
-			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+}$
 			
 			int ret = statement.executeUpdate();
 			
@@ -106,7 +107,8 @@ $else$
 			$endif$
 			
 			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
-			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+}$
 			
 			java.sql.ResultSet resultSet = statement.executeQuery();
 			
