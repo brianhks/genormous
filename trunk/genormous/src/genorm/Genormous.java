@@ -100,10 +100,13 @@ public class Genormous extends TemplateHelper
 		
 		Genormous gen = new Genormous(cl.source, cl.destination, cl.targetPackage,
 				cl.includeStringSets, cl.graphVizFile);
+				
+		QueryGen qgen = new QueryGen(cl.source, cl.destination, cl.targetPackage);
 		
 		try
 			{
 			gen.generateClasses();
+			qgen.generateClasses();
 			}
 		catch (Exception e)
 			{
@@ -115,6 +118,7 @@ public class Genormous extends TemplateHelper
 	public Genormous(String source, String destDir, String packageName, boolean includeStringSets, String graphVizFile)
 		{
 		super(destDir);
+		
 		m_source = source;
 		m_typeMap = new PropertiesFile("types.properties");
 		m_formatter = new DefaultFormat();
@@ -289,19 +293,12 @@ public class Genormous extends TemplateHelper
 				
 				m_generatedFileCount ++;
 				File derivedFile = new File(m_destDir+"/"+className+".java");
-				if (derivedFile.exists())
+				if (!derivedFile.exists())
 					{
-					BufferedReader derivedbr = new BufferedReader(new FileReader(derivedFile));
-					String firstLine = derivedbr.readLine();
-					if (!firstLine.contains("NOPRESERVE"))
-						derivedFile = new File(m_destDir+"/"+className+".java.dif");
-						
-					derivedbr.close();
+					fw = new FileWriter(derivedFile);
+					fw.write(derivedTemplate.toString());
+					fw.close();
 					}
-					
-				fw = new FileWriter(derivedFile);
-				fw.write(derivedTemplate.toString());
-				fw.close();
 				}
 			
 			//Sort the tables first

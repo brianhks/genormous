@@ -16,8 +16,9 @@ public class QueryTest
 		}
 		
 	//This gets set from the context
-	public void setDatabase(Database db)
+	public void setDatabase(HSQLDatabase db)
 		{
+		System.out.println("Setting db in QueryTest");
 		m_database = db;
 		}
 		
@@ -27,7 +28,7 @@ public class QueryTest
 	public void setInputParams(List<Object> params) { m_inputParams = params; }
 	
 	@Test(
-		hardDependencyOn = { "Database.createDatabase" } )
+		hardDependencyOn = { "HSQLDatabase.createDatabase" } )
 	public void testQuery()
 			throws SQLException
 		{

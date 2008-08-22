@@ -76,6 +76,7 @@ public class Column
 	public String getForeignTableColumnMethodName() { return (m_formatter.formatMethodName(m_foreignTableColumnName)); }
 	public String getComment() { return (m_comment); }
 	public boolean getAllowNull() { return (m_allowNull); }
+	public boolean isAllowNull() { return (m_allowNull); }
 	public void setAllowNull(boolean allowNull) { m_allowNull = allowNull; }
 	
 	public void setPrimaryKey() 

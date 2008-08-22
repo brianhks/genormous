@@ -119,7 +119,7 @@ public class QueryGen extends TemplateHelper
 			
 			
 			//NodeList nl = xmldoc.getElementsByTagName(QUERY);
-			Iterator queryit = xmldoc.selectNodes("/queries/query").iterator();
+			Iterator queryit = xmldoc.selectNodes("/*/query").iterator();
 			while (queryit.hasNext())
 				{
 				Element e = (Element)queryit.next();

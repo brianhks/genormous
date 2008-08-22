@@ -15,7 +15,7 @@ public class Create
 	{
 	//---------------------------------------------------------------------------
 	@Test(
-		hardDependencyOn = { "Database.createDatabase" })
+		hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void ormUnitTests()
 		{
 		GenOrmDataSource.begin();
@@ -28,7 +28,7 @@ public class Create
 		
 	//---------------------------------------------------------------------------
 	@Test(
-		hardDependencyOn = { "Database.createDatabase" })
+		hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void createTest()
 			throws Exception
 		{
@@ -53,7 +53,7 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void findMissingTest()
 			throws Exception
 		{
@@ -68,7 +68,7 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void foreignKeyTest()
 			throws Exception
 		{
@@ -102,7 +102,7 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void selectTest()
 			throws Exception
 		{
@@ -128,7 +128,7 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void deleteBeforeCreateTest()
 			throws Exception
 		{
@@ -154,7 +154,7 @@ public class Create
 		}
 		
 	//---------------------------------------------------------------------------
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void circularDependencyTest()
 			throws Exception
 		{
@@ -175,7 +175,7 @@ public class Create
 	/**
 		This test is for updating a table where the primary key is also a foriegn key
 	*/
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void foreignPrimaryKeyTest()
 			throws Exception
 		{
@@ -196,7 +196,7 @@ public class Create
 	/**
 		This tests creating two of the same entries in a single transaction
 	*/
-	@Test(hardDependencyOn = { "Database.createDatabase" })
+	@Test(hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void duplicateCreateTest()
 			throws Exception
 		{

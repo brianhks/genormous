@@ -2,6 +2,7 @@ package genorm.runtime;
 
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.Types;
 
 public class GenOrmInt extends GenOrmField
 	{
@@ -32,7 +33,10 @@ public class GenOrmInt extends GenOrmField
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setInt(pos, m_value);
+		if (m_isNull)
+			ps.setNull(pos, Types.INTEGER);
+		else
+			ps.setInt(pos, m_value);
 		}
 		
 	public String getSQLValue()
