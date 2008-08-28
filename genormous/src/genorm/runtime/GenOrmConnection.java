@@ -70,6 +70,14 @@ public class GenOrmConnection
 		return (urec);
 		}
 		
+	/**
+		Returns the cached record if it exists, null otherwise
+	*/
+	public GenOrmRecord getCachedRecord(GenOrmRecord rec)
+		{
+		return (m_uniqueRecordMap.get(rec));
+		}
+		
 	public void commit()
 		{
 		if (!m_initializedConnection)
