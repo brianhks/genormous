@@ -245,25 +245,34 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		public $table.className$ find($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
-			$table.className$ rec = null;
-			try
+			$table.className$ rec = new $table.className$();
+			
+			//Create temp object and look in cache for it
+			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
+			rec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec);
+			
+			if (rec == null)
 				{
-				java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
-				$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
+				try
+					{
+					//No cached object so look in db
+					java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
+					$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
 }$
-				if (DEBUG)
-					System.out.println(ps);
-					
-				java.sql.ResultSet rs = ps.executeQuery();
-				if (rs.next())
-					rec = new$table.className$(rs);
-					
-				rs.close();
-				ps.close();
-				}
-			catch (java.sql.SQLException sqle)
-				{
-				throw new GenOrmException(sqle);
+					if (DEBUG)
+						System.out.println(ps);
+						
+					java.sql.ResultSet rs = ps.executeQuery();
+					if (rs.next())
+						rec = new$table.className$(rs);
+						
+					rs.close();
+					ps.close();
+					}
+				catch (java.sql.SQLException sqle)
+					{
+					throw new GenOrmException(sqle);
+					}
 				}
 				
 			return (rec);
@@ -456,6 +465,12 @@ $if(!query.singleResult)$rs.close();$endif$
 	$foreignKeys:foreignGetAndSetMethods()$
 	
 	
+	//---------------------------------------------------------------------------
+	private void initialize($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
+		{
+		$primaryKeys:{col | m_$col.parameterName$.setValue($col.parameterName$);$\n$}$
+		}
+		
 	//---------------------------------------------------------------------------
 	private void initialize(java.sql.ResultSet rs)
 		{
