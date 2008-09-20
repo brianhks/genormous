@@ -37,6 +37,13 @@ Loop at the end
 		</tests>
 	</run> -->
 	
+	<run name="Object Tests">
+		<classes>
+			<class name="SQLQueryTest">
+			</class>
+		</classes>
+	</run>
+	
 	<run name="First Run">
 		<classes>
 			<!-- <includeGroup>login_group</includeGroup> -->

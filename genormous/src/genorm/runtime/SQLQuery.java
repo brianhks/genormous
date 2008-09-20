@@ -28,16 +28,14 @@ public class SQLQuery
 	protected String replaceText(String input, Map<String, String> replacements)
 		{
 		String token = "%";
-		StringBuilder sb = new StringBuilder();			
-		StringTokenizer st = new StringTokenizer(input, token);
+		StringBuilder sb = new StringBuilder();
+		String[] split = input.split(token);
 		String value;
-		String s;
 		int i = 0;
 		boolean tag = false;
 		
-		while (st.hasMoreTokens())
+		for (String s : split)
 			{
-			s = st.nextToken();
 			if ((value = (String)replacements.get(s)) != null)
 				{
 				tag = true;

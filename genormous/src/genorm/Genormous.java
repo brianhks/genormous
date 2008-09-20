@@ -105,7 +105,9 @@ public class Genormous extends TemplateHelper
 		
 		try
 			{
+			System.out.println("Generating classes");
 			gen.generateClasses();
+			System.out.println("Generating queries");
 			qgen.generateClasses();
 			}
 		catch (Exception e)
@@ -165,8 +167,11 @@ public class Genormous extends TemplateHelper
 			ormObjectTG.setSuperGroup(dataTypeMapGroup);
 			
 			SAXReader reader = new SAXReader();
+			reader.setValidation(false);
+			reader.setIncludeExternalDTDDeclarations(false);
+			/* reader.setProperty(org.apache.xerces.parsers.XML11Configuration.LOAD_EXTERNAL_DTD,
+					new ); */
 			Document xmldoc = reader.read(new File(m_source));
-			
 			
 			Iterator tableit = xmldoc.selectNodes("/tables/table").iterator();
 			while (tableit.hasNext())
@@ -174,6 +179,7 @@ public class Genormous extends TemplateHelper
 				int dirtyFlag = 1;
 				Element e = (Element) tableit.next();
 				String tableName = e.attribute(NAME).getValue();
+				//System.out.println("Table "+tableName);
 				Table table = new Table(tableName, m_formatter);
 				table.setComment(e.elementText(COMMENT));
 				
