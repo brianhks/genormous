@@ -78,11 +78,8 @@ public class GenOrmConnection
 		return (m_uniqueRecordMap.get(rec));
 		}
 		
-	public void commit()
+	public void flush()
 		{
-		if (!m_initializedConnection)
-			return;
-			
 		try
 			{
 			Iterator<GenOrmRecord> it = m_transactionList.iterator();
@@ -93,9 +90,26 @@ public class GenOrmConnection
 			while (it.hasNext())
 				it.next().commitChanges();
 				
+			m_transactionList.clear();
+			}
+		catch (SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
+		}
+		
+	public void commit()
+		{
+		if (!m_initializedConnection)
+			return;
+		
+		flush();
+			
+		try
+			{
 			if (m_closeConnection)
 				m_connection.commit();
-			m_transactionList.clear();
+			
 			m_uniqueRecordMap.clear();
 			m_committed = true;
 			}

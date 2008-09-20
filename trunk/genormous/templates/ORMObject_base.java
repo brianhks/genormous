@@ -17,6 +17,7 @@ public void set$col.methodName$($col.type$ data)
 		
 	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
 	}
+	
 $if(col.allowNull)$
 public void set$col.methodName$Null()
 	{
@@ -28,6 +29,7 @@ public void set$col.methodName$Null()
 	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
 	}
 $endif$
+
 
 >>
 	
@@ -335,7 +337,8 @@ public class $table.className$_base extends GenOrmRecord
 		public void testQueryMethods()
 			{
 			ResultSet rs;
-			$table.queries:{ query | $if(!query.singleResult)$rs = $endif$get$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
+			$table.queries:{ query | System.out.println("$table.className$.get$query.className$");
+$if(!query.singleResult)$rs = $endif$get$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
 $if(!query.singleResult)$rs.close();$endif$
 }$
 			}

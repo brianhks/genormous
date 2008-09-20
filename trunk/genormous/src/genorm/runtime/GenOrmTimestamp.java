@@ -47,7 +47,10 @@ public class GenOrmTimestamp extends GenOrmField
 		
 	public int hashCode()
 		{
-		return (m_value.hashCode());
+		if (m_value == null)
+			return (0);
+		else
+			return (m_value.hashCode());
 		}
 		
 	public boolean equals(Object obj)

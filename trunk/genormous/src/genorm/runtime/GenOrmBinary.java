@@ -44,7 +44,10 @@ public class GenOrmBinary extends GenOrmField
 		
 	public int hashCode()
 		{
-		return (Arrays.hashCode(m_value));
+		if (m_value == null)
+			return (0);
+		else
+			return (Arrays.hashCode(m_value));
 		}
 		
 	public boolean equals(Object obj)

@@ -19,7 +19,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import genorm.runtime.*;
 
-public class $query.className$Query extends SQLQuery
+public class $query.className$Query extends genorm.runtime.SQLQuery
 	{
 	public static final String QUERY_NAME = "$query.queryName$";
 	public static final String QUERY = "$query.sqlQuery$";
