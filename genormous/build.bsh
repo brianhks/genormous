@@ -13,7 +13,7 @@ make.includeCPMakeScript("java.bsh");
 source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
 
 bldoutdir = "build";
-javadocdir = bldoutdir+"/doc";
+//javadocdir = bldoutdir+"/doc";
 classoutdir = bldoutdir+"/classes";
 jaroutdir = bldoutdir+"/jar";
 gendir = bldoutdir+"/gen";
@@ -55,7 +55,7 @@ make.createDirectoryRule(bldoutdir, null, true);
 make.createDirectoryRule(jaroutdir, null, true);
 make.createDirectoryRule(distdir, null, true);
 make.createDirectoryRule(gentestdir, null, true);
-make.createDirectoryRule(javadocdir, null, true);
+//make.createDirectoryRule(javadocdir, null, true);
 make.createDirectoryRule(genbuilddir, null, true);
 make.createDirectoryRule(gensrcdir, null, true);
 make.createDirectoryRule(testbuilddir, null, true);
@@ -74,10 +74,12 @@ jf.addFiles("etc", ".");
 
 //-------------------------------------------------------------------
 //==-- CREATE JAVADOCS --==
-make.createPhonyRule("javadoc", javadocdir, "javadoc");
+make.createPhonyRule("javadoc", null, "javadoc");
 void javadoc(String target, String[] prereqs)
 	{
-	make.exec(srcdir, "javadoc -public -d ../doc "+make.arrayToString(sourceFiles), true);
+	cmd = "javadoc -public -d doc/javadoc -sourcepath src -subpackages genorm.runtime";
+	make.exec(cmd);
+	//make.exec(srcdir, "javadoc -public -d ../doc "+make.arrayToString(sourceFiles), true);
 	}
 
 //-------------------------------------------------------------------

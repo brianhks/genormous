@@ -143,6 +143,10 @@ $else$
 			}
 		
 		//------------------------------------------------------------------------
+		/**
+			Closes any underlying java.sql.Result set and java.sql.Statement 
+			that was used to create this results set.
+		*/
 		public void close()
 			{
 			try
@@ -157,6 +161,10 @@ $else$
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the reults as an ArrayList of Record objects.
+			The Result set is closed within this call
+		*/
 		public ArrayList<Record> getArrayList(int maxRows)
 			{
 			ArrayList<Record> results = new ArrayList<Record>();
@@ -184,16 +192,23 @@ $else$
 				throw new GenOrmException(sqle);
 				}
 				
+			close();
 			return (results);
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the underlying java.sql.ResultSet object
+		*/
 		public java.sql.ResultSet getResultSet()
 			{
 			return (m_resultSet);
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the current record in the result set
+		*/
 		public Record getRecord()
 			{
 			Record ret = null;
@@ -210,6 +225,11 @@ $else$
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			This call expects only one record in the result set.  If multiple records
+			are found an excpetion is thrown.
+			The ResultSet object is automatically closed by this call.
+		*/
 		public Record getOnlyRecord()
 			{
 			Record ret = null;
@@ -232,6 +252,9 @@ $else$
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns true if there is another record in the result set.
+		*/
 		public boolean next()
 			{
 			boolean ret = false;

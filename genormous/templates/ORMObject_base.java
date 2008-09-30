@@ -186,6 +186,9 @@ public class $table.className$_base extends GenOrmRecord
 			}
 	
 		//---------------------------------------------------------------------------
+		/**
+			Returns the SQL create statement for this table
+		*/
 		public String getCreateStatement()
 			{
 			return (CREATE_SQL);
@@ -193,6 +196,9 @@ public class $table.className$_base extends GenOrmRecord
 			
 		$if(table.hasPrimaryKey)$
 		//---------------------------------------------------------------------------
+		/**
+			Creates a new entry with the specified primary keys.
+		*/
 		public $table.className$ create($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
 			$table.className$ rec = new $table.className$();
@@ -204,6 +210,9 @@ public class $table.className$_base extends GenOrmRecord
 			}
 		$endif$
 		//---------------------------------------------------------------------------
+		/**
+			Creates a new entry that is empty
+		*/
 		public $table.className$ createRecord()
 			{
 			$table.className$ rec = new $table.className$();
@@ -213,6 +222,11 @@ public class $table.className$_base extends GenOrmRecord
 			}
 			
 		//---------------------------------------------------------------------------
+		/**
+		If the table has a primary key that is auto generated this method will 
+		return a new table entry with a generated primary key.
+		@return $table.className$ with generated primary key
+		*/
 		public $table.className$ createWithGeneratedKey()
 			{
 			$if(!table.generatedKey)$
@@ -229,6 +243,13 @@ public class $table.className$_base extends GenOrmRecord
 			}
 			
 		//---------------------------------------------------------------------------
+		/**
+		A generic api for finding a record.
+		@param keys This must match the primary key for this record.  If the 
+		record has multiple primary keys this parameter must be of type Object[] 
+		where each element is the corresponding key.
+		@return $table.className$ or null if no record is found
+		*/
 		public $table.className$ findRecord(Object keys)
 			{
 			$if(table.hasPrimaryKey)$
@@ -245,6 +266,10 @@ public class $table.className$_base extends GenOrmRecord
 			
 		$if(table.hasPrimaryKey)$
 		//---------------------------------------------------------------------------
+		/**
+		Find the record with the specified primary keys
+		@return $table.className$ or null if no record is found
+		*/
 		public $table.className$ find($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
 			$table.className$ rec = new $table.className$();
@@ -281,6 +306,11 @@ public class $table.className$_base extends GenOrmRecord
 			}
 		
 		//---------------------------------------------------------------------------
+		/**
+		This is the same as find except if the record returned is null a new one 
+		is created with the specified primary keys
+		@return A new or existing record.  
+		*/
 		public $table.className$ findOrCreate($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
 			$table.className$ rec = find($primaryKeys:{key | $key.parameterName$}; separator=", "$);
@@ -292,12 +322,23 @@ public class $table.className$_base extends GenOrmRecord
 			
 		$endif$
 		//---------------------------------------------------------------------------
+		/**
+			Convenience method for selecting records.  Ideally this should not be use, 
+			instead a custom query for this table should be used.
+			@param where sql where statement.
+		*/
 		public ResultSet select(String where)
 			{
 			return (select(where, null));
 			}
 			
 		//---------------------------------------------------------------------------
+		/**
+			Convenience method for selecting records.  Ideally this should not be use, 
+			instead a custom query for this table should be used.
+			@param where sql where statement.
+			@param orderBy sql order by statement
+		*/
 		public ResultSet select(String where, String orderBy)
 			{
 			ResultSet rs = null;
@@ -334,6 +375,9 @@ public class $table.className$_base extends GenOrmRecord
 		$table.queries:addQueryMethods()$
 		
 		//---------------------------------------------------------------------------
+		/**
+			Calls all query methods with test parameters.
+		*/
 		public void testQueryMethods()
 			{
 			ResultSet rs;
@@ -363,6 +407,10 @@ $if(!query.singleResult)$rs.close();$endif$
 			}
 		
 		//------------------------------------------------------------------------
+		/**
+			Closes any underlying java.sql.Result set and java.sql.Statement 
+			that was used to create this results set.
+		*/
 		public void close()
 			{
 			try
@@ -377,6 +425,10 @@ $if(!query.singleResult)$rs.close();$endif$
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the reults as an ArrayList of Record objects.
+			The Result set is closed within this call
+		*/
 		public ArrayList<$table.className$> getArrayList(int maxRows)
 			{
 			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
@@ -405,22 +457,34 @@ $if(!query.singleResult)$rs.close();$endif$
 				throw new GenOrmException(sqle);
 				}
 				
+			close();
 			return (results);
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the underlying java.sql.ResultSet object
+		*/
 		public java.sql.ResultSet getResultSet()
 			{
 			return (m_resultSet);
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns the current record in the result set
+		*/
 		public $table.className$ getRecord()
 			{
 			return (factory.new$table.className$(m_resultSet));
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			This call expects only one record in the result set.  If multiple records
+			are found an excpetion is thrown.
+			The ResultSet object is automatically closed by this call.
+		*/
 		public $table.className$ getOnlyRecord()
 			{
 			$table.className$ ret = null;
@@ -438,10 +502,14 @@ $if(!query.singleResult)$rs.close();$endif$
 				throw new GenOrmException(sqle);
 				}
 				
+			close();
 			return (ret);
 			}
 			
 		//------------------------------------------------------------------------
+		/**
+			Returns true if there is another record in the result set.
+		*/
 		public boolean next()
 			{
 			boolean ret = false;
