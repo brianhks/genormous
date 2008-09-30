@@ -27,44 +27,80 @@ public abstract class GenOrmRecord
 		m_queryFields = new ArrayList<GenOrmField>();
 		}
 		
+	/**
+		Returns an iterator of the {@link genorm.runtime.GenOrmField}s that
+		are associated with this record.
+	*/
 	public Iterator<GenOrmField> getFieldIterator()
 		{
 		return (m_fields.iterator());
 		}
 		
+	/**
+		Identifies this record as a new record that needs to be added to the database
+	*/
 	public boolean isNew() { return (m_isNewRecord); }
 		
+	/**
+		This method is called whenever a modification is made to this record.
+		The purpose is for setting a modification timestamp.
+	*/
 	public abstract void setMTS();
+	
+	/**
+		This method is called when a new record is created.  The purpose is
+		to set a creation timestamp for this record.
+	*/
 	public abstract void setCTS();
 	
 	//---------------------------------------------------------------------------
 	protected boolean isEmptyReference(String s) { return (s == null); }
 	protected boolean isEmptyReference(int i) { return (i == 0); }
 	//---------------------------------------------------------------------------
+	/**
+		Deletes this record
+	*/
 	public void delete()
 		{
 		m_isDeleted = true;
 		}
 		
 	//---------------------------------------------------------------------------
+	/**
+		Returns if the record has been deleted by a previous call to {@link #delete()}
+	*/
 	public boolean isDeleted() { return (m_isDeleted); }
 	
 	//---------------------------------------------------------------------------
+	/**
+		Returns if this record has been modified
+	*/
 	public boolean isDirty()
 		{
 		return (m_dirtyFlags != 0);
 		}
 		
 	//---------------------------------------------------------------------------
+	/**
+		Forces this record to be dirty which will cause all values to be commited 
+		to the database upon commit of the transaction
+	*/
 	public void setDirty()
 		{
 		//This will mark all attributes as dirty
 		m_dirtyFlags = -1;
 		}
 	//---------------------------------------------------------------------------
+	/**
+		Sets this record to be ignored.  Ignored records are not commited to the 
+		database.
+	*/
 	public void setIgnored(boolean ignore) { m_isIgnored = ignore; }
 	
 	//---------------------------------------------------------------------------
+	/**
+		Identifies if this record is ignored or not.
+	*/
 	public boolean isIgnored() { return (m_isIgnored); }
 	
 	//---------------------------------------------------------------------------
@@ -210,7 +246,7 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
-	public void createIfNew()
+	/*package*/ void createIfNew()
 			throws SQLException
 		{
 		if ((m_isNewRecord) && (!m_isDeleted) && (!m_isIgnored))
@@ -222,7 +258,7 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
-	public void commitChanges()
+	/*package*/ void commitChanges()
 			throws SQLException
 		{
 		String query;
@@ -248,6 +284,10 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
+	/**
+		Flush any changes made to this record.  The record will be inserted if 
+		it is new.
+	*/
 	public void flush()
 			throws SQLException
 		{
