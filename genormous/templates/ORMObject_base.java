@@ -267,6 +267,39 @@ public class $table.className$_base extends GenOrmRecord
 		$if(table.hasPrimaryKey)$
 		//---------------------------------------------------------------------------
 		/**
+			Deletes the record with the specified primary keys.
+			@return Returns true if the record existed false otherwise.
+		*/
+		public boolean delete($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
+			{
+			boolean ret = true;
+			$table.className$ rec = new $table.className$();
+			
+			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
+			$table.className$ cacheRec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec);
+			
+			if (cacheRec != null)
+				cacheRec.delete(); //The record was in the cache so set it to be deleted.
+			else
+				{
+				rec.delete();
+				try
+					{
+					//We will try to flush it to make sure the record is there
+					rec.flush();
+					}
+				catch (java.sql.SQLException sqle)
+					{
+					//The record did not exist so return false
+					ret = false;
+					}
+				}
+				
+			return (ret);
+			}
+			
+		//---------------------------------------------------------------------------
+		/**
 		Find the record with the specified primary keys
 		@return $table.className$ or null if no record is found
 		*/
@@ -569,13 +602,17 @@ m_fields.add(m_$col.parameterName$);$\n$}$
 	//---------------------------------------------------------------------------
 	public void setMTS()
 		{
-		//setMTS(new Timestamp(System.currentTimeMillis()));
+		$if (table.isMTSet)$
+		set$table.mTColumn.methodName$(new java.sql.Timestamp(System.currentTimeMillis()));
+		$endif$
 		}
 		
 	//---------------------------------------------------------------------------
 	public void setCTS()
 		{
-		//setCTS(new Timestamp(System.currentTimeMillis()));
+		$if (table.isCTSet)$
+		set$table.cTColumn.methodName$(new java.sql.Timestamp(System.currentTimeMillis()));
+		$endif$
 		}
 		
 	//---------------------------------------------------------------------------

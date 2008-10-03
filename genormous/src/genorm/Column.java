@@ -19,6 +19,7 @@ public class Column
 	private boolean m_allowNull;
 	private Format m_formatter;
 	private boolean m_unique;
+	private String m_autoSet;
 	
 	public Column(String name)
 		{
@@ -92,6 +93,9 @@ public class Column
 	public void setDirtyFlag(int flag) { m_dirtyFlag = flag; }
 	public void setUnique() { m_unique = true; }
 	public void setCustomType(String type) { m_customType = type; }
+	public void setAutoSet(String autoSet) { m_autoSet = autoSet; }
+	public String getAutoSet() { return (m_autoSet); }
+
 	
 	public String getXML()
 		{

@@ -18,6 +18,11 @@ public class GenOrmException extends RuntimeException
 		super(message, cause);
 		}
 		
+	public GenOrmException(GenOrmRecord rec, Throwable cause)
+		{
+		super("Exception in table "+rec.getTableName()+" {"+rec.toString()+"}", cause);
+		}
+		
 	public GenOrmException(Throwable cause)
 		{
 		super(cause);

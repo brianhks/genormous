@@ -1,5 +1,10 @@
 
 <tables>
+	<global>
+		<col name="mts" type="timestamp" auto_set="mts"/>
+		<col name="cts" type="timestamp" auto_set="cts"/>
+	</global>
+	
 	<table name="segment">
 		<comment></comment>
 		<property key="hsqldb_tableType" value="CACHED"/>

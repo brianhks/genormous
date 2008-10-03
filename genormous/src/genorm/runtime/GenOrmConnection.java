@@ -80,21 +80,31 @@ public class GenOrmConnection
 		
 	public void flush()
 		{
+		GenOrmRecord currentRecord = null;
 		try
 			{
 			Iterator<GenOrmRecord> it = m_transactionList.iterator();
 			while (it.hasNext())
-				it.next().createIfNew();
+				{
+				currentRecord = it.next();
+				currentRecord.createIfNew();
+				}
 				
 			it = m_transactionList.iterator();
 			while (it.hasNext())
-				it.next().commitChanges();
+				{
+				currentRecord = it.next();
+				currentRecord.commitChanges();
+				}
 				
 			m_transactionList.clear();
 			}
 		catch (SQLException sqle)
 			{
-			throw new GenOrmException(sqle);
+			if (currentRecord != null)
+				throw new GenOrmException(currentRecord, sqle);
+			else
+				throw new GenOrmException(sqle);
 			}
 		}
 		

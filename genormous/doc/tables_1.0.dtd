@@ -1,4 +1,5 @@
-<!ELEMENT tables (table+)>
+<!ELEMENT tables (global?,table+)>
+<!ELEMENT global (col+)>
 <!ELEMENT table (comment?,property*,col+,query*)>
 <!ATTLIST table
 	name CDATA #REQUIRED

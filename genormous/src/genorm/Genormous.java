@@ -19,6 +19,7 @@ public class Genormous extends TemplateHelper
 	public static final String UNIQUE = "unique";
 	public static final String COL = "col";
 	public static final String TABLE = "table";
+	public static final String GLOBAL = "global";
 	public static final String COLUMN = "column";
 	public static final String REF_TABLE = "reftable";
 	public static final String REFERENCE = "reference";
@@ -28,6 +29,8 @@ public class Genormous extends TemplateHelper
 	public static final String QUERY = "query";
 	public static final String DEFAULT_VALUE = "default_value";
 	public static final String ALLOW_NULL = "allow_null";
+	public static final String AUTO_SET = "auto_set";
+	
 	
 	private String m_source;
 	//private String m_destDir;
@@ -173,6 +176,45 @@ public class Genormous extends TemplateHelper
 					new ); */
 			Document xmldoc = reader.read(new File(m_source));
 			
+			//Read in global column definitions
+			ArrayList<Column> globalColumns = new ArrayList<Column>();
+			Iterator globColIt = xmldoc.selectNodes("/tables/global/col").iterator();
+			while (globColIt.hasNext())
+				{
+				Element cole = (Element)globColIt.next();
+				String colName = cole.attribute(NAME).getValue();
+				String type = cole.attribute(TYPE).getValue();
+				Column col = new Column(colName, m_typeMap.getString(type), type, m_formatter);
+				
+				if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
+					col.setAllowNull(false);
+					
+				if (cole.attribute(DEFAULT_VALUE) != null)
+					col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
+				
+				if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
+					col.setUnique();
+				
+				if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
+					col.setPrimaryKey();
+					
+				if (cole.attribute(AUTO_SET) != null)
+					col.setAutoSet(cole.attribute(AUTO_SET).getValue());
+					
+				//Attribute refTable = cole.attribute(REF_TABLE);
+				Element refTable = cole.element(REFERENCE);
+				if (refTable != null)
+					{
+					col.setForeignKey();
+					col.setForeignTableName(refTable.attributeValue(TABLE));
+					col.setForeignTableColumnName(refTable.attributeValue(COLUMN));
+					}
+					
+				col.setComment(cole.elementText(COMMENT));
+				
+				globalColumns.add(col);
+				}
+			
 			Iterator tableit = xmldoc.selectNodes("/tables/table").iterator();
 			while (tableit.hasNext())
 				{
@@ -212,6 +254,9 @@ public class Genormous extends TemplateHelper
 					if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
 						col.setPrimaryKey();
 						
+					if (cole.attribute(AUTO_SET) != null)
+						col.setAutoSet(cole.attribute(AUTO_SET).getValue());
+						
 					//Attribute refTable = cole.attribute(REF_TABLE);
 					Element refTable = cole.element(REFERENCE);
 					if (refTable != null)
@@ -222,6 +267,29 @@ public class Genormous extends TemplateHelper
 						}
 						
 					col.setComment(cole.elementText(COMMENT));
+					
+					if ("mts".equals(col.getAutoSet()))
+						table.setMTColumn(col);
+						
+					if ("cts".equals(col.getAutoSet()))
+						table.setCTColumn(col);
+						
+					table.addColumn(col);
+					}
+					
+				//Add global columns to table
+				Iterator<Column> globCols = globalColumns.iterator();
+				while (globCols.hasNext())
+					{
+					Column col = globCols.next();
+					col.setDirtyFlag(dirtyFlag);
+					dirtyFlag <<= 1;
+					
+					if ("mts".equals(col.getAutoSet()))
+						table.setMTColumn(col);
+						
+					if ("cts".equals(col.getAutoSet()))
+						table.setCTColumn(col);
 					
 					table.addColumn(col);
 					}

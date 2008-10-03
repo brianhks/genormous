@@ -8,7 +8,7 @@ public abstract class GenOrmRecord
 	/**
 	For debug output recompile with this value set to true
 	*/
-	protected static final boolean DEBUG = false;
+	protected static boolean DEBUG = false;
 	
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
 	protected boolean                  m_isNewRecord;   //Identifies if this is a new record
@@ -25,6 +25,14 @@ public abstract class GenOrmRecord
 		m_fields = new ArrayList<GenOrmField>();
 		m_isNewRecord = false;
 		m_queryFields = new ArrayList<GenOrmField>();
+		}
+		
+	/**
+		Returns the name of the table this record is from
+	*/
+	public String getTableName()
+		{
+		return (m_tableName);
 		}
 		
 	/**
