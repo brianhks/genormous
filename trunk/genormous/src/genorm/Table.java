@@ -18,6 +18,8 @@ public class Table
 	private String m_createSQL;
 	private ArrayList<Query> m_queries;
 	private ArrayList<Set<Column>> m_uniqueColumns;
+	private Column m_setMTColumn; //Column to set modification time stamp on
+	private Column m_setCTColumn; //Column to set creation time stamp on
 	
 	public Table(String tableName, Format format)
 		{
@@ -35,6 +37,8 @@ public class Table
 		m_createSQL = "";
 		m_queries = new ArrayList<Query>();
 		m_uniqueColumns = new ArrayList<Set<Column>>();
+		m_setMTColumn = null;
+		m_setCTColumn = null;
 		}
 		
 	public void addQuery(Query q)
@@ -186,5 +190,12 @@ public class Table
 		
 	public void setCreateSQL(String sql) { m_createSQL = sql; }
 	public String getCreateSQL() { return (m_createSQL); }
-		
+	
+	public boolean getIsMTSet() { return (m_setMTColumn != null); }
+	public void setMTColumn(Column col) { m_setMTColumn = col; }
+	public Column getMTColumn() { return (m_setMTColumn); }
+
+	public boolean getIsCTSet() { return (m_setCTColumn != null); }
+	public void setCTColumn(Column col) { m_setCTColumn = col; }
+	public Column getCTColumn() { return (m_setCTColumn); }
 	}
