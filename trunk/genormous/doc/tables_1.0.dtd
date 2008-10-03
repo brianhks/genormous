@@ -20,6 +20,7 @@
 	default_value CDATA #IMPLIED
 	allow_null CDATA "true"
 	unique CDATA "false"
+	auto_set (mts|cts) #IMPLIED 
 	>
 	
 <!ELEMENT reference EMPTY>
