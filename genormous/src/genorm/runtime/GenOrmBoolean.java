@@ -14,9 +14,16 @@ public class GenOrmBoolean extends GenOrmField
 		m_value = false;
 		}
 		
-	public void setValue(boolean value)
+	public boolean setValue(boolean value)
 		{
-		m_value = value;
+		if (m_isNull || (m_value != value))
+			{
+			m_value = value;
+			m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public boolean getValue()
@@ -28,6 +35,7 @@ public class GenOrmBoolean extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getBoolean(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 

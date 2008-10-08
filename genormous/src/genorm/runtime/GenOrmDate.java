@@ -14,9 +14,20 @@ public class GenOrmDate extends GenOrmField
 		m_value = null;
 		}
 		
-	public void setValue(Date value)
+	public boolean setValue(Date value)
 		{
-		m_value = value;
+		if (((m_value == null) && (value != null)) || 
+				((m_value != null) && (!m_value.equals(value))))
+			{
+			m_value = value;
+			if (m_value == null)
+				setNull();
+			else
+				m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public Date getValue()
@@ -28,6 +39,7 @@ public class GenOrmDate extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getDate(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 

@@ -81,6 +81,7 @@ public class GenOrmConnection
 	public void flush()
 		{
 		GenOrmRecord currentRecord = null;
+		//System.out.println("Flushing transaction list ("+m_transactionList.size()+")");
 		try
 			{
 			Iterator<GenOrmRecord> it = m_transactionList.iterator();
@@ -128,6 +129,8 @@ public class GenOrmConnection
 			throw new GenOrmException(sqle);
 			}
 		}
+		
+	public boolean isCommitted() { return (m_committed); }
 		
 	public void close()
 		{

@@ -14,11 +14,20 @@ public class GenOrmString extends GenOrmField
 		m_value = null;
 		}
 		
-	public void setValue(String value)
+	public boolean setValue(String value)
 		{
-		m_value = value;
-		if (m_value == null)
-			setNull();
+		if (((m_value == null) && (value != null)) || 
+				((m_value != null) && (!m_value.equals(value))))
+			{
+			m_value = value;
+			if (m_value == null)
+				setNull();
+			else
+				m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public String getValue()
@@ -30,6 +39,7 @@ public class GenOrmString extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getString(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 

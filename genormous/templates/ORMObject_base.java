@@ -8,14 +8,16 @@ setAndGetMethods(col) ::= <<
 public $col.type$ get$col.methodName$() { return (m_$col.parameterName$.getValue()); }
 public void set$col.methodName$($col.type$ data)
 	{
-	m_$col.parameterName$.setValue(data);
+	boolean changed = m_$col.parameterName$.setValue(data);
 	
-	//TODO: should check if the value has changed
 	//Add the now dirty record to the transaction only if it is not previously dirty
-	if (m_dirtyFlags == 0)
-		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
-		
-	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+	if (changed)
+		{
+		if (m_dirtyFlags == 0)
+			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			
+		m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+		}
 	}
 	
 $if(col.allowNull)$
