@@ -5,9 +5,6 @@ import java.sql.*;
 
 public abstract class GenOrmRecord
 	{
-	/**
-	For debug output recompile with this value set to true
-	*/
 	protected static boolean DEBUG = false;
 	
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
@@ -71,6 +68,7 @@ public abstract class GenOrmRecord
 	public void delete()
 		{
 		m_isDeleted = true;
+		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 		}
 		
 	//---------------------------------------------------------------------------
@@ -97,6 +95,7 @@ public abstract class GenOrmRecord
 		{
 		//This will mark all attributes as dirty
 		m_dirtyFlags = -1;
+		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 		}
 	//---------------------------------------------------------------------------
 	/**
@@ -141,7 +140,9 @@ public abstract class GenOrmRecord
 					}
 					
 				first = false;
+				sb.append("\"");
 				sb.append(meta.getFieldName());
+				sb.append("\"");
 				m_queryFields.add(gof);
 				valuesSB.append("?");
 				}
@@ -172,7 +173,9 @@ public abstract class GenOrmRecord
 					sb.append(" ");
 					
 				first = false;
+				sb.append("\"");
 				sb.append(meta.getFieldName());
+				sb.append("\"");
 				sb.append(" = ");
 				sb.append("?");
 				m_queryFields.add(gof);
@@ -203,7 +206,9 @@ public abstract class GenOrmRecord
 					sb.append(" ");
 					
 				first = false;
+				sb.append("\"");
 				sb.append(meta.getFieldName());
+				sb.append("\"");
 				sb.append(" = ");
 				sb.append("?");
 				m_queryFields.add(gof);
@@ -299,6 +304,7 @@ public abstract class GenOrmRecord
 	public void flush()
 			throws SQLException
 		{
+		//System.out.println("Flushing record for "+m_tableName+" "+toString());
 		createIfNew();
 		commitChanges();
 		m_dirtyFlags = 0;

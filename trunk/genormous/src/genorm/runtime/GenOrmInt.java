@@ -14,9 +14,16 @@ public class GenOrmInt extends GenOrmField
 		m_value = 0;
 		}
 		
-	public void setValue(int value)
+	public boolean setValue(int value)
 		{
-		m_value = value;
+		if (m_isNull || (m_value != value))
+			{
+			m_value = value;
+			m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public int getValue()
@@ -28,6 +35,7 @@ public class GenOrmInt extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getInt(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 

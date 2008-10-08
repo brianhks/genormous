@@ -14,9 +14,20 @@ public class GenOrmBigDecimal extends GenOrmField
 		m_value = null;
 		}
 		
-	public void setValue(BigDecimal value)
+	public boolean setValue(BigDecimal value)
 		{
-		m_value = value;
+		if (((m_value == null) && (value != null)) || 
+				((m_value != null) && (!m_value.equals(value))))
+			{
+			m_value = value;
+			if (m_value == null)
+				setNull();
+			else
+				m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public BigDecimal getValue()
@@ -28,6 +39,7 @@ public class GenOrmBigDecimal extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getBigDecimal(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 

@@ -14,9 +14,20 @@ public class GenOrmTimestamp extends GenOrmField
 		m_value = null;
 		}
 		
-	public void setValue(Timestamp value)
+	public boolean setValue(Timestamp value)
 		{
-		m_value = value;
+		if (((m_value == null) && (value != null)) || 
+				((m_value != null) && (!m_value.equals(value))))
+			{
+			m_value = value;
+			if (m_value == null)
+				setNull();
+			else
+				m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public Timestamp getValue()
@@ -28,6 +39,7 @@ public class GenOrmTimestamp extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getTimestamp(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
@@ -64,6 +76,9 @@ public class GenOrmTimestamp extends GenOrmField
 		
 	public String toString()
 		{
-		return (m_value.toString());
+		if (m_value != null)
+			return (m_value.toString());
+		else
+			return ("null");
 		}
 	}

@@ -11,7 +11,7 @@ public abstract class GenOrmField
 	public GenOrmField(GenOrmFieldMeta gofm)
 		{
 		m_fieldMeta = gofm;
-		m_isNull = false;
+		m_isNull = true;
 		}
 		
 	public GenOrmFieldMeta getFieldMeta() { return (m_fieldMeta); }

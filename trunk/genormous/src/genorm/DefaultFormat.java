@@ -7,7 +7,7 @@ public class DefaultFormat
 	/*package*/ static String toCamelCase(String str, boolean upcaseFirstChar)
 		{
 		StringBuffer sb = new StringBuffer();
-		char[] cArr = str.toCharArray();
+		char[] cArr = str.toLowerCase().toCharArray();
 		
 		if (upcaseFirstChar)
 			{

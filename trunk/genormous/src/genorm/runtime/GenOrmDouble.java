@@ -13,9 +13,16 @@ public class GenOrmDouble extends GenOrmField
 		m_value = 0.0;
 		}
 		
-	public void setValue(double value)
+	public boolean setValue(double value)
 		{
-		m_value = value;
+		if (m_isNull || (m_value != value))
+			{
+			m_value = value;
+			m_isNull = false;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public double getValue()
@@ -27,6 +34,7 @@ public class GenOrmDouble extends GenOrmField
 			throws java.sql.SQLException
 		{
 		m_value = rs.getDouble(pos);
+		m_isNull = rs.wasNull();
 		}
 		
 	public void placeValue(PreparedStatement ps, int pos) 
