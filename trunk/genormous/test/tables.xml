@@ -52,7 +52,7 @@
 		<col name="NOTE_ID" type="integer" primary_key="true">
 			<comment></comment>
 		</col>
-		<col name="TRANSLATION" type="integer" primary_key="false">
+		<col name="TRANSLATION" type="integer" primary_key="false" allow_null="false">
 			<comment></comment>
 			<reference table="segment" column="SEGMENT_ID"/>
 		</col>

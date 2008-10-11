@@ -10,7 +10,7 @@ public class GenOrmConnection
 	private boolean m_closeConnection;
 	private ArrayList<GenOrmRecord> m_transactionList;
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
-	private Map<GenOrmRecord, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
+	private Map<GenOrmRecordKey, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
 	private boolean m_committed;
 	private boolean m_initializedConnection;
 	
@@ -23,7 +23,7 @@ public class GenOrmConnection
 		{
 		m_connection = null;
 		m_transactionList = new ArrayList<GenOrmRecord>();
-		m_uniqueRecordMap = new HashMap<GenOrmRecord, GenOrmRecord>();
+		m_uniqueRecordMap = new HashMap<GenOrmRecordKey, GenOrmRecord>();
 		m_initializedConnection = false;
 		
 		try
@@ -56,11 +56,11 @@ public class GenOrmConnection
 	*/
 	public GenOrmRecord getUniqueRecord(GenOrmRecord rec)
 		{
-		GenOrmRecord urec = m_uniqueRecordMap.get(rec);
+		GenOrmRecord urec = m_uniqueRecordMap.get(rec.getRecordKey());
 		if (urec == null)
 			{
 			urec = rec;
-			m_uniqueRecordMap.put(rec, rec);
+			m_uniqueRecordMap.put(rec.getRecordKey(), rec);
 			}
 		else
 			{ //Need to ignore the new one
@@ -73,9 +73,22 @@ public class GenOrmConnection
 	/**
 		Returns the cached record if it exists, null otherwise
 	*/
-	public GenOrmRecord getCachedRecord(GenOrmRecord rec)
+	public GenOrmRecord getCachedRecord(GenOrmRecordKey key)
 		{
-		return (m_uniqueRecordMap.get(rec));
+		return (m_uniqueRecordMap.get(key));
+		}
+		
+	/**
+		Checks to see if a record key is part of this transaction.
+		This is used by the GenOrmRecord to see if a foreign key is begin created
+		at the same time.
+		
+		TODO: Sort out the records in order of depenendency and change this to 
+		only return records that have not been commited.
+	*/
+	/*package*/ boolean isInTransaction(GenOrmRecordKey key)
+		{
+		return (m_uniqueRecordMap.containsKey(key));
 		}
 		
 	public void flush()
@@ -88,7 +101,7 @@ public class GenOrmConnection
 			while (it.hasNext())
 				{
 				currentRecord = it.next();
-				currentRecord.createIfNew();
+				currentRecord.createIfNew(this);
 				}
 				
 			it = m_transactionList.iterator();

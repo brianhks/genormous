@@ -242,6 +242,7 @@ public class Genormous extends TemplateHelper
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					
+					
 					if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
 						col.setAllowNull(false);
 						
@@ -281,7 +282,7 @@ public class Genormous extends TemplateHelper
 				Iterator<Column> globCols = globalColumns.iterator();
 				while (globCols.hasNext())
 					{
-					Column col = globCols.next();
+					Column col = globCols.next().getCopy();
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					

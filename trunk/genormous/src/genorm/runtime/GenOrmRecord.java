@@ -10,26 +10,28 @@ public abstract class GenOrmRecord
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
 	protected boolean                  m_isNewRecord;   //Identifies if this is a new record
 	protected int                      m_dirtyFlags;    //Identifies which field is dirty
-	protected String                   m_tableName;     //Name of the table
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
 	protected boolean                  m_isIgnored;     //This record should not be committed in this transaction
+	protected GenOrmRecordKey          m_recordKey;
 	
 	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
 	
 	public GenOrmRecord(String tableName)
 		{
-		m_tableName = tableName;
+		m_recordKey = new GenOrmRecordKey(tableName);
 		m_fields = new ArrayList<GenOrmField>();
 		m_isNewRecord = false;
 		m_queryFields = new ArrayList<GenOrmField>();
 		}
+		
+	public GenOrmRecordKey getRecordKey() { return (m_recordKey); }
 		
 	/**
 		Returns the name of the table this record is from
 	*/
 	public String getTableName()
 		{
-		return (m_tableName);
+		return (m_recordKey.getTableName());
 		}
 		
 	/**
@@ -111,13 +113,27 @@ public abstract class GenOrmRecord
 	public boolean isIgnored() { return (m_isIgnored); }
 	
 	//---------------------------------------------------------------------------
-	private String createInsertStatement()
+	/**
+		Returns a list of foreign keys for this record
+	*/
+	public abstract List<GenOrmRecordKey> getForeignKeys();
+	
+	//---------------------------------------------------------------------------
+	protected void addField(GenOrmField field)
+		{
+		m_fields.add(field);
+		if (field.getFieldMeta().isPrimaryKey())
+			m_recordKey.addKeyField(field.getFieldMeta().getFieldName(), field);
+		}
+	
+	//---------------------------------------------------------------------------
+	private String createInsertStatement(GenOrmConnection con)
 		{
 		StringBuilder sb = new StringBuilder();
 		m_queryFields.clear();
 		
 		sb.append("INSERT INTO ");
-		sb.append(m_tableName);
+		sb.append(m_recordKey.getTableName());
 		sb.append(" (");
 		
 		StringBuilder valuesSB = new StringBuilder();
@@ -127,12 +143,29 @@ public abstract class GenOrmRecord
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if (meta.isPrimaryKey() || (!meta.isForeignKey() && 
-					((m_dirtyFlags & meta.getDirtyFlag()) != 0)))
-			//if (!meta.isForeignKey())
-			//if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
+			//System.out.println("looking at "+meta.getFieldName());
+			//System.out.println(gof);
+			
+			boolean addForeignKey = false;
+			if (meta.isForeignKey() && (con != null))
 				{
-				m_dirtyFlags ^= meta.getDirtyFlag(); //Clear dirty flag on key
+				//This is gauranteed if it is a foreign key
+				GenOrmRecordKey key = gof.getRecordKey();
+				
+				//Looking to see if the record is part of the transaction
+				GenOrmRecord rec = con.getCachedRecord(key);
+				if ((rec == null) || (!rec.isNew()) || (!rec.isDirty()))
+					{
+					//System.out.println("Key = "+key);
+					//System.out.println("Add foreign key "+meta.getFieldName());
+					addForeignKey = true;
+					}
+				}
+			
+			if (((m_dirtyFlags & meta.getDirtyFlag()) != 0) &&
+					( (meta.isPrimaryKey()) || (!meta.isForeignKey()) || addForeignKey ) )
+				{
+				m_dirtyFlags ^= meta.getDirtyFlag(); //Clear dirty flag on value
 				if (!first)
 					{
 					sb.append(",");
@@ -190,7 +223,7 @@ public abstract class GenOrmRecord
 		m_queryFields.clear();
 		
 		sb.append("UPDATE ");
-		sb.append(m_tableName);
+		sb.append(m_recordKey.getTableName());
 		sb.append(" SET");
 		Iterator<GenOrmField> it = m_fields.iterator();
 		boolean first = true;
@@ -227,7 +260,7 @@ public abstract class GenOrmRecord
 		m_queryFields.clear();
 		
 		sb.append("DELETE FROM ");
-		sb.append(m_tableName);
+		sb.append(m_recordKey.getTableName());
 		
 		addKeyedWhereStatement(sb);
 			
@@ -259,14 +292,14 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
-	/*package*/ void createIfNew()
+	/*package*/ void createIfNew(GenOrmConnection con)
 			throws SQLException
 		{
 		if ((m_isNewRecord) && (!m_isDeleted) && (!m_isIgnored))
 			{
 			setCTS();
 			setMTS();
-			runStatement(createInsertStatement());
+			runStatement(createInsertStatement(con));
 			}
 		}
 		
@@ -304,8 +337,9 @@ public abstract class GenOrmRecord
 	public void flush()
 			throws SQLException
 		{
+		GenOrmConnection con = GenOrmDataSource.getGenOrmConnection();
 		//System.out.println("Flushing record for "+m_tableName+" "+toString());
-		createIfNew();
+		createIfNew(con);
 		commitChanges();
 		m_dirtyFlags = 0;
 		m_isNewRecord = false;
@@ -318,26 +352,19 @@ public abstract class GenOrmRecord
 	@Override
 	public int hashCode()
 		{
-		Iterator<GenOrmField> it = m_fields.iterator();
-		int hashCode = 1;
-		while (it.hasNext())
-			{
-			GenOrmField gof = it.next();
-			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if (meta.isPrimaryKey())
-				{
-				//Same hash code calculation as used in a java.util.List
-				hashCode = 31 * hashCode + gof.hashCode();
-				}
-			}
-			
-		return (hashCode);
+		return (m_recordKey.hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
 	/**
-		Equality is based on the values of the primary keys only
+		Equality is based on the table name and values of the primary keys only
 	*/
 	@Override
-	public abstract boolean equals(Object obj);
+	public boolean equals(Object obj)
+		{
+		if (!(obj instanceof GenOrmRecord))
+			return (false);
+			
+		return (m_recordKey.equals(((GenOrmRecord)obj).getRecordKey()));
+		}
 	}

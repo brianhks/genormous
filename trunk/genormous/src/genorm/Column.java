@@ -2,7 +2,7 @@ package genorm;
 
 import java.util.*;
 
-public class Column
+public class Column implements Cloneable
 	{
 	private String m_name;
 	private boolean m_primaryKey;
@@ -41,6 +41,20 @@ public class Column
 		m_isDefaultSet = false;
 		m_allowNull = true;
 		m_unique = false;
+		}
+		
+	public Column getCopy()
+		{
+		Column copy  = null;
+		try
+			{
+			copy = (Column)clone();
+			}
+		catch (CloneNotSupportedException e)
+			{
+			}
+			
+		return (copy);
 		}
 		
 	@Override

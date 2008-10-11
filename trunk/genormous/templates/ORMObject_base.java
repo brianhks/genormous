@@ -278,7 +278,7 @@ public class $table.className$_base extends GenOrmRecord
 			$table.className$ rec = new $table.className$();
 			
 			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
-			$table.className$ cacheRec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec);
+			$table.className$ cacheRec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec.getRecordKey());
 			
 			if (cacheRec != null)
 				cacheRec.delete(); //The record was in the cache so set it to be deleted.
@@ -311,7 +311,7 @@ public class $table.className$_base extends GenOrmRecord
 			
 			//Create temp object and look in cache for it
 			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
-			rec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec);
+			rec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec.getRecordKey());
 			
 			if (rec == null)
 				{
@@ -565,6 +565,10 @@ $if(!query.singleResult)$rs.close();$endif$
 	//===========================================================================
 		
 	$columns:{col | private $javaToGenOrmMap.(col.type)$ m_$col.parameterName$;$\n$}$
+	
+	private List<GenOrmRecordKey> m_foreignKeys;
+	
+	public List<GenOrmRecordKey> getForeignKeys() { return (m_foreignKeys); }
 
 	$columns:setAndGetMethods()$	
 	
@@ -595,13 +599,21 @@ $if(!query.singleResult)$rs.close();$endif$
 		{
 		super(TABLE_NAME);
 		
+		m_foreignKeys = new ArrayList<GenOrmRecordKey>();
+		
 		$columns:{col | 
 m_$col.parameterName$ = new $javaToGenOrmMap.(col.type)$($col.nameCaps$_FIELD_META);
-m_fields.add(m_$col.parameterName$);$\n$}$
+addField(m_$col.parameterName$);$\n$}$
+		GenOrmRecordKey foreignKey;
+		$foreignKeys:{key | foreignKey = new GenOrmRecordKey("$key.tableName$");
+$key.keys:{col | foreignKey.addKeyField("$col.foreignTableColumnName$", m_$col.parameterName$);$\n$}$
+m_foreignKeys.add(foreignKey);
+}; separator="\n"$
 		}
 	
 	//---------------------------------------------------------------------------	
 	//---------------------------------------------------------------------------
+	@Override
 	public void setMTS()
 		{
 		$if (table.isMTSet)$
@@ -610,6 +622,7 @@ m_fields.add(m_$col.parameterName$);$\n$}$
 		}
 		
 	//---------------------------------------------------------------------------
+	@Override
 	public void setCTS()
 		{
 		$if (table.isCTSet)$
@@ -617,22 +630,6 @@ m_fields.add(m_$col.parameterName$);$\n$}$
 		$endif$
 		}
 		
-	//---------------------------------------------------------------------------
-	/**
-		Returns true of the primary keys have the same value as those in obj
-	*/
-	public boolean equals(Object obj)
-		{
-		if (!(obj instanceof $table.className$_base))
-			return (false);
-			
-		$table.className$_base other = ($table.className$_base)obj;
-		if ($primaryKeys:{key | m_$key.parameterName$.equals(other.m_$key.parameterName$)}; separator=" &&\n\t\t\t\t "$)
-			return (true);
-		else
-			return (false);
-		}
-	
 	//---------------------------------------------------------------------------
 	public String toString()
 		{
