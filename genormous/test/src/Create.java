@@ -99,6 +99,17 @@ public class Create
 		
 		GenOrmDataSource.commit();
 		GenOrmDataSource.close();
+		
+		GenOrmDataSource.begin();
+		
+		//Todo: why is the phase getting set on this?
+		Note note = Note.factory.createWithGeneratedKey();
+		note.isDirty();
+		note.setTranslationRef(seg1);
+		note.isDirty();
+		
+		GenOrmDataSource.commit();
+		GenOrmDataSource.close();
 		}
 		
 	//---------------------------------------------------------------------------
