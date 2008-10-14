@@ -30,7 +30,7 @@
 	id CDATA #IMPLIED
 	>
 	
-<!ELEMENT query (input?,replace?,sql)>
+<!ELEMENT query (comment?,input?,replace?,sql)>
 <!ATTLIST query
 	name CDATA #REQUIRED
 	result_type (single|multi) #REQUIRED
@@ -40,7 +40,7 @@
 
 <!ELEMENT replace (param*)>
 
-<!ELEMENT param (EMPTY)>
+<!ELEMENT param EMPTY>
 <!ATTLIST param
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
