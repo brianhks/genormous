@@ -36,7 +36,7 @@ $endif$
 >>
 	
 declarMetaFields(col) ::= <<
-private static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", $col.dirtyFlag$, $col.primaryKey$, $col.foreignKey$);
+private static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", "$col.customType$", $col.dirtyFlag$, $col.primaryKey$, $col.foreignKey$);
 
 >>
 
@@ -65,6 +65,9 @@ m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
 
 addQueryMethods(query) ::= <<
 //---------------------------------------------------------------------------
+/**
+	$query.comment$
+*/
 public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 	{
 	String query = SELECT+"$query.sqlQuery$";
@@ -118,10 +121,10 @@ public class $table.className$_base extends GenOrmRecord
 }$
 	//Change this value to true to turn on warning messages
 	private static final boolean WARNINGS = false;
-	private static final String SELECT = "SELECT $columns:{col | this.$col.name$}; separator=", "$ ";
+	private static final String SELECT = "SELECT $columns:{col | this.\"$col.name$\"}; separator=", "$ ";
 	private static final String FROM = "FROM $table.name$ this ";
 	private static final String WHERE = "WHERE ";
-	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $key.name$ = ?}; separator=" AND "$";
+	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | \"$key.name$\" = ?}; separator=" AND "$";
 	
 	private static final String TABLE_NAME = "$table.name$";
 	
@@ -132,7 +135,7 @@ public class $table.className$_base extends GenOrmRecord
 	public static class $table.className$KeyGenerator
 			implements GenOrmKeyGenerator
 		{
-		private static final String MAX_QUERY = "SELECT MAX($table.primaryKey.name$) FROM $table.name$";
+		private static final String MAX_QUERY = "SELECT MAX(\"$table.primaryKey.name$\") FROM $table.name$";
 		
 		private volatile long m_nextKey;
 		
@@ -175,9 +178,14 @@ public class $table.className$_base extends GenOrmRecord
 			implements GenOrmRecordFactory
 		{
 		public static final String CREATE_SQL = "$createSQL$";
+
+		private ArrayList<GenOrmFieldMeta> m_fieldMeta;
 		
 		private $table.className$Factory()
 			{
+			m_fieldMeta = new ArrayList<GenOrmFieldMeta>();
+			$columns:{col | m_fieldMeta.add($col.nameCaps$_FIELD_META);
+}$
 			}
 			
 		protected $table.className$ new$table.className$(java.sql.ResultSet rs)
@@ -187,6 +195,15 @@ public class $table.className$_base extends GenOrmRecord
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			}
 	
+		//---------------------------------------------------------------------------
+		/**
+			Returns a list of the feild meta for the class that this is a factory of
+		*/
+		public List<GenOrmFieldMeta> getFields()
+			{
+			return (m_fieldMeta);
+			}
+
 		//---------------------------------------------------------------------------
 		/**
 			Returns the SQL create statement for this table

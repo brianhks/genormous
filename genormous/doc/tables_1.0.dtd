@@ -1,6 +1,6 @@
-<!ELEMENT tables (global?,table+)>
+<!ELEMENT tables (global?,table+,query*)>
 <!ELEMENT global (col+)>
-<!ELEMENT table (comment?,property*,col+,query*)>
+<!ELEMENT table (comment?,property*,col+,table_query*)>
 <!ATTLIST table
 	name CDATA #REQUIRED
 	>
@@ -28,10 +28,12 @@
 	table CDATA #REQUIRED
 	column CDATA #REQUIRED
 	id CDATA #IMPLIED
+	on_delete (cascade|null|default) #IMPLIED
+	on_update (cascade|null|default) #IMPLIED
 	>
 	
-<!ELEMENT query (comment?,input?,replace?,sql)>
-<!ATTLIST query
+<!ELEMENT table_query (comment?,input?,replace?,sql)>
+<!ATTLIST table_query
 	name CDATA #REQUIRED
 	result_type (single|multi) #REQUIRED
 	>
@@ -40,11 +42,18 @@
 
 <!ELEMENT replace (param*)>
 
+<!ELEMENT return (param*)>
+
 <!ELEMENT param EMPTY>
 <!ATTLIST param
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
-	test CDATA #REQUIRED
+	test CDATA #IMPLIED
 	>
 	
 <!ELEMENT sql (#PCDATA)>
+
+<!ELEMENT query (comment?,input?,replace?,return?,sql)>
+<!ATTLIST query
+	name CDATA #REQUIRED
+	>

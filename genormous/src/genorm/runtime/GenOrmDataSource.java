@@ -96,4 +96,13 @@ public class GenOrmDataSource
 		{
 		return (s_tlConnectionList.get().peek().getConnection().prepareStatement(sql));
 		}
+	
+	public static int rawUpdate(String sql)
+			throws SQLException
+		{
+		Statement stmt = createStatement();
+		int ret = stmt.executeUpdate(sql);
+		stmt.close();
+		return (ret);
+		}
 	}

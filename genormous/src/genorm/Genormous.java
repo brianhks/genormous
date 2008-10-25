@@ -30,6 +30,8 @@ public class Genormous extends TemplateHelper
 	public static final String DEFAULT_VALUE = "default_value";
 	public static final String ALLOW_NULL = "allow_null";
 	public static final String AUTO_SET = "auto_set";
+	public static final String ON_UPDATE = "on_update";
+	public static final String ON_DELETE = "on_delete";
 	
 	
 	private String m_source;
@@ -39,6 +41,7 @@ public class Genormous extends TemplateHelper
 	private String m_packageName;
 	private boolean m_includeStringSets;
 	private String m_graphVizFile;
+	private String m_databaseType;
 	
 	
 	//===========================================================================
@@ -50,6 +53,7 @@ public class Genormous extends TemplateHelper
 		public boolean includeStringSets;
 		public String customTypeProperties;
 		public String customDBTypeProperties;
+		public String databaseType;
 		public String graphVizFile;
 		
 		public CommandLine()
@@ -61,6 +65,7 @@ public class Genormous extends TemplateHelper
 			customTypeProperties = null;
 			customDBTypeProperties = null;
 			graphVizFile = null;
+			databaseType = null;
 			}
 		}
 		
@@ -73,6 +78,7 @@ public class Genormous extends TemplateHelper
 		new BoolDef('s', "includeStringSets"),
 		new StringDef('c', "customTypeProperties"),
 		new StringDef('b', "customDBTypeProperties"),
+		new StringDef('t', "databaseType"),
 		new StringDef('g', "graphVizFile")
 		};
 		
@@ -104,7 +110,11 @@ public class Genormous extends TemplateHelper
 		Genormous gen = new Genormous(cl.source, cl.destination, cl.targetPackage,
 				cl.includeStringSets, cl.graphVizFile);
 				
+		if (cl.databaseType != null)
+			gen.setDatabaseType(cl.databaseType);
+				
 		QueryGen qgen = new QueryGen(cl.source, cl.destination, cl.targetPackage);
+		qgen.setTypeMap(gen.m_typeMap);
 		
 		try
 			{
@@ -130,6 +140,16 @@ public class Genormous extends TemplateHelper
 		m_packageName = packageName;
 		m_includeStringSets = includeStringSets;
 		m_graphVizFile = graphVizFile;
+		m_databaseType = "hsqldb";
+		}
+		
+//------------------------------------------------------------------------------
+	/**
+		Used to set what *_types.properties and *_create.st file to use 
+	*/
+	public void setDatabaseType(String type)
+		{
+		m_databaseType = type;
 		}
 		
 //------------------------------------------------------------------------------
@@ -161,8 +181,10 @@ public class Genormous extends TemplateHelper
 			StringTemplateGroup dataTypeMapGroup = loadTemplateGroup("templates/data_type_maps.st");
 			
 			//Switch on the type of database
-			dataTypeMapGroup.defineMap("typeToSQLTypeMap", new PropertiesFile("templates/hsqldb_types.properties"));
-			dataTypeMapGroup.defineTemplate("dbCreate", readResource("templates/hsqldb_create.st"));
+			String propFile = "templates/"+m_databaseType+"_types.properties";
+			dataTypeMapGroup.defineMap("typeToSQLTypeMap", new PropertiesFile(propFile));
+			String createFile = "templates/"+m_databaseType+"_create.st";
+			dataTypeMapGroup.defineTemplate("dbCreate", readResource(createFile));
 			
 			StringTemplateGroup ormBaseObjectTG = loadTemplateGroup("templates/ORMObject_base.java");
 			ormBaseObjectTG.setSuperGroup(dataTypeMapGroup);
@@ -208,6 +230,12 @@ public class Genormous extends TemplateHelper
 					col.setForeignKey();
 					col.setForeignTableName(refTable.attributeValue(TABLE));
 					col.setForeignTableColumnName(refTable.attributeValue(COLUMN));
+					
+					if (refTable.attribute(ON_DELETE) != null)
+						col.setOnDelete(refTable.attribute(ON_DELETE).getValue());
+						
+					if (refTable.attribute(ON_UPDATE) != null)
+						col.setOnUpdate(refTable.attribute(ON_UPDATE).getValue());
 					}
 					
 				col.setComment(cole.elementText(COMMENT));
@@ -265,6 +293,12 @@ public class Genormous extends TemplateHelper
 						col.setForeignKey();
 						col.setForeignTableName(refTable.attributeValue(TABLE));
 						col.setForeignTableColumnName(refTable.attributeValue(COLUMN));
+						
+						if (refTable.attribute(ON_DELETE) != null)
+							col.setOnDelete(refTable.attribute(ON_DELETE).getValue());
+						
+						if (refTable.attribute(ON_UPDATE) != null)
+							col.setOnUpdate(refTable.attribute(ON_UPDATE).getValue());
 						}
 						
 					col.setComment(cole.elementText(COMMENT));
@@ -295,7 +329,15 @@ public class Genormous extends TemplateHelper
 					table.addColumn(col);
 					}
 					
-				Iterator queries = e.elementIterator(QUERY);
+				Iterator queries = e.elementIterator(Query.TABLE_QUERY);
+				while (queries.hasNext())
+					{
+					Query q = new Query((Element)queries.next(), m_formatter, m_typeMap);
+					table.addQuery(q);
+					}
+				
+				//This is grandfather in older table setups
+				queries = e.elementIterator(Query.QUERY);
 				while (queries.hasNext())
 					{
 					Query q = new Query((Element)queries.next(), m_formatter, m_typeMap);
@@ -355,7 +397,7 @@ public class Genormous extends TemplateHelper
 				createTemplate.setAttributes(attributes);
 				String sql = createTemplate.toString().trim();
 				t.setCreateSQL(sql);
-				attributes.put("createSQL", sql.replaceAll("\\n+", "\\\\n"));
+				attributes.put("createSQL", sql.replaceAll("\\n+", "\\\\n").replace("\"", "\\\""));
 				
 				baseTemplate.setAttributes(attributes);
 				
