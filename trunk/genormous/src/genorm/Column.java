@@ -20,6 +20,8 @@ public class Column implements Cloneable
 	private Format m_formatter;
 	private boolean m_unique;
 	private String m_autoSet;
+	private String m_onDelete;
+	private String m_onUpdate;
 	
 	public Column(String name)
 		{
@@ -41,6 +43,8 @@ public class Column implements Cloneable
 		m_isDefaultSet = false;
 		m_allowNull = true;
 		m_unique = false;
+		m_onDelete = null;
+		m_onUpdate = null;
 		}
 		
 	public Column getCopy()
@@ -134,4 +138,10 @@ public class Column implements Cloneable
 		
 		return (sb.toString());
 		}
+		
+	public void setOnDelete(String onDelete) { m_onDelete = onDelete; }
+	public String getOnDelete() { return (m_onDelete); }
+
+	public void setOnUpdate(String onUpdate) { m_onUpdate = onUpdate; }
+	public String getOnUpdate() { return (m_onUpdate); }
 	}

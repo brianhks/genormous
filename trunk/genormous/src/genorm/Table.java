@@ -21,6 +21,7 @@ public class Table
 	private Column m_setMTColumn; //Column to set modification time stamp on
 	private Column m_setCTColumn; //Column to set creation time stamp on
 	
+	
 	public Table(String tableName, Format format)
 		{
 		m_formatter = format;
@@ -190,6 +191,7 @@ public class Table
 		
 	public void setCreateSQL(String sql) { m_createSQL = sql; }
 	public String getCreateSQL() { return (m_createSQL); }
+	public String getCreateSQLEscaped() { return (m_createSQL.replaceAll("\"", "\\\"")); }
 	
 	public boolean getIsMTSet() { return (m_setMTColumn != null); }
 	public void setMTColumn(Column col) { m_setMTColumn = col; }
@@ -198,4 +200,5 @@ public class Table
 	public boolean getIsCTSet() { return (m_setCTColumn != null); }
 	public void setCTColumn(Column col) { m_setCTColumn = col; }
 	public Column getCTColumn() { return (m_setCTColumn); }
+	
 	}

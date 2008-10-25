@@ -15,6 +15,7 @@ public class QueryGen extends TemplateHelper
 	private String m_source;
 	private Format m_formatter;
 	private String m_packageName;
+	private PropertiesFile m_typeMap;
 	
 	
 	//===========================================================================
@@ -99,6 +100,12 @@ public class QueryGen extends TemplateHelper
 		{
 		m_formatter = formatter;
 		}
+
+//------------------------------------------------------------------------------
+	/*package*/ void setTypeMap(PropertiesFile typeMap)
+		{
+		m_typeMap = typeMap;
+		}
 		
 //------------------------------------------------------------------------------
 	public void generateClasses()
@@ -123,7 +130,7 @@ public class QueryGen extends TemplateHelper
 			while (queryit.hasNext())
 				{
 				Element e = (Element)queryit.next();
-				Query q = new Query(e, m_formatter);
+				Query q = new Query(e, m_formatter, m_typeMap);
 				
 				String fileName = q.getClassName() + "Query.java";
 								

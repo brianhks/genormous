@@ -15,13 +15,13 @@
 			<param name="text" type="String"/>
 		</return>
 		<sql>
-			select s.source, s.segment_id, t.text
+			select s."source", s."segment_id", t."text"
 			from
 			segment s, target t, language l
 			where
-			l.language_code = ? and l.country_code = ? and
-			l.language_id = t.language and
-			s.segment_id = t.segment
+			l."language_code" = ? and l."country_code" = ? and
+			l."language_id" = t."language" and
+			s."segment_id" = t."segment"
 		</sql>
 	</query>
 	
@@ -33,7 +33,7 @@
 			<param name="code" type="String"/>
 		</return>
 		<sql>
-			select language_id, language_code as code from language
+			select "language_id", "language_code" as code from language
 		</sql>
 	</query>
 	
@@ -59,7 +59,7 @@
 		</return>
 		<sql>
 			delete from language
-			where language_code = ?
+			where "language_code" = ?
 		</sql>
 	</query>
 	

@@ -129,7 +129,7 @@ public class Create
 		
 		GenOrmDataSource.begin();
 		
-		ArrayList<Segment> list = Segment.factory.select("source = 'Segment5'").getArrayList(10);
+		ArrayList<Segment> list = Segment.factory.select("\"source\" = 'Segment5'").getArrayList(10);
 		
 		assertEquals(1, list.size());
 		assertEquals(key, seg.getSegmentId());

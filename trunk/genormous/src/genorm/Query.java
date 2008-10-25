@@ -9,6 +9,7 @@ public class Query
 	//XML elements and attribute names
 	public static final String NAME = "name";
 	public static final String QUERY = "query";
+	public static final String TABLE_QUERY = "table_query";
 	public static final String INPUT = "input";
 	public static final String REPLACE = "replace";
 	public static final String RETURN = "return";
@@ -16,6 +17,7 @@ public class Query
 	public static final String RESULT_TYPE = "result_type";
 	public static final String RESULT_SINGLE = "single";
 	public static final String RESULT_MULTI = "multi";
+	public static final String COMMENT = "comment";
 	
 	
 	private Format m_formatter;
@@ -24,6 +26,7 @@ public class Query
 	private ArrayList<Parameter> m_replacements;
 	private ArrayList<Parameter> m_outputs;
 	private String m_sqlQuery;
+	private String m_comment;
 	private boolean m_resultTypeSingle;
 	private Properties m_typeMap;
 	
@@ -34,6 +37,7 @@ public class Query
 	
 	public Query(Element queryRoot, Format formatter, Properties typeMap)
 		{
+		m_comment = "";
 		m_typeMap = typeMap;
 		m_formatter = formatter;
 		m_queryName = queryRoot.attributeValue(NAME);
@@ -55,6 +59,7 @@ public class Query
 		Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
 		
 		m_sqlQuery = queryRoot.elementTextTrim("sql");
+		m_comment = queryRoot.elementTextTrim(COMMENT);
 		Matcher m = selectPattern.matcher(m_sqlQuery);
 		if (m.matches())
 			{
@@ -64,7 +69,7 @@ public class Query
 			// Check split length with m_outputs length to make sure they match
 			if (split.length != m_outputs.size())
 				{
-				System.out.println("Warning, output parameter count does not match the select statement");
+				System.out.println("Warning, in query "+m_queryName+" output parameter count does not match the select statement");
 				
 				System.out.println("Select parameters:");
 				for (int I = 0; I < split.length; I++)
@@ -88,13 +93,17 @@ public class Query
 								break;
 						
 						String paramName = m_outputs.get(I).getName();
-						if (!paramName.equals(m.group(group)))
+						String selectParam = m.group(group);
+						if ((selectParam.startsWith("\"") && selectParam.endsWith("\"")))
+							selectParam = selectParam.substring(1, selectParam.length() -1);
+							
+						if (!paramName.equals(selectParam))
 							{
-							System.out.println("Param "+paramName+" does not match select statement "+m.group(group));
+							System.out.println("Query "+m_queryName+": Param "+paramName+" does not match select statement "+selectParam);
 							}
 						}
 					else
-						System.out.println("Select param \""+param+"\" does not match regular expression");
+						System.out.println("Query "+m_queryName+": Select param \""+param+"\" does not match regular expression");
 					}
 				}
 			}
@@ -130,7 +139,8 @@ public class Query
 	public boolean isUpdate() { return (m_outputs.size() == 0); }
 	public int getOutputsCount() { return (m_outputs.size()); }
 	public boolean isReplaceQuery() { return (m_replacements.size() > 0); }
-	public String getSqlQuery() { return (m_sqlQuery.replaceAll("\\n+", "\\\\n")); }
+	public String getSqlQuery() { return (m_sqlQuery.replaceAll("\\n+", "\\\\n").replace("\"", "\\\"")); }
+	public String getComment() { return (m_comment); }
 	
 	public boolean isSingleResult() { return (m_resultTypeSingle); }
 	
