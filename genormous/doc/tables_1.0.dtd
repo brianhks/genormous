@@ -1,6 +1,6 @@
 <!ELEMENT tables (global?,table+,query*)>
 <!ELEMENT global (col+)>
-<!ELEMENT table (comment?,property*,col+,table_query*,primary_key?,unique*)>
+<!ELEMENT table (comment?,property*,col+,primary_key?,unique*,table_query*)>
 <!ATTLIST table
 	name CDATA #REQUIRED
 	>
