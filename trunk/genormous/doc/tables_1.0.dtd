@@ -1,6 +1,6 @@
 <!ELEMENT tables (global?,table+,query*)>
 <!ELEMENT global (col+)>
-<!ELEMENT table (comment?,property*,col+,table_query*)>
+<!ELEMENT table (comment?,property*,col+,table_query*,primary_key?,unique*)>
 <!ATTLIST table
 	name CDATA #REQUIRED
 	>
@@ -55,5 +55,12 @@
 
 <!ELEMENT query (comment?,input?,replace?,return?,sql)>
 <!ATTLIST query
+	name CDATA #REQUIRED
+	>
+
+<!ELEMENT primary_key (colref+)>
+<!ELEMENT unique (colref+)>
+<!ELEMENT colref EMPTY>
+<!ATTLIST colref
 	name CDATA #REQUIRED
 	>
