@@ -6,6 +6,8 @@ import java.sql.*;
 
 public class GenOrmConnection
 	{
+	private static final Logger s_logger = LoggerFactory.getLogger(GenOrmConnection.class.getName());
+	
 	private Connection m_connection;
 	private boolean m_closeConnection;
 	private ArrayList<GenOrmRecord> m_transactionList;
@@ -47,6 +49,7 @@ public class GenOrmConnection
 			}
 		catch (SQLException sqle)
 			{
+			s_logger.error(sqle.getMessage(), sqle);
 			throw new GenOrmException(sqle);
 			}
 		}
@@ -115,6 +118,7 @@ public class GenOrmConnection
 			}
 		catch (SQLException sqle)
 			{
+			s_logger.error(sqle.getMessage(), sqle);
 			if (currentRecord != null)
 				throw new GenOrmException(currentRecord, sqle);
 			else
@@ -139,6 +143,7 @@ public class GenOrmConnection
 			}
 		catch (SQLException sqle)
 			{
+			s_logger.error(sqle.getMessage(), sqle);
 			throw new GenOrmException(sqle);
 			}
 		}
@@ -161,6 +166,7 @@ public class GenOrmConnection
 			}
 		catch (SQLException sqle)
 			{
+			s_logger.error(sqle.getMessage(), sqle);
 			throw new GenOrmException(sqle);
 			}
 		}
@@ -172,11 +178,13 @@ public class GenOrmConnection
 			
 		try
 			{
+			s_logger.debug("Rolling back connection");
 			m_transactionList.clear();
 			m_connection.rollback();
 			}
 		catch (SQLException sqle)
 			{
+			s_logger.error(sqle.getMessage(), sqle);
 			throw new GenOrmException(sqle);
 			}
 		}

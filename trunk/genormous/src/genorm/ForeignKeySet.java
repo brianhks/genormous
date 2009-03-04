@@ -4,9 +4,9 @@ import java.util.*;
 
 public class ForeignKeySet
 	{
-	private String m_table;
+	private String m_table;            //Foreign table name
 	private HashSet<String> m_keySet;
-	private ArrayList<Column> m_keys;
+	private ArrayList<Column> m_keys;  //Local columns that point to foreign key
 	private Format m_formatter;
 	private String m_onDelete;
 	private String m_onUpdate;

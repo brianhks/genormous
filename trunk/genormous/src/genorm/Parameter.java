@@ -56,4 +56,12 @@ public class Parameter
 		else
 			return (m_testParam);
 		}
+		
+	@Override
+	public boolean equals(Object obj)
+		{
+		Parameter other = (Parameter)obj;
+			
+		return (other.m_type.equals(m_type));
+		}
 	}

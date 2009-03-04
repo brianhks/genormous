@@ -33,7 +33,7 @@
 			<comment>Identifies this segment as being mergeable</comment>
 		</col>
 		<col name="double_value" type="double"/>
-		<query name="next_segment_on_source" result_type="single">
+		<table_query name="next_segment_on_source" result_type="single">
 			<input>
 				<param name="source" type="string" test="test value"/>
 			</input>
@@ -42,7 +42,18 @@
 				where this."prev_segment" = prev."segment_id" and
 				prev."source" = ?
 			</sql>
-		</query>
+		</table_query>
+		
+		<table_query name="next_segment_on_source" result_type="single">
+			<input>
+				<param name="source" type="string" test="test value"/>
+			</input>
+			<sql>
+				from segment this, segment prev
+				where this."prev_segment" = prev."segment_id" and
+				prev."source" = ?
+			</sql>
+		</table_query>
 	</table>
 	
 	
@@ -87,6 +98,15 @@
 		<col name="text" type="string" primary_key="false">
 			<comment></comment>
 		</col>
+		
+		<table_query name="by_segment" result_type="multi">
+			<input>
+				<param name="segment" type="integer" test="1"/>
+			</input>
+			<sql>
+				from target this where this."segment" = ? order by this."text"
+			</sql>
+		</table_query>
 	</table>
 	
 	<table name="language">

@@ -82,8 +82,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
 		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
 		
-		if (DEBUG)
-			System.out.println(statement);
+		s_logger.debug(statement.toString());
 		
 		ResultSet rs = new ResultSet(statement.executeQuery(), query, statement);
 		
@@ -95,7 +94,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		}
 	catch (java.sql.SQLException sqle)
 		{
-		if (DEBUG)
+		if (s_logger.isDebug())
 			sqle.printStackTrace();
 		throw new GenOrmException(sqle);
 		}
@@ -117,6 +116,8 @@ import genorm.runtime.*;
 */
 public class $table.className$_base extends GenOrmRecord
 	{
+	private static final Logger s_logger = LoggerFactory.getLogger($table.className$.class.getName());
+
 	$columns:{col | public static final String COL_$col.nameCaps$ = "$col.name$";
 }$
 	//Change this value to true to turn on warning messages
@@ -141,7 +142,7 @@ public class $table.className$_base extends GenOrmRecord
 		
 		public $table.className$KeyGenerator(javax.sql.DataSource ds)
 			{
-			m_nextKey = 1;
+			m_nextKey = 0;
 			try
 				{
 				java.sql.Connection con = ds.getConnection();
@@ -338,8 +339,7 @@ public class $table.className$_base extends GenOrmRecord
 					java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
 					$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
 }$
-					if (DEBUG)
-						System.out.println(ps);
+					s_logger.debug(ps.toString());
 						
 					java.sql.ResultSet rs = ps.executeQuery();
 					if (rs.next())
@@ -433,9 +433,9 @@ public class $table.className$_base extends GenOrmRecord
 		public void testQueryMethods()
 			{
 			ResultSet rs;
-			$table.queries:{ query | System.out.println("$table.className$.get$query.className$");
+			$table.queries:{ query | $if(!query.skipTest)$System.out.println("$table.className$.get$query.className$");
 $if(!query.singleResult)$rs = $endif$get$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
-$if(!query.singleResult)$rs.close();$endif$
+$if(!query.singleResult)$rs.close();$endif$$endif$
 }$
 			}
 		}
@@ -615,7 +615,7 @@ $if(!query.singleResult)$rs.close();$endif$
 	/*package*/ $table.className$_base()
 		{
 		super(TABLE_NAME);
-		
+		m_logger = s_logger;
 		m_foreignKeys = new ArrayList<GenOrmRecordKey>();
 		
 		$columns:{col | 

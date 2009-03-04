@@ -54,6 +54,11 @@ public class GenOrmDataSource
 		{
 		s_tlConnectionList.get().addFirst(new GenOrmConnection(s_dsEnvelope));
 		}
+
+	public static void flush()
+		{
+		s_tlConnectionList.get().peek().flush();
+		}
 		
 	public static void commit()
 		{

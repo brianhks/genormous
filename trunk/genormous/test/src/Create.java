@@ -32,6 +32,15 @@ public class Create
 	public void createTest()
 			throws Exception
 		{
+		//Logger.getLogger("test").setLevel(Level.FINE);
+		
+		/* Handler[] handlers = Logger.getLogger( "" ).getHandlers();
+		for ( int index = 0; index < handlers.length; index++ )
+			{
+			System.out.println("handler");
+			handlers[index].setLevel( Level.FINE );
+			} */
+			
 		GenOrmDataSource.begin();
 		
 		Segment seg = Segment.factory.createWithGeneratedKey();

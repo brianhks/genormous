@@ -29,6 +29,20 @@ public class Query
 	private String m_comment;
 	private boolean m_resultTypeSingle;
 	private Properties m_typeMap;
+	private boolean m_skipTest;
+	
+	public Query(Format formatter, String name, ArrayList<Parameter> params, String sql)
+		{
+		m_formatter = formatter;
+		m_queryName = name;
+		m_inputs = params;
+		m_replacements = new ArrayList<Parameter>();
+		m_outputs = new ArrayList<Parameter>();
+		m_sqlQuery = sql;
+		m_comment = "";
+		m_resultTypeSingle = false;
+		m_skipTest = true;
+		}
 	
 	public Query(Element queryRoot, Format formatter)
 		{
@@ -37,6 +51,7 @@ public class Query
 	
 	public Query(Element queryRoot, Format formatter, Properties typeMap)
 		{
+		m_skipTest = false;
 		m_comment = "";
 		m_typeMap = typeMap;
 		m_formatter = formatter;
@@ -132,6 +147,8 @@ public class Query
 		return (params);
 		}
 		
+	public boolean isSkipTest() { return (m_skipTest); }
+		
 	public String getQueryName() { return (m_queryName); }
 	public ArrayList<Parameter> getInputs() { return (m_inputs); }
 	public ArrayList<Parameter> getReplacements() { return (m_replacements); }
@@ -151,4 +168,19 @@ public class Query
 	
 	
 	public String getClassName() { return (m_formatter.formatClassName(m_queryName)); }
+	
+	@Override
+	public int hashCode()
+		{
+		return (m_queryName.hashCode());
+		}
+		
+	@Override
+	public boolean equals(Object obj)
+		{
+		Query other = (Query)obj;
+		
+		return (other.m_queryName.equals(m_queryName) && other.m_inputs.equals(m_inputs) &&
+				other.m_replacements.equals(m_replacements));
+		}
 	}

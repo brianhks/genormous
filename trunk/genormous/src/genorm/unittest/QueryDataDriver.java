@@ -81,6 +81,8 @@ public class QueryDataDriver extends DataDriver
 						inputList.add(new Integer(test));
 					else if (type.equals("String"))
 						inputList.add(test);
+					else if (type.equals("java.sql.Timestamp"))
+						inputList.add(java.sql.Timestamp.valueOf(test));
 					}
 					
 				queryData.put(INPUT_PARAMS, inputList);
