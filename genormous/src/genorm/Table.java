@@ -16,7 +16,7 @@ public class Table
 	private ArrayList<ForeignKeySet> m_foreignKeys;
 	private Format m_formatter;
 	private String m_createSQL;
-	private ArrayList<Query> m_queries;
+	private HashSet<Query> m_queries;
 	private ArrayList<Set<Column>> m_uniqueColumns;
 	private Column m_setMTColumn; //Column to set modification time stamp on
 	private Column m_setCTColumn; //Column to set creation time stamp on
@@ -36,18 +36,23 @@ public class Table
 		m_properties = new HashMap<String, String>();
 		m_foreignKeys = new ArrayList<ForeignKeySet>();
 		m_createSQL = "";
-		m_queries = new ArrayList<Query>();
+		m_queries = new HashSet<Query>();
 		m_uniqueColumns = new ArrayList<Set<Column>>();
 		m_setMTColumn = null;
 		m_setCTColumn = null;
 		}
 		
+	//This will remove the query if it is already there and add the one added last
 	public void addQuery(Query q)
 		{
-		m_queries.add(q);
+		if (!m_queries.add(q))
+			{
+			m_queries.remove(q);
+			m_queries.add(q);
+			}
 		}
 		
-	public ArrayList<Query> getQueries()
+	public Set<Query> getQueries()
 		{
 		return (m_queries);
 		}

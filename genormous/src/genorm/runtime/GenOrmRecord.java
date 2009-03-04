@@ -5,14 +5,13 @@ import java.sql.*;
 
 public abstract class GenOrmRecord
 	{
-	protected static boolean DEBUG = false;
-	
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
 	protected boolean                  m_isNewRecord;   //Identifies if this is a new record
 	protected int                      m_dirtyFlags;    //Identifies which field is dirty
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
 	protected boolean                  m_isIgnored;     //This record should not be committed in this transaction
 	protected GenOrmRecordKey          m_recordKey;
+	protected Logger                   m_logger;
 	
 	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
 	
@@ -25,6 +24,11 @@ public abstract class GenOrmRecord
 		}
 		
 	public GenOrmRecordKey getRecordKey() { return (m_recordKey); }
+	
+	public Logger getLogger()
+		{
+		return (m_logger);
+		}
 		
 	/**
 		Returns the name of the table this record is from
@@ -69,8 +73,11 @@ public abstract class GenOrmRecord
 	*/
 	public void delete()
 		{
-		m_isDeleted = true;
-		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+		if (!m_isDeleted)
+			{
+			m_isDeleted = true;
+			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			}
 		}
 		
 	//---------------------------------------------------------------------------
@@ -95,9 +102,11 @@ public abstract class GenOrmRecord
 	*/
 	public void setDirty()
 		{
+		if (m_dirtyFlags == 0)
+			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			
 		//This will mark all attributes as dirty
 		m_dirtyFlags = -1;
-		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 		}
 	//---------------------------------------------------------------------------
 	/**
@@ -271,17 +280,19 @@ public abstract class GenOrmRecord
 	private void runStatement(String statement)
 			throws SQLException
 		{
-		if (DEBUG)
-			System.out.println("SQL Querry: "+statement);
+		if (m_logger.isDebug())
+			{
+			m_logger.debug("SQL Query: "+statement);
+			}
 			
 		PreparedStatement stmt = GenOrmDataSource.prepareStatement(statement);
 		
 		for (int I = 0; I < m_queryFields.size(); I++)
 			{
-			if (DEBUG)
+			if (m_logger.isDebug())
 				{
 				GenOrmField field = m_queryFields.get(I);
-				System.out.println(field.getFieldMeta().getFieldName()+" : "+field.toString());
+				m_logger.debug(field.getFieldMeta().getFieldName()+" : "+field.toString());
 				}
 				
 			m_queryFields.get(I).placeValue(stmt, I+1);
@@ -310,8 +321,7 @@ public abstract class GenOrmRecord
 		String query;
 		
 		if (m_isIgnored)
-			return;
-		
+			return; 
 		if (m_isDeleted)
 			{
 			//If the record is new there is no reason to delete it as it is not there

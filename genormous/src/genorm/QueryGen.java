@@ -133,6 +133,7 @@ public class QueryGen extends TemplateHelper
 				Query q = new Query(e, m_formatter, m_typeMap);
 				
 				String fileName = q.getClassName() + "Query.java";
+				String dataFileName = q.getClassName() + "Data.java";
 								
 				genfiles++;
 				Map<String, Object> attributes = new HashMap<String, Object>();
@@ -147,6 +148,18 @@ public class QueryGen extends TemplateHelper
 				fw = new FileWriter(m_destDir+"/"+fileName);
 				fw.write(queryTemplate.toString());
 				fw.close();
+				
+				File dataFile = new File(m_destDir+"/"+dataFileName);
+				if (!q.isUpdate() && !dataFile.exists())
+					{
+					genfiles++;
+					queryTemplate = queryObjectTG.getInstanceOf("objectQueryData");
+					queryTemplate.setAttributes(attributes);
+					
+					fw = new FileWriter(m_destDir+"/"+dataFileName);
+					fw.write(queryTemplate.toString());
+					fw.close();
+					}
 				}
 			
 			Map<String, Object> attributes = new HashMap<String, Object>();

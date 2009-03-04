@@ -11,6 +11,11 @@ import static java.lang.System.out;
 
 public class Genormous extends TemplateHelper
 	{
+	/**
+		Genorm property to not inherit global column definitions
+	*/
+	public static final String GENORM_INHERIT = "genorm.inherit";
+	
 	//XML elements and attribute names
 	public static final String NAME = "name";
 	public static final String COMMENT = "comment";
@@ -313,20 +318,50 @@ public class Genormous extends TemplateHelper
 					}
 					
 				//Add global columns to table
-				Iterator<Column> globCols = globalColumns.iterator();
-				while (globCols.hasNext())
+				if (!"false".equals(table.getProperties().get(GENORM_INHERIT)))
 					{
-					Column col = globCols.next().getCopy();
-					col.setDirtyFlag(dirtyFlag);
-					dirtyFlag <<= 1;
-					
-					if ("mts".equals(col.getAutoSet()))
-						table.setMTColumn(col);
+					Iterator<Column> globCols = globalColumns.iterator();
+					while (globCols.hasNext())
+						{
+						Column col = globCols.next().getCopy();
+						col.setDirtyFlag(dirtyFlag);
+						dirtyFlag <<= 1;
 						
-					if ("cts".equals(col.getAutoSet()))
-						table.setCTColumn(col);
+						if ("mts".equals(col.getAutoSet()))
+							table.setMTColumn(col);
+							
+						if ("cts".equals(col.getAutoSet()))
+							table.setCTColumn(col);
+						
+						table.addColumn(col);
+						}
+					}
 					
-					table.addColumn(col);
+				//Add Queries for foreign keys
+				for (ForeignKeySet fkeySet : table.getForeignKeys())
+					{
+					StringBuilder sqlQuery = new StringBuilder();
+					ArrayList<Parameter> params = new ArrayList<Parameter>();
+					
+					sqlQuery.append("FROM ");
+					sqlQuery.append(table.getName());
+					sqlQuery.append(" this WHERE ");
+					boolean first = true;
+					for (Column c : fkeySet.getKeys())
+						{
+						if (!first)
+							sqlQuery.append(" AND ");
+						sqlQuery.append("this.\"");
+						sqlQuery.append(c.getName());
+						sqlQuery.append("\" = ?");
+						first = false;
+						
+						params.add(new Parameter(c.getName(), c.getType(), m_formatter));
+						}
+						
+					String queryName = "by_"+fkeySet.getTableName();
+						
+					table.addQuery(new Query(m_formatter, queryName, params, sqlQuery.toString()));
 					}
 					
 				Iterator queries = e.elementIterator(Query.TABLE_QUERY);
@@ -361,8 +396,8 @@ public class Genormous extends TemplateHelper
 				StringTemplate baseTemplate = ormBaseObjectTG.getInstanceOf("baseClass");
 				StringTemplate derivedTemplate = ormObjectTG.getInstanceOf("derivedClass");
 				
-				ArrayList<ForeignKeySet> foreignKeySetList = new ArrayList<ForeignKeySet>();
-				Map<String, ForeignKeySet> foreignKeySetMap = new HashMap<String, ForeignKeySet>();
+				//ArrayList<ForeignKeySet> foreignKeySetList = new ArrayList<ForeignKeySet>();
+				//Map<String, ForeignKeySet> foreignKeySetMap = new HashMap<String, ForeignKeySet>();
 				ArrayList<Column> columns = t.getColumns();
 				Iterator<Column> colit = columns.iterator();
 				while (colit.hasNext())
