@@ -22,7 +22,9 @@ public class Genormous extends TemplateHelper
 	public static final String TYPE = "type";
 	public static final String PRIMARY_KEY = "primary_key";
 	public static final String UNIQUE = "unique";
+	public static final String UNIQUE_SET = "unique_set";
 	public static final String COL = "col";
+	public static final String COL_REF = "colref";
 	public static final String TABLE = "table";
 	public static final String GLOBAL = "global";
 	public static final String COLUMN = "column";
@@ -60,6 +62,7 @@ public class Genormous extends TemplateHelper
 		public String customDBTypeProperties;
 		public String databaseType;
 		public String graphVizFile;
+		public boolean help;
 		
 		public CommandLine()
 			{
@@ -71,6 +74,7 @@ public class Genormous extends TemplateHelper
 			customDBTypeProperties = null;
 			graphVizFile = null;
 			databaseType = null;
+			help = false;
 			}
 		}
 		
@@ -84,8 +88,26 @@ public class Genormous extends TemplateHelper
 		new StringDef('c', "customTypeProperties"),
 		new StringDef('b', "customDBTypeProperties"),
 		new StringDef('t', "databaseType"),
-		new StringDef('g', "graphVizFile")
+		new StringDef('g', "graphVizFile"),
+		new BoolDef('?', "help")
 		};
+		
+		
+	//---------------------------------------------------------------------------
+	private static void printHelp()
+		{
+		out.println("GenORMous version X");
+		out.println("Usage: java -jar genormous.jar -o <source file> -d <destination dir> -p <package name>");
+		out.println("      ([-x <xml file> [-x ...] [-t <tag> [-t ...]]]|([-c <test class> [-c ...]]");
+		out.println("      [<target method> ...]))");
+		out.println("  -e: Runs DepUnit in regression mode.");
+		out.println("  -r: Name of the xml report file to generate.");
+		out.println("  -s: Stylesheet to use to style the report.");
+		out.println("  -x: XML input file that defines a suite of test runs.");
+		out.println("  -c: Test class to include in the run.");
+		out.println("  -t: Only test runs marked with this tag will run.");
+		out.println("  target methods: Specific test methods to run.");
+		}
 		
 	
 //==============================================================================
@@ -111,6 +133,13 @@ public class Genormous extends TemplateHelper
 		ArgumentProcessor proc = new ArgumentProcessor(PARAMETERS);
 		
 		proc.processArgs(args, cl);
+		
+		if (cl.help || (args.length == 0))
+			{
+			printHelp();
+			return;
+			}
+			
 		
 		Genormous gen = new Genormous(cl.source, cl.destination, cl.targetPackage,
 				cl.includeStringSets, cl.graphVizFile);
@@ -219,8 +248,11 @@ public class Genormous extends TemplateHelper
 				if (cole.attribute(DEFAULT_VALUE) != null)
 					col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
 				
-				if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
+				if ((cole.attribute(UNIQUE) != null) && (cole.attribute(UNIQUE).getValue().equals("true")))
 					col.setUnique();
+					
+				/* if (cole.attribute(UNIQUE_SET) != null)
+					col.setUniqueSet(cole.attribute(UNIQUE_SET).getValue()); */
 				
 				if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
 					col.setPrimaryKey();
@@ -284,6 +316,9 @@ public class Genormous extends TemplateHelper
 					
 					if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
 						col.setUnique();
+						
+					/* if (cole.attribute(UNIQUE_SET) != null)
+						col.setUniqueSet(cole.attribute(UNIQUE_SET).getValue()); */
 					
 					if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
 						col.setPrimaryKey();
@@ -362,6 +397,21 @@ public class Genormous extends TemplateHelper
 					String queryName = "by_"+fkeySet.getTableName();
 						
 					table.addQuery(new Query(m_formatter, queryName, params, sqlQuery.toString()));
+					}
+					
+				//Get Unique definitions
+				Iterator uniques = e.elementIterator(UNIQUE);
+				while (uniques.hasNext())
+					{
+					Iterator uniqueRefs = ((Element)uniques.next()).elementIterator(COL_REF);
+					Set<Column> uniqueSet = new HashSet<Column>();
+					while (uniqueRefs.hasNext())
+						{
+						uniqueSet.add(table.getColumn(
+								((Element)uniqueRefs.next()).attribute(NAME).getValue()));
+						}
+						
+					table.getUniqueColumnSets().add(uniqueSet);
 					}
 					
 				Iterator queries = e.elementIterator(Query.TABLE_QUERY);
