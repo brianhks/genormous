@@ -139,13 +139,15 @@ public class $table.className$_base extends GenOrmRecord
 		private static final String MAX_QUERY = "SELECT MAX(\"$table.primaryKey.name$\") FROM $table.name$";
 		
 		private volatile long m_nextKey;
+		private javax.sql.DataSource m_ds;
 		
 		public $table.className$KeyGenerator(javax.sql.DataSource ds)
 			{
+			m_ds = ds;
 			m_nextKey = 0;
 			try
 				{
-				java.sql.Connection con = ds.getConnection();
+				java.sql.Connection con = m_ds.getConnection();
 				java.sql.Statement stmnt = con.createStatement();
 				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
 				if (rs.next())
@@ -155,6 +157,33 @@ public class $table.className$_base extends GenOrmRecord
 				stmnt.close();
 				con.commit();
 				con.close();
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				//The exception may occur if the table does not yet exist
+				if (WARNINGS)
+					System.out.println(sqle);
+				}
+			}
+			
+		/**
+		This resets the key generator from the values in the database
+		Usefull if the generated key has been modified via some other means
+		Connection must be open before calling this
+		*/
+		public synchronized void reset()
+			{
+			m_nextKey = 0;
+			try
+				{
+				java.sql.Connection con = GenOrmDataSource.getConnection();
+				java.sql.Statement stmnt = con.createStatement();
+				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
+				if (rs.next())
+					m_nextKey = rs.getLong(1);
+				
+				rs.close();
+				stmnt.close();
 				}
 			catch (java.sql.SQLException sqle)
 				{

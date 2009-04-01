@@ -135,6 +135,17 @@
 		
 	</table>
 	
+	<table name="unique_set_test">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="id" type="integer" primary_key="true"/>
+		<col name="str1" type="string"/>
+		<col name="str2" type="string"/>
+		<unique>
+			<colref name="str1"/>
+			<colref name="str2"/>
+		</unique>
+	</table>
+	
 	<!-- <table name="language_code">
 		<property key="hsqldb_tableType" value="CACHED"/>
 		<col name="language_code" type="string" primary_key="true">

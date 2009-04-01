@@ -7,6 +7,7 @@ public class Table
 	private String m_tableName;
 	private List<String> m_foreignTables;
 	private ArrayList<Column> m_columns;
+	private Map<String, Column> m_columnMap;
 	private ArrayList<Column> m_primaryKeys;
 	private Column m_primaryCol;
 	private String m_comment;
@@ -17,7 +18,8 @@ public class Table
 	private Format m_formatter;
 	private String m_createSQL;
 	private HashSet<Query> m_queries;
-	private ArrayList<Set<Column>> m_uniqueColumns;
+	private List<Set<Column>> m_uniqueColumns;
+	//private Map<String, Set<Column>> m_uniqueSets;
 	private Column m_setMTColumn; //Column to set modification time stamp on
 	private Column m_setCTColumn; //Column to set creation time stamp on
 	
@@ -28,6 +30,7 @@ public class Table
 		m_tableName = tableName;
 		m_foreignTables = new LinkedList<String>();
 		m_columns = new ArrayList<Column>();
+		m_columnMap = new HashMap<String, Column>();
 		m_primaryKeys = new ArrayList<Column>();
 		m_primaryCol = null;
 		m_comment = "";
@@ -38,6 +41,7 @@ public class Table
 		m_createSQL = "";
 		m_queries = new HashSet<Query>();
 		m_uniqueColumns = new ArrayList<Set<Column>>();
+		/* m_uniqueSets = new HashMap<String, Set<Column>>(); */
 		m_setMTColumn = null;
 		m_setCTColumn = null;
 		}
@@ -113,14 +117,20 @@ public class Table
 		return (m_uniqueColumns.size() != 0);
 		}
 		
-	public ArrayList<Set<Column>> getUniqueColumnSets()
+	public List<Set<Column>> getUniqueColumnSets()
 		{
 		return (m_uniqueColumns);
+		}
+		
+	public Column getColumn(String name)
+		{
+		return (m_columnMap.get(name));
 		}
 		
 	public void addColumn(Column col)
 		{
 		m_columns.add(col);
+		m_columnMap.put(col.getName(), col);
 		if (col.isPrimaryKey())
 			{
 			m_primaryCol = col;
@@ -154,6 +164,21 @@ public class Table
 			addForeignTable(col.getForeignTableName());
 			}
 			
+		/* if (col.getUniqueSet() != null)
+			{
+			String setId = col.getUniqueSet();
+			
+			Set<Column> set = m_uniqueSets.get(setId);
+			if (set == null)
+				{
+				set = new HashSet<Column>();
+				m_uniqueSets.put(setId, set);
+				m_uniqueColumns.add(set);
+				}
+				
+			set.add(col);
+			}
+		else  */
 		if (col.isUnique())
 			{
 			Set<Column> uniqueSet = new HashSet<Column>();

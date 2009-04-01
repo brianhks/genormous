@@ -19,6 +19,7 @@ public class Column implements Cloneable
 	private boolean m_allowNull;
 	private Format m_formatter;
 	private boolean m_unique;
+	private String m_uniqueSet;
 	private String m_autoSet;
 	private String m_onDelete;
 	private String m_onUpdate;
@@ -45,6 +46,7 @@ public class Column implements Cloneable
 		m_unique = false;
 		m_onDelete = null;
 		m_onUpdate = null;
+		m_uniqueSet = null;
 		}
 		
 	public Column getCopy()
@@ -59,6 +61,12 @@ public class Column implements Cloneable
 			}
 			
 		return (copy);
+		}
+		
+	@Override
+	public int hashCode()
+		{
+		return (m_name.hashCode());
 		}
 		
 	@Override
@@ -89,6 +97,7 @@ public class Column implements Cloneable
 	public boolean isForeignKey() { return (m_foreignKey); }
 	public boolean isKey() { return (m_primaryKey || m_foreignKey); }
 	public boolean isUnique() { return (m_unique); }
+	public String getUniqueSet() { return m_uniqueSet; }
 	public Table getForeignTable() { return (m_foreignTable); }
 	public String getForeignTableName() { return (m_foreignTableName); }
 	public String getForeignTableColumnName() { return (m_foreignTableColumnName); }
@@ -110,6 +119,7 @@ public class Column implements Cloneable
 	public void setComment(String comment) { m_comment = comment; }
 	public void setDirtyFlag(int flag) { m_dirtyFlag = flag; }
 	public void setUnique() { m_unique = true; }
+	public void setUniqueSet(String set) { System.out.println("Unique "+set); m_uniqueSet = set; }
 	public void setCustomType(String type) { m_customType = type; }
 	public void setAutoSet(String autoSet) { m_autoSet = autoSet; }
 	public String getAutoSet() { return (m_autoSet); }

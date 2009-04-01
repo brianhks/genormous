@@ -66,7 +66,7 @@ make.createExplicitDependency(targetjar, jaroutdir);
 make.createExplicitDependency(targetjar, classFiles);
 make.createExplicitDependency(targetjar, templateFiles);
 make.createExplicitDependency(targetjar, propertyFiles);
-jf = new JarFile(targetjar);
+jf = new JarFile(targetjar, "manifest.txt");
 jf.addFiles(classoutdir, ".");
 jf.addFiles(".", templatedir);
 jf.addFiles(srcdir, propertyFiles);

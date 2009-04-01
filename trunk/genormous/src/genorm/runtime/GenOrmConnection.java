@@ -15,6 +15,7 @@ public class GenOrmConnection
 	private Map<GenOrmRecordKey, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
 	private boolean m_committed;
 	private boolean m_initializedConnection;
+	private Map<String, Object> m_properties;
 	
 	public GenOrmConnection(GenOrmDSEnvelope dse)
 		{
@@ -23,6 +24,7 @@ public class GenOrmConnection
 	
 	public GenOrmConnection(GenOrmDSEnvelope dse, Connection con)
 		{
+		m_properties = new HashMap<String, Object>();
 		m_connection = null;
 		m_transactionList = new ArrayList<GenOrmRecord>();
 		m_uniqueRecordMap = new HashMap<GenOrmRecordKey, GenOrmRecord>();
@@ -52,6 +54,22 @@ public class GenOrmConnection
 			s_logger.error(sqle.getMessage(), sqle);
 			throw new GenOrmException(sqle);
 			}
+		}
+		
+	/**
+		Sets a property to be associated with this connection
+	*/
+	public void setProperty(String name, Object value)
+		{
+		m_properties.put(name, value);
+		}
+		
+	/**
+		Gets a property set on this connection
+	*/
+	public Object getProperty(String name)
+		{
+		return (m_properties.get(name));
 		}
 		
 	/**
