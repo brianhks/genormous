@@ -7,15 +7,22 @@
 
 <xsl:template match="test_results">
 
-<testsuite errors="0" name="LingoPoint Tests Suite" time="5.0">
+<depunit>
+
+<xsl:for-each select="run">
+
+<testsuite errors="0" time="5.0">
 	<xsl:attribute name="tests">
-		<xsl:value-of select="count(run/test)"/>
+		<xsl:value-of select="@total"/>
 	</xsl:attribute>
 	<xsl:attribute name="failed">
-		<xsl:value-of select="count(run/test[@status='failed'])"/>
+		<xsl:value-of select="@failed"/>
+	</xsl:attribute>
+	<xsl:attribute name="name">
+		<xsl:value-of select="@name"/>
 	</xsl:attribute>
 
-<xsl:for-each select="run/test">
+<xsl:for-each select="test">
 		<testcase classname="{@class}" name="{@method}" time="1.0">
 		
 		<xsl:if test="@status = 'failed'">
@@ -32,7 +39,10 @@
 		
 </testsuite>
 
+</xsl:for-each>
+
+</depunit>
+
 </xsl:template>
-	
 
 </xsl:stylesheet>
