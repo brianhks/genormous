@@ -18,19 +18,12 @@
 		</java>
 	</target>
 	
-	<target name="update-test" description="Runs unit tests" depends="svnupdate">
+	<target name="test" description="Runs unit tests">
 		<java classname="cpmake.CPMake" fork="true" classpathref="cpmake-path"
 				failonerror="true">
 			<arg value="test"/>
 		</java>
 	</target>
-	
-	<target name="svnupdate" description="calls svn up">
-		<exec executable="svn">
-			<arg value="up"/>
-		</exec>
-	</target>
-	
 	
 
 </project>
