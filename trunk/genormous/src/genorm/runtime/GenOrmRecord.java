@@ -311,6 +311,7 @@ public abstract class GenOrmRecord
 			setCTS();
 			setMTS();
 			runStatement(createInsertStatement(con));
+			m_isNewRecord = false;
 			}
 		}
 		

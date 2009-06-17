@@ -2,6 +2,7 @@
 
 <queries>
 	<query name="latest_translation">
+		<comment>This is a test comment</comment>
 		<input>
 			<param name="language_code" type="String" test="en"/>
 			<param name="country_code" type="String" test="US"/>

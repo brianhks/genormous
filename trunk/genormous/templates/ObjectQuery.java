@@ -19,8 +19,13 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import genorm.runtime.*;
 
+/**
+	$query.comment$
+*/
 public class $query.className$Query extends genorm.runtime.SQLQuery
 	{
+	private static final Logger s_logger = LoggerFactory.getLogger($query.className$Query.class.getName());
+	
 	public static final String QUERY_NAME = "$query.queryName$";
 	public static final String QUERY = "$query.sqlQuery$";
 	private static final int ATTRIBUTE_COUNT = $query.outputsCount$;
@@ -99,22 +104,33 @@ $else$
 		{
 		try
 			{
-			String query = QUERY;
+			String genorm_query = QUERY;
 			$if(query.replaceQuery)$
-			HashMap<String, String> replaceMap = new HashMap<String, String>();
-			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf($rep.parameterName$));}$
-			query = replaceText(query, replaceMap);
+			HashMap<String, String> genorm_replaceMap = new HashMap<String, String>();
+			$query.replacements:{rep | genorm_replaceMap.put("$rep.tag$", String.valueOf($rep.parameterName$));}$
+			genorm_query = replaceText(genorm_query, genorm_replaceMap);
 			$endif$
 			
-			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
-			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+			java.sql.PreparedStatement genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
+			long genorm_queryTimeStart = 0L;
+			if (s_logger.isInfo())
+				{
+				genorm_queryTimeStart = System.currentTimeMillis();
+				}
+				
+			java.sql.ResultSet genorm_resultSet = genorm_statement.executeQuery();
 			
-			java.sql.ResultSet resultSet = statement.executeQuery();
+			if (genorm_queryTimeStart != 0L)
+				{
+				long genorm_quryTime = System.currentTimeMillis() - genorm_queryTimeStart;
+				s_logger.info(genorm_quryTime);
+				}
 			
-			ResultSet ret = new ResultSet(resultSet, statement, query);
+			ResultSet genorm_ret = new ResultSet(genorm_resultSet, genorm_statement, genorm_query);
 			
-			return (ret);
+			return (genorm_ret);
 			}
 		catch (java.sql.SQLException sqle)
 			{

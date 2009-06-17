@@ -6,7 +6,7 @@ setAndGetMethods(col) ::= <<
 	$col.comment$
 */
 public $col.type$ get$col.methodName$() { return (m_$col.parameterName$.getValue()); }
-public void set$col.methodName$($col.type$ data)
+public $table.className$ set$col.methodName$($col.type$ data)
 	{
 	boolean changed = m_$col.parameterName$.setValue(data);
 	
@@ -18,10 +18,12 @@ public void set$col.methodName$($col.type$ data)
 			
 		m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
 		}
+		
+	return (($table.className$)this);
 	}
 	
 $if(col.allowNull)$
-public void set$col.methodName$Null()
+public $table.className$ set$col.methodName$Null()
 	{
 	m_$col.parameterName$.setNull();
 	
@@ -29,6 +31,8 @@ public void set$col.methodName$Null()
 		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 		
 	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+	
+	return (($table.className$)this);
 	}
 $endif$
 
@@ -48,7 +52,7 @@ public $foreignKeys.table.className$ get$foreignKeys.methodName$()
 	}
 	
 //--------------------------------------------------------------------------
-public void set$foreignKeys.methodName$($foreignKeys.table.className$ table)
+public $table.className$ set$foreignKeys.methodName$($foreignKeys.table.className$ table)
 	{
 	//Add the now dirty record to the transaction only if it is not previously dirty
 	if ((!m_isNewRecord) && (m_dirtyFlags == 0))
@@ -58,6 +62,7 @@ public void set$foreignKeys.methodName$($foreignKeys.table.className$ table)
 m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
 }; separator="\n"$
 	
+	return (($table.className$)this);
 	}
 
 
@@ -330,19 +335,7 @@ public class $table.className$_base extends GenOrmRecord
 			if (cacheRec != null)
 				cacheRec.delete(); //The record was in the cache so set it to be deleted.
 			else
-				{
 				rec.delete();
-				try
-					{
-					//We will try to flush it to make sure the record is there
-					rec.flush();
-					}
-				catch (java.sql.SQLException sqle)
-					{
-					//The record did not exist so return false
-					ret = false;
-					}
-				}
 				
 			return (ret);
 			}
