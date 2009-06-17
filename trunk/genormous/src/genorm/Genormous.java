@@ -433,7 +433,7 @@ public class Genormous extends TemplateHelper
 				tables.offer(table);
 				}
 			
-			PrintWriter dotFile = new PrintWriter(new FileWriter("tables.dot"));
+			//PrintWriter dotFile = new PrintWriter(new FileWriter("tables.dot"));
 			
 			Iterator<Table> it = tables.iterator();
 			while (it.hasNext())
