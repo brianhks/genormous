@@ -8,5 +8,5 @@ public interface Format
 	public String formatMethodName(String columnName); //used
 	//public String formatStaticNameRef(String columnName);
 	public String formatForeignKeyMethod(ForeignKeySet fks);
-	public String formatParameterName(String columnName)
+	public String formatParameterName(String columnName);
 	}
