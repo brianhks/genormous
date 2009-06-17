@@ -79,12 +79,13 @@ public class Query
 		if (m.matches())
 			{
 			String select = m.group(1).trim();
-			String split[] = select.split(",");
+			
+			String split[] = splitSelect(select);
 			
 			// Check split length with m_outputs length to make sure they match
 			if (split.length != m_outputs.size())
 				{
-				System.out.println("Warning, in query "+m_queryName+" output parameter count does not match the select statement");
+				System.out.println("Warning, in query \""+m_queryName+"\" output parameter count does not match the select statement");
 				
 				System.out.println("Select parameters:");
 				for (int I = 0; I < split.length; I++)
@@ -123,6 +124,84 @@ public class Query
 				}
 			}
 		}
+		
+	private Pattern m_tickPattern = Pattern.compile("\\'.*?\\'", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+	//private Pattern m_parenPattern = Pattern.compile("\\(.*?,[^\\(]*?\\)", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+	
+	private static final String TICK_SEC = "@%tick%@";
+	private static final String PAREN_SEC = "@%paren%@";
+		
+	private String[] splitSelect(String select)
+		{
+		//System.out.println("ORIGINAL SELECT: "+select);
+		//System.out.println();
+		ArrayList<String> ticks = new ArrayList<String>();
+		ArrayList<String> parens = new ArrayList<String>();
+		
+		Matcher matcher = m_tickPattern.matcher(select);
+		while (matcher.find())
+			{
+			ticks.add(matcher.group());
+			}
+		select = matcher.replaceAll(TICK_SEC);
+		
+		int openParen;
+		while ((openParen = select.indexOf("(")) != -1)
+			{
+			int closeParen = 0;
+			int parenCount = 1;
+			
+			for (int I = openParen+1; I < select.length(); I++)
+				{
+				char c = select.charAt(I);
+				
+				if (c == '(')
+					parenCount++;
+				else if (c == ')')
+					parenCount--;
+					
+				if (parenCount == 0)
+					{
+					closeParen = I;
+					break;
+					}
+				}
+				
+			if (closeParen != 0)
+				{
+				parens.add(select.substring(openParen, closeParen+1));
+				
+				//System.out.println("PAREN SECTION: "+select.substring(openParen, closeParen+1));
+				
+				select = select.substring(0, openParen) + PAREN_SEC + select.substring(closeParen+1);
+				//System.out.println("NEW SELECT: "+select);
+				//System.out.println();
+				}
+			}
+			
+		//System.out.println(select);
+		String[] split = select.split(",");
+		
+		int tickPos = 0;
+		int parenPos = 0;
+		
+		//Now put back the tick and paren sections
+		for (int I = 0; I < split.length; I++)
+			{
+			while (split[I].indexOf(PAREN_SEC) != -1)
+				{
+				split[I] = split[I].replaceFirst(PAREN_SEC, parens.get(parenPos++));
+				}
+			
+			while (split[I].indexOf(TICK_SEC) != -1)
+				{
+				split[I] = split[I].replaceFirst(TICK_SEC, ticks.get(tickPos++));
+				}
+			}
+			
+		return (split);
+		}
+		
 		
 	private ArrayList<Parameter> getParameters(Element e)
 		{

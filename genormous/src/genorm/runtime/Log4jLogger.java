@@ -42,6 +42,16 @@ public class Log4jLogger extends org.apache.log4j.Logger
 			{
 			return (m_logger.isDebugEnabled());
 			}
+			
+		public boolean isInfo()
+			{
+			return (m_logger.isInfoEnabled());
+			}
+			
+		public void info(Object msg)
+			{
+			m_logger.info(msg);
+			}
 		}
 
 	protected Log4jLogger(String name)
@@ -68,5 +78,10 @@ public class Log4jLogger extends org.apache.log4j.Logger
 	public boolean isDebug() 
 		{ 
 		return (isDebugEnabled()); 
+		}
+		
+	public boolean isInfo()
+		{
+		return (isInfoEnabled());
 		}
 	}

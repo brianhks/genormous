@@ -7,6 +7,18 @@ Loop at the beginning
 Loop at the end
 -->
 <suite name="Genormous Test Suite" verbose="1">
+	<!-- <run name="Error Handle Run">
+		<tag>errors</tag>
+		<classes>
+			<class name="PostgresDatabase">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="ErrorTests"/>
+			
+		</classes>
+	</run> -->
+	
 	<!-- <classGroup name="login_group">
 		<class name="LoginTest"/>
 		<class name="LoginTestPart2"/>
