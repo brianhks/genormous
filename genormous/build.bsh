@@ -130,6 +130,7 @@ classpath.addPath(testbuilddir);
 depTest = new DepUnitTest("test", testClassFiles, classpath);
 depTest.setReportFile("build/report.xml");
 depTest.setXMLInputFile("test/test.xml");
+depTest.setStyleSheet("junitreport.xsl");
 if (make.getProperty("TEST_TAGS") != null)
 	{
 	depTest.setTestTags(make.getProperty("TEST_TAGS").split(","));
