@@ -97,16 +97,17 @@ public class Genormous extends TemplateHelper
 	private static void printHelp()
 		{
 		out.println("GenORMous version X");
-		out.println("Usage: java -jar genormous.jar -o <source file> -d <destination dir> -p <package name>");
-		out.println("      ([-x <xml file> [-x ...] [-t <tag> [-t ...]]]|([-c <test class> [-c ...]]");
-		out.println("      [<target method> ...]))");
-		out.println("  -e: Runs DepUnit in regression mode.");
-		out.println("  -r: Name of the xml report file to generate.");
-		out.println("  -s: Stylesheet to use to style the report.");
-		out.println("  -x: XML input file that defines a suite of test runs.");
-		out.println("  -c: Test class to include in the run.");
-		out.println("  -t: Only test runs marked with this tag will run.");
-		out.println("  target methods: Specific test methods to run.");
+		out.println("Usage: java -jar genormous.jar -o <source xml> -d <dest dir> -p <package>");
+		out.println("      [-s] [-c <custom type properties>] [-b <custom db properties>]");
+		out.println("      [-t <database type>] [-g <graphViz file>] [-?]");
+		out.println("  -o: Source xml containing table definitions.");
+		out.println("  -d: Destination dir to write generated files to.");
+		out.println("  -p: Package name of generated files.");
+		out.println("  -s: .");
+		out.println("  -c: Custom type properties file.");
+		out.println("  -b: Custom DB type properties file.");
+		out.println("  -t: Database type.");
+		out.println("  -g: Name of graphViz dot file to generate.");
 		}
 		
 	
@@ -146,6 +147,10 @@ public class Genormous extends TemplateHelper
 				
 		if (cl.databaseType != null)
 			gen.setDatabaseType(cl.databaseType);
+			
+		if (cl.customTypeProperties != null)
+			gen.setTypesFile(cl.customTypeProperties);
+			
 				
 		QueryGen qgen = new QueryGen(cl.source, cl.destination, cl.targetPackage);
 		qgen.setTypeMap(gen.m_typeMap);

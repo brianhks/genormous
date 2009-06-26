@@ -1,3 +1,4 @@
+
 package genorm.runtime;
 
 import java.sql.ResultSet;

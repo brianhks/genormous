@@ -21,6 +21,7 @@ public abstract class GenOrmRecord
 		m_fields = new ArrayList<GenOrmField>();
 		m_isNewRecord = false;
 		m_queryFields = new ArrayList<GenOrmField>();
+		m_isIgnored = false;
 		}
 		
 	public GenOrmRecordKey getRecordKey() { return (m_recordKey); }
