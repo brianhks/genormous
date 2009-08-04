@@ -1,6 +1,22 @@
 <?xml version="1.0" ?>
 
 <queries>
+	<configuration>
+		<querygen package="test" formatter="">
+			<typeMap>
+				<type custom="integer" java="int"/>
+				<type custom="date" java="java.sql.Date"/>
+				<type custom="boolean" java="boolean"/>
+				<type custom="string" java="String"/>
+				<type custom="timestamp" java="java.sql.Timestamp"/>
+				<type custom="binary" java="byte[]"/>
+				<type custom="money" java="java.math.BigDecimal"/>
+				<type custom="version" java="Double"/>
+			</typeMap>
+			<!-- <plugin class="genorm.plugins.memcached.MemCachePlugin"/> -->
+		</querygen>
+	</configuration>
+	
 	<query name="latest_translation">
 		<comment>This is a test comment</comment>
 		<input>
@@ -20,6 +36,7 @@
 			from
 			segment s, target t, language l
 			where
+			<!-- comment -->
 			l."language_code" = ? and l."country_code" = ? and
 			l."language_id" = t."language" and
 			s."segment_id" = t."segment"

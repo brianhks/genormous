@@ -73,7 +73,9 @@ public class GenOrmConnection
 		}
 		
 	/**
-		Returns a unique record instance for this transaction
+		Returns a unique record instance for this transaction.
+		If the record is in the cache it returns the cached record otherwise the 
+		record is added to the cache and returned
 	*/
 	public GenOrmRecord getUniqueRecord(GenOrmRecord rec)
 		{

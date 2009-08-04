@@ -7,12 +7,17 @@ public class PropertiesFile extends Properties
 	{
 	String m_FileName;
 	boolean m_nonFile;
+	boolean m_exists;
 
 	public PropertiesFile(String fileName)
 		{
+		m_exists = false;
 		m_nonFile = false;
 		FileInputStream fReader;
 		m_FileName = fileName;
+		
+		if (fileName == null)
+			return;
 
 		try
 			{
@@ -21,6 +26,7 @@ public class PropertiesFile extends Properties
 				{
 				this.load(fReader);
 				fReader.close();
+				m_exists = true;
 				}
 			}
 		catch(Exception e)
@@ -38,6 +44,7 @@ public class PropertiesFile extends Properties
 					{
 					this.load(in);
 					in.close();
+					m_exists = true;
 					}
 				}
 			catch (IOException ioe)
@@ -48,6 +55,8 @@ public class PropertiesFile extends Properties
 			}
 		}
 
+//-------------------------------------------------------------------
+	public boolean exists() { return (m_exists); }
 //-------------------------------------------------------------------
 	public String getString(String key)
 		{

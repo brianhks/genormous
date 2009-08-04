@@ -19,6 +19,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import genorm.runtime.*;
 
+$pluginIncludes$
+
 /**
 	$query.comment$
 */
@@ -418,6 +420,7 @@ sb.append("\"");
 		
 $endif$
 
+	$pluginMethods$
 	}
 >>
 

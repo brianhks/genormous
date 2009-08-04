@@ -5,10 +5,9 @@
  */
  
 import cpmake.*;
+import cpmake.java.*;
 
 print("===============================================================");
-
-make.includeCPMakeScript("java.bsh");
 
 source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
 
@@ -40,7 +39,7 @@ classpath.addPath(classoutdir);
 
 //-------------------------------------------------------------------
 //==-- CREATES RULE FOR COMPILING --==
-JavaCompiler jc = new JavaCompiler(srcdir, classoutdir, classpath);
+JavaCompiler jc = make.initPlugin(new JavaCompiler(srcdir, classoutdir, classpath));
 classFiles = jc.getClassFiles();
 //jc.getDefinition().setOption("unchecked");
 
@@ -66,7 +65,7 @@ make.createExplicitDependency(targetjar, jaroutdir);
 make.createExplicitDependency(targetjar, classFiles);
 make.createExplicitDependency(targetjar, templateFiles);
 make.createExplicitDependency(targetjar, propertyFiles);
-jf = new JarFile(targetjar, "manifest.txt");
+jf = make.initPlugin(new JarFile(targetjar, "manifest.txt"));
 jf.addFiles(classoutdir, ".");
 jf.addFiles(".", templatedir);
 jf.addFiles(srcdir, propertyFiles);
@@ -101,7 +100,7 @@ make.createPhonyRule("compile_gen", new String[] {"gensrc_test",genbuilddir}, "c
 void compileGen(CPMakeRule rule)
 	{
 	print("Compiling generated source");
-	compilerDef = Definition.getDefinition("javac");
+	compilerDef = make.getDefinition("javac");
 	compilerDef.setMode("debug");
 	compilerDef.setOption("builddir", genbuilddir);
 	compilerDef.setOption("classpath", classpath.getFormattedPath());
@@ -119,7 +118,7 @@ void compileGen(CPMakeRule rule)
 //-------------------------------------------------------------------
 //==-- COMPILE TEST FILES --==
 classpath.addPath(genbuilddir);
-jctest = new JavaCompiler(testsrc, testbuilddir, classpath);
+jctest = make.initPlugin(new JavaCompiler(testsrc, testbuilddir, classpath));
 testClassFiles = jctest.getClassFiles();
 jctest.addDependency("compile_gen");
 
@@ -127,7 +126,7 @@ jctest.addDependency("compile_gen");
 //-------------------------------------------------------------------
 //==-- TEST --==
 classpath.addPath(testbuilddir);
-depTest = new DepUnitTest("test", testClassFiles, classpath);
+depTest = new DepUnitTest("test", testClassFiles.toArray(new String[0]), classpath);
 depTest.setReportFile("build/report.xml");
 depTest.setXMLInputFile("test/test.xml");
 depTest.setStyleSheet("junitreport.xsl");

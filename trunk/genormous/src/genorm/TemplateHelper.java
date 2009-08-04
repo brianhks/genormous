@@ -9,10 +9,9 @@ public class TemplateHelper
 	protected String m_destDir;
 	protected int m_generatedFileCount;
 	
-	public TemplateHelper(String destDir)
+	public TemplateHelper()
 		{
 		m_generatedFileCount = 0;
-		m_destDir = destDir;
 		}
 	
 	protected String readResource(String fileName)
@@ -31,6 +30,12 @@ public class TemplateHelper
 		reader.close();
 			
 		return (sBuf.toString());
+		}
+		
+	//------------------------------------------------------------------------------
+	protected void setDestinationDir(String dir)
+		{
+		m_destDir = dir;
 		}
 		
 	//------------------------------------------------------------------------------
