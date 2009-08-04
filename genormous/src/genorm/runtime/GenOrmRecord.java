@@ -278,9 +278,10 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
-	private void runStatement(String statement)
+	private boolean runStatement(String statement)
 			throws SQLException
 		{
+		boolean ret = false;
 		if (m_logger.isDebug())
 			{
 			m_logger.debug("SQL Query: "+statement);
@@ -299,8 +300,10 @@ public abstract class GenOrmRecord
 			m_queryFields.get(I).placeValue(stmt, I+1);
 			}
 			
-		stmt.execute();
+		ret = (stmt.executeUpdate() != 0);
+			
 		stmt.close();
+		return (ret);
 		}
 		
 	//---------------------------------------------------------------------------
@@ -317,20 +320,21 @@ public abstract class GenOrmRecord
 		}
 		
 	//---------------------------------------------------------------------------
-	/*package*/ void commitChanges()
+	/*package*/ boolean commitChanges()
 			throws SQLException
 		{
+		boolean ret = true;
 		String query;
 		
 		if (m_isIgnored)
-			return; 
+			return(true);
 		if (m_isDeleted)
 			{
 			//If the record is new there is no reason to delete it as it is not there
 			if (m_isNewRecord)
-				return;
+				return(true);
 				
-			runStatement(createDeleteStatement());
+			ret = runStatement(createDeleteStatement());
 			}
 		else if (m_dirtyFlags != 0)
 			{
@@ -339,22 +343,31 @@ public abstract class GenOrmRecord
 			
 			runStatement(createUpdateStatement());
 			}
+			
+		return (ret);
 		}
 		
 	//---------------------------------------------------------------------------
 	/**
 		Flush any changes made to this record.  The record will be inserted if 
 		it is new.
+		
+		@return In all cases except a delete this will return true.  In the case
+		where the record is deleted it will return true if the record was in the db
+		and false if it wasn't.
 	*/
-	public void flush()
+	public boolean flush()
 			throws SQLException
 		{
+		boolean ret = false;
 		GenOrmConnection con = GenOrmDataSource.getGenOrmConnection();
 		//System.out.println("Flushing record for "+m_tableName+" "+toString());
 		createIfNew(con);
-		commitChanges();
+		ret = commitChanges();
 		m_dirtyFlags = 0;
 		m_isNewRecord = false;
+		
+		return (ret);
 		}
 		
 	//---------------------------------------------------------------------------

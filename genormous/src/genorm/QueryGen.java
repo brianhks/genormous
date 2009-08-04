@@ -12,11 +12,17 @@ import static java.lang.System.out;
 
 public class QueryGen extends TemplateHelper
 	{
-	private String m_source;
+	public static final String SOURCE = "genorm.querygen.source";
+	public static final String DESTINATION = "genorm.querygen.destination";
+	public static final String PACKAGE = "genorm.querygen.package";
+	public static final String FORMATTER = "genomr.querygen.formatter";
+	public static final String TYPE_MAP = "genorm.querygen.typeMap";
+	
 	private Format m_formatter;
 	private String m_packageName;
-	private PropertiesFile m_typeMap;
-	
+	private Map<String, String> m_typeMap;
+	private Properties m_config;
+	private ArrayList<QueryPlugin> m_pluginList;
 	
 	//===========================================================================
 	private static class CommandLine
@@ -24,12 +30,14 @@ public class QueryGen extends TemplateHelper
 		public String source;
 		public String destination;
 		public String targetPackage;
+		public String configurationFile;
 		
 		public CommandLine()
 			{
 			source = null;
 			destination = null;
 			targetPackage = null;
+			configurationFile = null;
 			}
 		}
 		
@@ -39,6 +47,7 @@ public class QueryGen extends TemplateHelper
 		new StringDef('s', "source"),
 		new StringDef('d', "destination"),
 		new StringDef('p', "targetPackage"),
+		new StringDef('c', "configurationFile"),
 		};
 		
 	
@@ -76,6 +85,8 @@ public class QueryGen extends TemplateHelper
 		
 		QueryGen og = new QueryGen(cl.source, cl.destination, cl.targetPackage);
 		
+		
+		
 		try
 			{
 			og.generateClasses();
@@ -87,24 +98,119 @@ public class QueryGen extends TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
-	public QueryGen(String source, String destDir, String packageName)
+	public QueryGen()
 		{
-		super(destDir);
-		m_source = source;
-		m_formatter = new DefaultFormat();
-		m_packageName = packageName;
+		m_config = new Properties();
+		m_pluginList = new ArrayList<QueryPlugin>();
 		}
 		
 //------------------------------------------------------------------------------
-	public void setFormat(Format formatter)
+	public QueryGen(Properties configuration)
 		{
-		m_formatter = formatter;
+		m_config = configuration;
+		m_pluginList = new ArrayList<QueryPlugin>();
+		}
+		
+//------------------------------------------------------------------------------
+	public QueryGen(String source, String destDir, String packageName)
+		{
+		m_config = new Properties();
+		m_config.setProperty(SOURCE, source);
+		m_config.setProperty(DESTINATION, destDir);
+		m_config.setProperty(PACKAGE, packageName);
+		m_pluginList = new ArrayList<QueryPlugin>();
 		}
 
 //------------------------------------------------------------------------------
-	/*package*/ void setTypeMap(PropertiesFile typeMap)
+	private String getRequiredProperty(String prop)
+			throws ConfigurationException
+		{
+		String value = m_config.getProperty(prop);
+		
+		if (value == null)
+			throw new ConfigurationException(prop, "Option is required");
+			
+		return (value);
+		}
+
+//------------------------------------------------------------------------------
+	private Object loadClass(String prop, String defaultClass)
+			throws ConfigurationException
+		{
+		Object ret = null;
+		
+		String className = m_config.getProperty(prop, defaultClass);
+		
+		try
+			{
+			if (className != null)
+				ret = Class.forName(className).newInstance();
+			}
+		catch (ClassNotFoundException cnfe)
+			{
+			throw new ConfigurationException(prop, "Cannot load class "+className);
+			}
+		catch (InstantiationException ie)
+			{
+			throw new ConfigurationException(prop, "Cannot load class "+className);
+			}
+		catch (IllegalAccessException iae)
+			{
+			throw new ConfigurationException(prop, "Cannot load class "+className);
+			}
+			
+		return (ret);
+		}
+		
+//------------------------------------------------------------------------------
+	public void setConfiguration(String configurationFile)
+		{
+		setConfiguration(new PropertiesFile(configurationFile));
+		}
+		
+//------------------------------------------------------------------------------
+	public void setConfiguration(Properties configuration)
+		{
+		m_config = configuration;
+		}
+		
+//------------------------------------------------------------------------------
+	public void setConfigOption(String option, String value)
+		{
+		m_config.setProperty(option, value);
+		}
+
+//------------------------------------------------------------------------------
+	/* package */ void setTypeMap(Map<String, String> typeMap)
 		{
 		m_typeMap = typeMap;
+		}
+		
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+	private void loadConfiguration(Element e)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException
+		{
+		m_packageName = e.attributeValue("package");
+		Iterator types = e.selectNodes("type").iterator();
+		if (types.hasNext())
+			m_typeMap = new HashMap<String, String>();
+			
+		while (types.hasNext())
+			{
+			Element type = (Element)types.next();
+			m_typeMap.put(type.attributeValue("custom"), type.attributeValue("java"));
+			}
+			
+		Iterator plugins = e.selectNodes("plugin").iterator();
+		while (plugins.hasNext())
+			{
+			Element plugin = (Element)plugins.next();
+			QueryPlugin qPlugin = (QueryPlugin)Class.forName(plugin.attributeValue("class")).newInstance();
+			
+			qPlugin.init(plugin);
+			m_pluginList.add(qPlugin);
+			}
 		}
 		
 //------------------------------------------------------------------------------
@@ -114,10 +220,23 @@ public class QueryGen extends TemplateHelper
 		FileWriter fw;
 		int genfiles = 0;
 		
+		String destDir = getRequiredProperty(DESTINATION);
+		super.setDestinationDir(destDir);
+		String source = getRequiredProperty(SOURCE);
+		String packageName = getRequiredProperty(PACKAGE);
+		
+		Format formatter = (Format)loadClass(FORMATTER, "genorm.DefaultFormat");
+		if (m_typeMap == null)
+			m_typeMap = Genormous.readPropertiesFile(new PropertiesFile(m_config.getProperty(TYPE_MAP)));
+			
 		try
 			{
 			SAXReader reader = new SAXReader();
-			Document xmldoc = reader.read(new File(m_source));
+			Document xmldoc = reader.read(new File(source));
+			
+			Iterator config = xmldoc.selectNodes("/queries/configuration/querygen").iterator();
+			if (config.hasNext())
+				loadConfiguration((Element)config.next());
 			
 			StringTemplateGroup dataTypeMapGroup = loadTemplateGroup("templates/data_type_maps.st");
 			
@@ -130,7 +249,7 @@ public class QueryGen extends TemplateHelper
 			while (queryit.hasNext())
 				{
 				Element e = (Element)queryit.next();
-				Query q = new Query(e, m_formatter, m_typeMap);
+				Query q = new Query(e, formatter, m_typeMap);
 				
 				String fileName = q.getClassName() + "Query.java";
 				String dataFileName = q.getClassName() + "Data.java";
@@ -139,8 +258,23 @@ public class QueryGen extends TemplateHelper
 				Map<String, Object> attributes = new HashMap<String, Object>();
 				//TextReplace sqlQuery = new TextReplace(this.getClass().getClassLoader().getResourceAsStream("ObjectQuery.tmpl"), "%");
 				
-				attributes.put("package", m_packageName);
+				attributes.put("package", packageName);
 				attributes.put("query", q);
+				
+				StringBuilder pluginIncludes = new StringBuilder();
+				StringBuilder pluginMethods = new StringBuilder();
+				
+				for (QueryPlugin qp : m_pluginList)
+					{
+					pluginIncludes.append(qp.getIncludes(attributes));
+					pluginMethods.append(qp.getMethods(attributes));
+					
+					pluginIncludes.append("\n");
+					pluginMethods.append("\n");
+					}
+					
+				attributes.put("pluginIncludes", pluginIncludes.toString());
+				attributes.put("pluginMethods", pluginMethods.toString());
 				
 				StringTemplate queryTemplate = queryObjectTG.getInstanceOf("objectQuery");
 				queryTemplate.setAttributes(attributes);
@@ -163,7 +297,9 @@ public class QueryGen extends TemplateHelper
 				}
 			
 			Map<String, Object> attributes = new HashMap<String, Object>();
-			attributes.put("package", m_packageName);
+			attributes.put("package", packageName);
+			
+			
 			
 			/* genfiles++;
 			writeTemplate("SQLQuery.java", attributes);

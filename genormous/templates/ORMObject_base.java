@@ -322,20 +322,41 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Deletes the record with the specified primary keys.
-			@return Returns true if the record existed false otherwise.
+			The point of this api is to prevent a hit on the db to see if the record
+			is there.  This call will add a record to the next transaction that is 
+			marked for delete. 
+			
+			@return Returns true if the record was previous created and existed
+			either in the transaction cache or the db.
 		*/
 		public boolean delete($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
-			boolean ret = true;
+			boolean ret = false;
 			$table.className$ rec = new $table.className$();
 			
 			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
-			$table.className$ cacheRec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec.getRecordKey());
+			GenOrmConnection con = GenOrmDataSource.getGenOrmConnection();
+			$table.className$ cachedRec = ($table.className$)con.getCachedRecord(rec.getRecordKey());
 			
-			if (cacheRec != null)
-				cacheRec.delete(); //The record was in the cache so set it to be deleted.
+			if (cachedRec != null)
+				{
+				ret = true;
+				cachedRec.delete();
+				}
 			else
+				{
+				rec = ($table.className$)con.getUniqueRecord(rec);  //This adds the record to the cache
 				rec.delete();
+				try
+					{
+					ret = rec.flush();
+					}
+				catch (java.sql.SQLException sqle)
+					{
+					throw new GenOrmException(sqle);
+					}
+				rec.setIgnored(true); //So the system does not try to delete it again at commmit
+				}
 				
 			return (ret);
 			}

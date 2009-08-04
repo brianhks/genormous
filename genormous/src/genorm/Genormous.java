@@ -43,7 +43,7 @@ public class Genormous extends TemplateHelper
 	
 	private String m_source;
 	//private String m_destDir;
-	private PropertiesFile m_typeMap;
+	private Map<String, String> m_typeMap;
 	private Format m_formatter;
 	private String m_packageName;
 	private boolean m_includeStringSets;
@@ -112,6 +112,22 @@ public class Genormous extends TemplateHelper
 		
 	
 //==============================================================================
+	/*package*/ static Map<String, String> readPropertiesFile(PropertiesFile props)
+		{
+		if (!props.exists())
+			return (null);
+			
+		Map<String, String> map = new HashMap<String, String>();
+		
+		Iterator<Object> keys = props.keySet().iterator();
+		while (keys.hasNext())
+			{
+			String key = (String)keys.next();
+			map.put(key, (String)props.get(key));
+			}
+			
+		return (map);
+		}
 		
 /* //------------------------------------------------------------------------------
 	private String getCreateCommands(Iterator<String> it)
@@ -171,10 +187,9 @@ public class Genormous extends TemplateHelper
 //------------------------------------------------------------------------------
 	public Genormous(String source, String destDir, String packageName, boolean includeStringSets, String graphVizFile)
 		{
-		super(destDir);
-		
+		super.setDestinationDir(destDir);
 		m_source = source;
-		m_typeMap = new PropertiesFile("types.properties");
+		m_typeMap = readPropertiesFile(new PropertiesFile("types.properties"));
 		m_formatter = new DefaultFormat();
 		m_packageName = packageName;
 		m_includeStringSets = includeStringSets;
@@ -194,7 +209,7 @@ public class Genormous extends TemplateHelper
 //------------------------------------------------------------------------------
 	public void setTypesFile(String typeFile)
 		{
-		m_typeMap = new PropertiesFile(typeFile);
+		m_typeMap = readPropertiesFile(new PropertiesFile(typeFile));
 		}
 		
 //------------------------------------------------------------------------------
@@ -245,7 +260,7 @@ public class Genormous extends TemplateHelper
 				Element cole = (Element)globColIt.next();
 				String colName = cole.attribute(NAME).getValue();
 				String type = cole.attribute(TYPE).getValue();
-				Column col = new Column(colName, m_typeMap.getString(type), type, m_formatter);
+				Column col = new Column(colName, m_typeMap.get(type), type, m_formatter);
 				
 				if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
 					col.setAllowNull(false);
@@ -308,7 +323,7 @@ public class Genormous extends TemplateHelper
 					Element cole = (Element)cols.next();
 					String colName = cole.attribute(NAME).getValue();
 					String type = cole.attribute(TYPE).getValue();
-					Column col = new Column(colName, m_typeMap.getString(type), type, m_formatter);
+					Column col = new Column(colName, m_typeMap.get(type), type, m_formatter);
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					

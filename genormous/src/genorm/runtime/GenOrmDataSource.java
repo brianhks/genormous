@@ -99,7 +99,8 @@ public class GenOrmDataSource
 	public static PreparedStatement prepareStatement(String sql)
 			throws SQLException
 		{
-		return (s_tlConnectionList.get().peek().getConnection().prepareStatement(sql));
+		GenOrmConnection goc = s_tlConnectionList.get().peek();
+		return (goc.getConnection().prepareStatement(sql));
 		}
 	
 	public static int rawUpdate(String sql)

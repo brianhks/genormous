@@ -28,7 +28,7 @@ public class Query
 	private String m_sqlQuery;
 	private String m_comment;
 	private boolean m_resultTypeSingle;
-	private Properties m_typeMap;
+	private Map<String, String> m_typeMap;
 	private boolean m_skipTest;
 	
 	public Query(Format formatter, String name, ArrayList<Parameter> params, String sql)
@@ -49,7 +49,7 @@ public class Query
 		this(queryRoot, formatter, null);
 		}
 	
-	public Query(Element queryRoot, Format formatter, Properties typeMap)
+	public Query(Element queryRoot, Format formatter, Map<String, String> typeMap)
 		{
 		m_skipTest = false;
 		m_comment = "";

@@ -16,7 +16,7 @@ public class Parameter
 	private Format m_formatter;
 	private String m_testParam;
 	
-	public Parameter(Element p, Format formatter, Properties typeMap)
+	public Parameter(Element p, Format formatter, Map<String, String> typeMap)
 		{
 		m_formatter = formatter;
 		m_name = p.attributeValue(NAME);
