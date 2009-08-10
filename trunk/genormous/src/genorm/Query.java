@@ -15,6 +15,7 @@ public class Query
 	public static final String RETURN = "return";
 	public static final String PARAM = "param";
 	public static final String RESULT_TYPE = "result_type";
+	public static final String RESULT_NONE = "none";
 	public static final String RESULT_SINGLE = "single";
 	public static final String RESULT_MULTI = "multi";
 	public static final String COMMENT = "comment";
@@ -27,7 +28,9 @@ public class Query
 	private ArrayList<Parameter> m_outputs;
 	private String m_sqlQuery;
 	private String m_comment;
+	private boolean m_resultTypeNone;
 	private boolean m_resultTypeSingle;
+	private boolean m_resultTypeMulti;
 	private Map<String, String> m_typeMap;
 	private boolean m_skipTest;
 	
@@ -58,12 +61,14 @@ public class Query
 		m_queryName = queryRoot.attributeValue(NAME);
 		String resultType = queryRoot.attributeValue(RESULT_TYPE);
 		if ((resultType != null) && (!resultType.equals(RESULT_SINGLE)) &&
-				(!resultType.equals(RESULT_MULTI)))
+				(!resultType.equals(RESULT_MULTI)) && (!resultType.equals(RESULT_NONE)))
 			{
-			System.out.println("result_type value \""+resultType+"\" must be \"single\" or \"multi\"");
+			System.out.println("result_type value \""+resultType+"\" must be \"none\", \"single\" or \"multi\"");
 			}
 			
+		m_resultTypeNone = RESULT_NONE.equals(resultType);
 		m_resultTypeSingle = RESULT_SINGLE.equals(resultType);
+		m_resultTypeMulti = RESULT_MULTI.equals(resultType);
 		
 		m_inputs = getParameters(queryRoot.element(INPUT));
 		m_replacements = getParameters(queryRoot.element(REPLACE));
@@ -238,6 +243,7 @@ public class Query
 	public String getSqlQuery() { return (m_sqlQuery.replaceAll("\\n+", "\\\\n").replace("\"", "\\\"")); }
 	public String getComment() { return (m_comment); }
 	
+	public boolean isNoneResult() { return (m_resultTypeNone); }
 	public boolean isSingleResult() { return (m_resultTypeSingle); }
 	
 	public boolean isParamQuery()

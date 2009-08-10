@@ -73,6 +73,37 @@ addQueryMethods(query) ::= <<
 /**
 	$query.comment$
 */
+$if(query.noneResult)$
+public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+	{
+	int rows = 0;
+	String update = "$query.sqlQuery$";
+	$if(query.replaceQuery)$
+	HashMap<String, String> replaceMap = new HashMap<String, String>();
+	$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
+	query = replaceText(query, replaceMap);
+	$endif$
+	
+	try
+		{
+		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(update);
+		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+		
+		s_logger.debug(statement.toString());
+		
+		rows = statement.executeUpdate();
+		}
+	catch (java.sql.SQLException sqle)
+		{
+		if (s_logger.isDebug())
+			sqle.printStackTrace();
+		throw new GenOrmException(sqle);
+		}
+		
+	return (rows);
+	}
+	
+$else$
 public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 	{
 	String query = SELECT+"$query.sqlQuery$";
@@ -104,6 +135,9 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		throw new GenOrmException(sqle);
 		}
 	}
+	
+$endif$
+
 
 >>
 
@@ -121,7 +155,7 @@ import genorm.runtime.*;
 */
 public class $table.className$_base extends GenOrmRecord
 	{
-	private static final Logger s_logger = LoggerFactory.getLogger($table.className$.class.getName());
+	protected static final Logger s_logger = LoggerFactory.getLogger($table.className$.class.getName());
 
 	$columns:{col | public static final String COL_$col.nameCaps$ = "$col.name$";
 }$
@@ -477,8 +511,10 @@ public class $table.className$_base extends GenOrmRecord
 			{
 			ResultSet rs;
 			$table.queries:{ query | $if(!query.skipTest)$System.out.println("$table.className$.get$query.className$");
+$if(query.noneResult)$run$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
+$else$
 $if(!query.singleResult)$rs = $endif$get$query.className$($[query.inputs,query.replacements]:{ p | $p.testParam$}; separator=", "$);
-$if(!query.singleResult)$rs.close();$endif$$endif$
+$if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 }$
 			}
 		}
