@@ -35,7 +35,7 @@
 <!ELEMENT table_query (comment?,input?,replace?,sql)>
 <!ATTLIST table_query
 	name CDATA #REQUIRED
-	result_type (single|multi) #REQUIRED
+	result_type (none|single|multi) #REQUIRED
 	>
 	
 <!ELEMENT input (param*)>
