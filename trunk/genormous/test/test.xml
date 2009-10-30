@@ -19,36 +19,6 @@ Loop at the end
 		</classes>
 	</run> -->
 	
-	<!-- <classGroup name="login_group">
-		<class name="LoginTest"/>
-		<class name="LoginTestPart2"/>
-	</classGroup> -->
-	
-	<!-- <run name="Data Driver Run">
-		<classes>
-			<class name="DataDriverTest">
-				<driver class="TestDataDriver"/>
-			</class>
-		</classes>
-	</run> -->
-	
-	<!-- <run name="Table Creator">
-		<tag>creator</tag>
-		<classes>
-			
-			<class name="MySQLDatabase">
-				<value name="CreateSQL">build/gen/src/test/create.sql</value>
-				<value name="DatabaseDir">data</value>
-			</class>
-			<class name="TableCreatorTest">
-			</class>
-		</classes>
-		
-		<tests>
-			<method>TableCreatorTest.testTableCreator</method>
-		</tests>
-	</run> -->
-	
 	<run name="Object Tests">
 		<classes>
 			<class name="SQLQueryTest">
@@ -76,71 +46,15 @@ Loop at the end
 		</tests> -->
 	</run>
 	
-	<!-- <run name="Cleanup Run">
+	<run name="Memcached Test">
+		<tag>memcached</tag>
 		<classes>
-			<class name="CleanupTest"/>
+			<class name="HSQLDatabase">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="MemCacheTests"/>
 		</classes>
 	</run>
-	
-	<run name="Fail run">
-		<classes>
-			<class name="UnitTest"/>
-		</classes>
-	</run>
-	
-	<run name="Second Run">
-		<classes>
-			<class name="LoginTest">
-				<value name="UserName">MyUserName</value>
-				<value name="Password">mysecret</value>
-			</class>
-		</classes>
-		
-		<tests>
-			<method>LoginTest.login</method>
-		</tests>
-	</run>
-	
-	
-	<run name="Repeat run">
-		<classes>
-			<includeGroup>login_group</includeGroup>
-			
-			<class name="LoginTest">
-				<value name="UserName">Sammy</value>
-				<value name="Password">secret</value>
-				<value name="test">4</value>
-			</class>
-			
-			<class name="LoginTestPart2">
-				<driver>
-					<data>
-						<value name="MyData">Here is my data</value>
-					</data>
-					<data>
-						<value name="MyData">Here is my data2</value>
-					</data>
-				</driver>
-			</class>
-		</classes>
-		
-	</run>
-	
-	<run name="fail login">
-		<classes>
-			<class name="LoginTest" >
-				<value name="UserName">Sammy</value>
-				<value name="Password">secret</value>
-				<value name="Fail">true</value>
-			</class>
-			<class name="Project">
-				<driver>
-					<data>
-						<value name="ProjectName">my project</value>
-					</data>
-				</driver>
-			</class>
-		</classes>
-	</run> -->
 	
 </suite>

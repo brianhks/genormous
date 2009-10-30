@@ -5,26 +5,30 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class SQLQuery
+public abstract class SQLQuery
 	{
 	protected Locale m_locale;
 	protected Formatter m_formatter;
 	
+	//---------------------------------------------------------------------------
 	public SQLQuery()
 		{
 		m_formatter = new DefaultFormatter();
 		}
 		
+	//---------------------------------------------------------------------------
 	public void setFormatter(Formatter formatter)
 		{
 		m_formatter = formatter;
 		}
 		
+	//---------------------------------------------------------------------------
 	public void setLocale(Locale locale)
 		{
 		m_formatter.setLocale(locale);
 		}
 		
+	//---------------------------------------------------------------------------
 	protected String replaceText(String input, Map<String, String> replacements)
 		{
 		String token = "%";
@@ -53,4 +57,12 @@ public class SQLQuery
 		
 		return (sb.toString());
 		}
+		
+	//---------------------------------------------------------------------------
+	public abstract String getQueryName();
+	public abstract String getQuery();
+	
+	//---------------------------------------------------------------------------
+	//---------------------------------------------------------------------------
+	//---------------------------------------------------------------------------
 	}

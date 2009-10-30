@@ -237,6 +237,7 @@ public class Query
 	public ArrayList<Parameter> getInputs() { return (m_inputs); }
 	public ArrayList<Parameter> getReplacements() { return (m_replacements); }
 	public ArrayList<Parameter> getOutputs() { return (m_outputs); }
+	public boolean isHasParameters() { return (m_inputs.size() + m_replacements.size() > 0); }
 	public boolean isUpdate() { return (m_outputs.size() == 0); }
 	public int getOutputsCount() { return (m_outputs.size()); }
 	public boolean isReplaceQuery() { return (m_replacements.size() > 0); }
