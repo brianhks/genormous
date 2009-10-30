@@ -2,7 +2,7 @@
 
 <queries>
 	<configuration>
-		<querygen package="test" formatter="">
+		<querygen package="test">
 			<typeMap>
 				<type custom="integer" java="int"/>
 				<type custom="date" java="java.sql.Date"/>
@@ -13,7 +13,7 @@
 				<type custom="money" java="java.math.BigDecimal"/>
 				<type custom="version" java="Double"/>
 			</typeMap>
-			<!-- <plugin class="genorm.plugins.memcached.MemCachePlugin"/> -->
+			<plugin class="genorm.plugins.memcached.MemCachePlugin"/>
 		</querygen>
 	</configuration>
 	
@@ -52,6 +52,21 @@
 		</return>
 		<sql>
 			select "language_id", "language_code" as code from language
+		</sql>
+	</query>
+	
+	<query name="similar_languages">
+		<input>
+			<param name="language_code" type="String" test="en"/>
+		</input>
+		<return>
+			<param name="language_id" type="int"/>
+			<param name="language_code" type="String"/>
+			<param name="country_code" type="String"/>
+		</return>
+		<sql>
+			select "language_id", "language_code", "country_code"
+			from language where "language_code" = ?
 		</sql>
 	</query>
 	

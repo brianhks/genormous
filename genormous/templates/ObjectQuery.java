@@ -19,12 +19,13 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import genorm.runtime.*;
 
-$pluginIncludes$
+$importList:{imp | import $imp$;}; separator="\n"$
 
 /**
 	$query.comment$
 */
 public class $query.className$Query extends genorm.runtime.SQLQuery
+		$if(queryImplementSetNotEmpty)$implements $queryImplementSet:{imp | $imp$}; separator=", "$$endif$
 	{
 	private static final Logger s_logger = LoggerFactory.getLogger($query.className$Query.class.getName());
 	
@@ -44,18 +45,50 @@ public class $query.className$Query extends genorm.runtime.SQLQuery
 	
 	private boolean m_serializable;
 	
+	$[query.inputs,query.replacements]:{ p | private $p.type$ m_$p.parameterName$;}; separator="\n"$
+
+$if(query.hasParameters)$
+	//Deprecated
 	public $query.className$Query()
 		{
 		super();
 		}
+$endif$
+		
+	//---------------------------------------------------------------------------
+	public $query.className$Query($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+		{
+		super();
+		$[query.inputs,query.replacements]:{ p | m_$p.parameterName$ = $p.parameterName$;}; separator="\n"$
+		}
+		
+	//---------------------------------------------------------------------------
+	public String getQueryName() { return (QUERY_NAME); }
+	
+	//---------------------------------------------------------------------------
+	public String getQuery() { return (QUERY); }
 		
 	//---------------------------------------------------------------------------
 	public void setSerializable(boolean serializable)
 		{
 		m_serializable = serializable;
 		}
-
+	
+	//---------------------------------------------------------------------------
+	public String toString()
+		{
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getName());
+		$[query.inputs,query.replacements]:{ p | sb.append(" $p.parameterName$=").append(String.valueOf(m_$p.parameterName$));}; separator="\n"$
+		
+		return (sb.toString());
+		}
+		
+	
 $if(query.update)$
+$if(query.hasParameters)$
+	//---------------------------------------------------------------------------
+	//Deprecated
 	public int runUpdate($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 		{
 		try
@@ -81,15 +114,43 @@ $if(query.update)$
 			throw new GenOrmException(sqle);
 			}
 		}
+$endif$
+	
+	//---------------------------------------------------------------------------
+	public int runUpdate()
+		{
+		try
+			{
+			String query = QUERY;
+			$if(query.replaceQuery)$
+			HashMap<String, String> replaceMap = new HashMap<String, String>();
+			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf(m_$rep.parameterName$));}$
+			query = replaceText(query, replaceMap);
+			$endif$
+			
+			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
+			$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
+}$
+			
+			int ret = statement.executeUpdate();
+			
+			statement.close();
+			return (ret);
+			}
+		catch (java.sql.SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
+		}
 $else$
 
 	//---------------------------------------------------------------------------
-	public void serializeQuery(ContentHandler ch, String tagName$if(query.paramQuery)$, $endif$$[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
+	public void serializeQuery(ContentHandler ch, String tagName)
 			throws org.xml.sax.SAXException
 		{
 		boolean prevSerializeState = m_serializable;
 		m_serializable = true;
-		ResultSet rs = runQuery($[query.inputs,query.replacements]:{ p | $p.parameterName$}; separator=", "$);
+		ResultSet rs = runQuery();
 		
 		while (rs.next())
 			{
@@ -101,7 +162,9 @@ $else$
 		m_serializable = prevSerializeState;
 		}
 	
+$if(query.hasParameters)$
 	//---------------------------------------------------------------------------
+	//Deprecated
 	public ResultSet runQuery($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 		{
 		try
@@ -130,7 +193,47 @@ $else$
 				s_logger.info(genorm_quryTime);
 				}
 			
-			ResultSet genorm_ret = new ResultSet(genorm_resultSet, genorm_statement, genorm_query);
+			ResultSet genorm_ret = new SQLResultSet(genorm_resultSet, genorm_statement, genorm_query);
+			
+			return (genorm_ret);
+			}
+		catch (java.sql.SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
+		}
+$endif$
+		
+	//---------------------------------------------------------------------------
+	public ResultSet runQuery()
+		{
+		try
+			{
+			String genorm_query = QUERY;
+			$if(query.replaceQuery)$
+			HashMap<String, String> genorm_replaceMap = new HashMap<String, String>();
+			$query.replacements:{rep | genorm_replaceMap.put("$rep.tag$", String.valueOf(m_$rep.parameterName$));}$
+			genorm_query = replaceText(genorm_query, genorm_replaceMap);
+			$endif$
+			
+			java.sql.PreparedStatement genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
+}$
+			long genorm_queryTimeStart = 0L;
+			if (s_logger.isInfo())
+				{
+				genorm_queryTimeStart = System.currentTimeMillis();
+				}
+				
+			java.sql.ResultSet genorm_resultSet = genorm_statement.executeQuery();
+			
+			if (genorm_queryTimeStart != 0L)
+				{
+				long genorm_quryTime = System.currentTimeMillis() - genorm_queryTimeStart;
+				s_logger.info(genorm_quryTime);
+				}
+			
+			ResultSet genorm_ret = new SQLResultSet(genorm_resultSet, genorm_statement, genorm_query);
 			
 			return (genorm_ret);
 			}
@@ -141,8 +244,20 @@ $else$
 		}
 		
 	//===========================================================================
-	public class ResultSet 
-			implements GenOrmQueryResultSet
+	//Plugin Classes and Methods
+	$pluginQueryBody$
+		
+	//===========================================================================
+	public interface ResultSet extends GenOrmQueryResultSet
+		{
+		public List<$query.className$Data> getArrayList(int maxRows);
+		public $query.className$Data getRecord();
+		public $query.className$Data getOnlyRecord();
+		}
+		
+	//===========================================================================
+	private class SQLResultSet 
+			implements ResultSet
 		{
 		private java.sql.ResultSet m_resultSet;
 		private java.sql.Statement m_statement;
@@ -151,7 +266,7 @@ $else$
 		
 		//------------------------------------------------------------------------
 		//need to pass in the statement so it can be closed after the result set
-		protected ResultSet(java.sql.ResultSet resultSet, java.sql.Statement statement, 
+		protected SQLResultSet(java.sql.ResultSet resultSet, java.sql.Statement statement, 
 				String query)
 			{
 			m_resultSet = resultSet;
@@ -183,7 +298,7 @@ $else$
 			Returns the reults as an ArrayList of Record objects.
 			The Result set is closed within this call
 		*/
-		public ArrayList<$query.className$Data> getArrayList(int maxRows)
+		public List<$query.className$Data> getArrayList(int maxRows)
 			{
 			ArrayList<$query.className$Data> results = new ArrayList<$query.className$Data>();
 			int count = 0;
@@ -291,7 +406,7 @@ $else$
 		}
 		
 	//===========================================================================
-	public class Record implements Attributes, GenOrmQueryRecord
+	public class Record extends GenOrmQueryRecord implements Attributes$recordImplementSet:{imp | , $imp$}$
 		{
 		$query.outputs:{ o | protected $o.type$ m_$o.parameterName$;
 }$

@@ -11,6 +11,8 @@ print("===============================================================");
 
 source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
 
+version = "1.1";
+
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
 classoutdir = bldoutdir+"/classes";
@@ -20,7 +22,7 @@ gensrcdir = gendir+"/src";
 genbuilddir = gendir+"/build";
 gentestdir = gensrcdir+"/test";
 srcdir = "src/java";
-targetjar = jaroutdir+"/genormous.jar";
+targetjar = jaroutdir+"/genormous-"+version+".jar";
 extdir = "lib";
 distdir = bldoutdir+"/dist";
 templatedir = "templates";
@@ -76,7 +78,7 @@ jf.addFiles("etc", ".");
 make.createPhonyRule("javadoc", null, "javadoc");
 void javadoc(String target, String[] prereqs)
 	{
-	cmd = "javadoc -public -d doc/javadoc -sourcepath src -subpackages genorm.runtime";
+	cmd = "javadoc -public -d doc/javadoc -sourcepath "+srcdir+" -subpackages genorm.runtime";
 	make.exec(cmd);
 	//make.exec(srcdir, "javadoc -public -d ../doc "+make.arrayToString(sourceFiles), true);
 	}
@@ -91,7 +93,7 @@ void genSrc(CPMakeRule rule)
 	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
 	
 	print("Generating Query source");
-	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.QueryGen -s test/queries.xml -d "+gentestdir+" -p test");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.QueryGen -s test/queries.xml -d "+gentestdir);
 	}
 
 //-------------------------------------------------------------------

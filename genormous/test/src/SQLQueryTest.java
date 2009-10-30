@@ -23,4 +23,7 @@ public class SQLQueryTest extends SQLQuery
 		repString = replaceText(testString, replace);
 		assertEquals("to be or will to be that %isn't% the question", repString);
 		}
+		
+	public String getQueryName() { return (""); }
+	public String getQuery() { return (""); }
 	}

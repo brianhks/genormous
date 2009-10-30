@@ -120,7 +120,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		
 		s_logger.debug(statement.toString());
 		
-		ResultSet rs = new ResultSet(statement.executeQuery(), query, statement);
+		ResultSet rs = new SQLResultSet(statement.executeQuery(), query, statement);
 		
 		$if(query.singleResult)$
 		return (rs.getOnlyRecord());
@@ -491,7 +491,7 @@ public class $table.className$_base extends GenOrmRecord
 					}
 				
 				String query = sb.toString();
-				rs = new ResultSet(stmnt.executeQuery(query), query, stmnt);
+				rs = new SQLResultSet(stmnt.executeQuery(query), query, stmnt);
 				}
 			catch (java.sql.SQLException sqle)
 				{
@@ -520,8 +520,16 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		}
 		
 	//===========================================================================
-	public static class ResultSet 
-			implements GenOrmResultSet
+	public static interface ResultSet extends GenOrmResultSet
+		{
+		public ArrayList<$table.className$> getArrayList(int maxRows);
+		public $table.className$ getRecord();
+		public $table.className$ getOnlyRecord();
+		}
+		
+	//===========================================================================
+	private static class SQLResultSet 
+			implements ResultSet
 		{
 		private java.sql.ResultSet m_resultSet;
 		private java.sql.Statement m_statement;
@@ -529,7 +537,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		private boolean m_onFirstResult;
 		
 		//------------------------------------------------------------------------
-		protected ResultSet(java.sql.ResultSet resultSet, String query, java.sql.Statement statement)
+		protected SQLResultSet(java.sql.ResultSet resultSet, String query, java.sql.Statement statement)
 			{
 			m_resultSet = resultSet;
 			m_statement = statement;

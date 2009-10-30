@@ -85,8 +85,6 @@ public class QueryGen extends TemplateHelper
 		
 		QueryGen og = new QueryGen(cl.source, cl.destination, cl.targetPackage);
 		
-		
-		
 		try
 			{
 			og.generateClasses();
@@ -116,8 +114,10 @@ public class QueryGen extends TemplateHelper
 		{
 		m_config = new Properties();
 		m_config.setProperty(SOURCE, source);
-		m_config.setProperty(DESTINATION, destDir);
-		m_config.setProperty(PACKAGE, packageName);
+		if (destDir != null)
+			m_config.setProperty(DESTINATION, destDir);
+		if (packageName != null)
+			m_config.setProperty(PACKAGE, packageName);
 		m_pluginList = new ArrayList<QueryPlugin>();
 		}
 
@@ -191,7 +191,12 @@ public class QueryGen extends TemplateHelper
 	private void loadConfiguration(Element e)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException
 		{
-		m_packageName = e.attributeValue("package");
+		if (e.attributeValue("package") != null)
+			m_config.setProperty(PACKAGE, e.attributeValue("package"));
+			
+		if (e.attributeValue("destination") != null)
+			m_config.setProperty(DESTINATION, e.attributeValue("destination"));
+			
 		Iterator types = e.selectNodes("type").iterator();
 		if (types.hasNext())
 			m_typeMap = new HashMap<String, String>();
@@ -220,10 +225,7 @@ public class QueryGen extends TemplateHelper
 		FileWriter fw;
 		int genfiles = 0;
 		
-		String destDir = getRequiredProperty(DESTINATION);
-		super.setDestinationDir(destDir);
 		String source = getRequiredProperty(SOURCE);
-		String packageName = getRequiredProperty(PACKAGE);
 		
 		Format formatter = (Format)loadClass(FORMATTER, "genorm.DefaultFormat");
 		if (m_typeMap == null)
@@ -237,6 +239,10 @@ public class QueryGen extends TemplateHelper
 			Iterator config = xmldoc.selectNodes("/queries/configuration/querygen").iterator();
 			if (config.hasNext())
 				loadConfiguration((Element)config.next());
+				
+			String destDir = getRequiredProperty(DESTINATION);
+			super.setDestinationDir(destDir);
+			String packageName = getRequiredProperty(PACKAGE);
 			
 			StringTemplateGroup dataTypeMapGroup = loadTemplateGroup("templates/data_type_maps.st");
 			
@@ -261,20 +267,34 @@ public class QueryGen extends TemplateHelper
 				attributes.put("package", packageName);
 				attributes.put("query", q);
 				
-				StringBuilder pluginIncludes = new StringBuilder();
-				StringBuilder pluginMethods = new StringBuilder();
+				//StringBuilder pluginIncludes = new StringBuilder();
+				StringBuilder pluginQueryBodies = new StringBuilder();
 				
+				Set<String> importSet = new TreeSet<String>();
+				Set<String> queryImplementSet = new TreeSet<String>();
+				Set<String> recordImplementSet = new TreeSet<String>();
 				for (QueryPlugin qp : m_pluginList)
 					{
-					pluginIncludes.append(qp.getIncludes(attributes));
-					pluginMethods.append(qp.getMethods(attributes));
+					importSet.addAll(qp.getQueryImports(attributes));
+					queryImplementSet.addAll(qp.getQueryImplements(attributes));
 					
-					pluginIncludes.append("\n");
-					pluginMethods.append("\n");
+					pluginQueryBodies.append(qp.getQueryBody(attributes));
+					pluginQueryBodies.append("\n");
+					
+					recordImplementSet.addAll(qp.getQueryRecordImplements(attributes));
+					//pluginIncludes.append(qp.getIncludes(attributes));
+					//pluginMethods.append(qp.getMethods(attributes));
+					
+					//pluginIncludes.append("\n");
+					//pluginMethods.append("\n");
 					}
 					
-				attributes.put("pluginIncludes", pluginIncludes.toString());
-				attributes.put("pluginMethods", pluginMethods.toString());
+				attributes.put("importList", importSet);
+				attributes.put("queryImplementSet", queryImplementSet);
+				attributes.put("queryImplementSetNotEmpty", !queryImplementSet.isEmpty());
+				attributes.put("recordImplementSet", recordImplementSet);
+				
+				attributes.put("pluginQueryBody", pluginQueryBodies.toString());
 				
 				StringTemplate queryTemplate = queryObjectTG.getInstanceOf("objectQuery");
 				queryTemplate.setAttributes(attributes);
