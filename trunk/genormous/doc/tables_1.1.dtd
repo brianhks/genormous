@@ -1,0 +1,87 @@
+<!ELEMENT tables (configuration?,global?,table+,query*)>
+<!ELEMENT configuration (option*,typeMap?,plugin*)>
+
+<!ELEMENT option EMPTY>
+<!ATTLIST option
+	name CDATA #REQUIRED
+	value CDATA #REQUIRED
+	>
+	
+<!ELEMENT typeMap (type+)>
+<!ELEMENT type EMPTY>
+<!ATTLIST type
+	custom CDATA #REQUIRED
+	java CDATA #REQUIRED
+	db CDATA #REQUIRED
+	>
+	
+<!ELEMENT plugin EMPTY>
+<!ATTLIST plugin
+	class CDATA #REQUIRED
+	>
+
+<!ELEMENT global (col+)>
+<!ELEMENT table (comment?,property*,col+,primary_key?,unique*,table_query*)>
+<!ATTLIST table
+	name CDATA #REQUIRED
+	>
+
+<!ELEMENT comment (#PCDATA)>
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	key CDATA #REQUIRED
+	value CDATA #REQUIRED
+	>
+
+<!ELEMENT col (comment?,property*,reference?)>
+<!ATTLIST col
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	primary_key CDATA "false"
+	default_value CDATA #IMPLIED
+	allow_null CDATA "true"
+	unique CDATA "false"
+	auto_set (mts|cts) #IMPLIED 
+	>
+	
+<!ELEMENT reference EMPTY>
+<!ATTLIST reference
+	table CDATA #REQUIRED
+	column CDATA #REQUIRED
+	id CDATA #IMPLIED
+	on_delete (cascade|null|default) #IMPLIED
+	on_update (cascade|null|default) #IMPLIED
+	>
+	
+<!ELEMENT table_query (comment?,input?,replace?,sql)>
+<!ATTLIST table_query
+	name CDATA #REQUIRED
+	result_type (none|single|multi) #REQUIRED
+	>
+	
+<!ELEMENT input (param*)>
+
+<!ELEMENT replace (param*)>
+
+<!ELEMENT return (param*)>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	test CDATA #IMPLIED
+	>
+	
+<!ELEMENT sql (#PCDATA)>
+
+<!ELEMENT query (comment?,input?,replace?,return?,sql)>
+<!ATTLIST query
+	name CDATA #REQUIRED
+	>
+
+<!ELEMENT primary_key (colref+)>
+<!ELEMENT unique (colref+)>
+<!ELEMENT colref EMPTY>
+<!ATTLIST colref
+	name CDATA #REQUIRED
+	>
