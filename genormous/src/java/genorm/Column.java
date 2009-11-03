@@ -8,6 +8,7 @@ public class Column implements Cloneable
 	private boolean m_primaryKey;
 	private String m_type;
 	private String m_customType;
+	private String m_sqlType;
 	private boolean m_foreignKey;
 	private String m_foreignTableName;
 	private String m_foreignTableColumnName;
@@ -29,12 +30,13 @@ public class Column implements Cloneable
 		m_name = name;
 		}
 	
-	public Column(String name, String type, String customType, Format format)
+	public Column(String name, String type, String customType, Format format, String sqlType)
 		{
 		m_formatter = format;
 		m_name = name;
 		m_type = type;
 		m_customType = customType;
+		m_sqlType = sqlType;
 		m_primaryKey = false;
 		m_foreignKey = false;
 		m_foreignTable = null;
@@ -92,6 +94,7 @@ public class Column implements Cloneable
 	public String getMethodName() { return (m_formatter.formatMethodName(m_name)); }
 	public String getType() { return (m_type); }
 	public String getCustomType() { return (m_customType); }
+	public String getSQLType() { return (m_sqlType); }
 	public String getDirtyFlag() { return ("0x"+Integer.toHexString(m_dirtyFlag)); }
 	public boolean isPrimaryKey() { return (m_primaryKey); }
 	public boolean isForeignKey() { return (m_foreignKey); }

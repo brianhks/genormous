@@ -5,10 +5,8 @@ import java.util.Properties;
 import java.util.Set;
 import org.dom4j.Element;
 
-public interface QueryPlugin
+public interface QueryPlugin extends GenPlugin
 	{
-	public void init(Element pluginElement);
-	
 	//Additional code for the Query object
 	public Set<String> getQueryImports(Map<String, Object> attributes);
 	public String getQueryBody(Map<String, Object> attributes);

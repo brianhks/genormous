@@ -6,7 +6,7 @@ import java.util.*;
 
 public class TemplateHelper
 	{
-	protected String m_destDir;
+	private String m_destDir;
 	protected int m_generatedFileCount;
 	
 	public TemplateHelper()
@@ -14,7 +14,7 @@ public class TemplateHelper
 		m_generatedFileCount = 0;
 		}
 	
-	protected String readResource(String fileName)
+	public String readResource(String fileName)
 			throws IOException
 		{
 		InputStreamReader reader;
@@ -33,20 +33,20 @@ public class TemplateHelper
 		}
 		
 	//------------------------------------------------------------------------------
-	protected void setDestinationDir(String dir)
+	public void setDestinationDir(String dir)
 		{
 		m_destDir = dir;
 		}
 		
 	//------------------------------------------------------------------------------
-	protected void writeTemplate(String templateName, Map<String, Object> attrs)
+	public void writeTemplate(String templateName, Map<String, Object> attrs)
 			throws IOException
 		{
 		writeTemplate(m_destDir+"/"+templateName, "templates/"+templateName, attrs);
 		}
 		
 	//------------------------------------------------------------------------------
-	protected void writeTemplate(String fileName, String templateName, Map<String, Object> attrs)
+	public void writeTemplate(String fileName, String templateName, Map<String, Object> attrs)
 			throws IOException
 		{
 		m_generatedFileCount ++;
@@ -69,7 +69,7 @@ public class TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
-	protected StringTemplateGroup loadTemplateGroup(String file)
+	public StringTemplateGroup loadTemplateGroup(String file)
 			throws IOException
 		{
 		StringTemplateGroup templateGroup = new StringTemplateGroup(

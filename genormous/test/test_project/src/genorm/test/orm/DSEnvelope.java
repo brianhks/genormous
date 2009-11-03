@@ -1,4 +1,4 @@
-package $package$;
+package genorm.test.orm;
 
 import java.util.*;
 import javax.sql.*;
@@ -14,8 +14,8 @@ public class DSEnvelope implements GenOrmDSEnvelope
 		{
 		m_dataSource = ds;
 		m_keyGenMap = new HashMap<String, GenOrmKeyGenerator>();
-		$tables:{t | $if(t.generatedKey)$m_keyGenMap.put("$t.name$", new $package$.$t.className$_base.$t.className$KeyGenerator(ds));$endif$
-}$
+		m_keyGenMap.put("author", new genorm.test.orm.Author_base.AuthorKeyGenerator(ds));
+
 		}
 		
 	public DataSource getDataSource()

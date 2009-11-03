@@ -23,6 +23,13 @@
 				failonerror="true">
 			<arg value="test"/>
 		</java>
+		
+		<java classname="cpmake.CPMake" fork="true" dir="test/test_project"
+				classpathref="cpmake-path" failonerror="true">
+			<arg value="clean"/>
+			<arg value="generate"/>
+			<arg value="test"/>
+		</java>
 	</target>
 	
 

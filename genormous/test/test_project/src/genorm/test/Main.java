@@ -1,6 +1,6 @@
 package genorm.test;
 
-import genorm.test.orm.genorm.GenOrmDataSource;
+import genorm.runtime.GenOrmDataSource;
 import genorm.test.orm.*;
 import org.hsqldb.jdbc.*;
 import java.io.*;
@@ -30,7 +30,7 @@ public class Main
 		if (createDB)
 			createDatabase(ds);
 			
-		GenOrmDataSource.setDataSource(ds);
+		GenOrmDataSource.setDataSource(new DSEnvelope(ds));
 		
 		//Now we are ready to use the orm
 		runMenu();
@@ -41,9 +41,11 @@ public class Main
 		c.close();
 		}
 		
+	//---------------------------------------------------------------------------
 	private static void createDatabase(DataSource ds)
 			throws Exception
 		{
+		System.out.println("Creating DB");
 		Connection c = ds.getConnection();
 		c.setAutoCommit(false);
 		
@@ -63,6 +65,7 @@ public class Main
 		c.close();
 		}
 		
+	//---------------------------------------------------------------------------
 	private static void runMenu()
 			throws Exception
 		{
@@ -75,7 +78,8 @@ public class Main
 			out.println("2. Add a book");
 			out.println("3. Display books from author");
 			out.println("4. Display all authors");
-			out.println("5. Quit");
+			out.println("5. Display all books");
+			out.println("6. Quit");
 			option = input.nextInt();
 			//input.nextLine();
 			switch (option)
@@ -87,11 +91,15 @@ public class Main
 				case 3: displayBooks(input);
 					break;
 				case 4: displayAllAuthors();
+					break;
+				case 5: displayAllBooks();
+					break;
 				}
 			}
-		while (option != 5);
+		while (option != 6);
 		}
 		
+	//---------------------------------------------------------------------------
 	private static void addAuthor(Scanner input)
 			throws Exception
 		{
@@ -100,15 +108,24 @@ public class Main
 		
 		GenOrmDataSource.begin();
 		
-		Author author = Author.factory.createWithGeneratedKey();
-		author.setName(name);
-		
-		out.println("Added author \""+name+"\" id = "+author.getAuthorId());
-		
-		GenOrmDataSource.commit();
-		GenOrmDataSource.close();
+		try
+			{
+			//Example of using a generated key to create a record
+			Author author = Author.factory.createWithGeneratedKey();
+			author.setName(name);
+			
+			out.println("Added author \""+name+"\" id = "+author.getAuthorId());
+			
+			GenOrmDataSource.commit();
+			}
+		finally
+			{
+			//The close will auto roll back if the commit has not been done
+			GenOrmDataSource.close();
+			}
 		}
 		
+	//---------------------------------------------------------------------------
 	private static void addBook(Scanner input)
 			throws Exception
 		{
@@ -130,20 +147,49 @@ public class Main
 				return;
 				}
 				
-			Book book = Book.factory.create();
+			//This table has no primary keys so we use the createRecord method
+			Book book = Book.factory.createRecord();
 			book.setAuthorRef(author);
-			book.setTitle(title);
-			book.setIsbn(isbn);
+			//We can chain set methods
+			book.setTitle(title).setIsbn(isbn);
 			
 			out.println("Added book "+title);
+			
+			GenOrmDataSource.commit();
 			}
 		finally
 			{
-			GenOrmDataSource.commit();
 			GenOrmDataSource.close();
 			}
 		}
 		
+	//---------------------------------------------------------------------------
+	private static void displayAllBooks()
+			throws Exception
+		{
+		GenOrmDataSource.begin();
+		
+		try
+			{
+			//Query with no parameters
+			AllBooksQuery abq = new AllBooksQuery();
+			AllBooksQuery.ResultSet rs = abq.runQuery();
+			while (rs.next())
+				{
+				AllBooksData data = rs.getRecord(); 
+				out.println(data);
+				}
+			rs.close();
+		
+			GenOrmDataSource.commit();
+			}
+		finally
+			{
+			GenOrmDataSource.close();
+			}
+		}
+		
+	//---------------------------------------------------------------------------
 	private static void displayBooks(Scanner input)
 			throws Exception
 		{
@@ -152,26 +198,48 @@ public class Main
 		
 		GenOrmDataSource.begin();
 		
-		BooksByAuthorQuery bbaq = new BooksByAuthorQuery();
-		Iterator<BooksByAuthorQuery.Data> it = bbaq.runQuery(name).iterator();
-		while (it.hasNext())
-			out.println(it.next());
+		try
+			{
+			//Query with one parameters.
+			BooksByAuthorQuery bbaq = new BooksByAuthorQuery(name);
+			BooksByAuthorQuery.ResultSet rs = bbaq.runQuery();
+			while (rs.next())
+				{
+				BooksByAuthorData data = rs.getRecord(); 
+				out.println(data);
+				}
+			rs.close();
 		
-		GenOrmDataSource.commit();
-		GenOrmDataSource.close();
+			GenOrmDataSource.commit();
+			}
+		finally
+			{
+			GenOrmDataSource.close();
+			}
 		}
 		
+	//---------------------------------------------------------------------------
 	private static void displayAllAuthors()
 			throws Exception
 		{
 		GenOrmDataSource.begin();
 		
-		AllAuthorsQuery aaq = new AllAuthorsQuery();
-		Iterator<AllAuthorsQuery.Data> it = aaq.runQuery().iterator();
-		while (it.hasNext())
-			out.println(it.next());
-		
-		GenOrmDataSource.commit();
-		GenOrmDataSource.close();
+		try
+			{
+			AllAuthorsQuery aaq = new AllAuthorsQuery();
+			AllAuthorsQuery.ResultSet rs = aaq.runQuery();
+			while (rs.next())
+				{
+				AllAuthorsData data = rs.getRecord();
+				out.println(data);
+				}
+			rs.close();
+			
+			GenOrmDataSource.commit();
+			}
+		finally
+			{
+			GenOrmDataSource.close();
+			}
 		}
 	}

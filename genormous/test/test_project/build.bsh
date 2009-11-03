@@ -5,6 +5,9 @@
  */
  
 import cpmake.*;
+import cpmake.java.*;
+
+print("===============================================================");
 
 srcdir = "src";
 ormdir = srcdir+"/genorm/test/orm";
@@ -12,20 +15,19 @@ blddir = "build";
 jarfile = "genormtest.jar";
 libdir = "../../lib";
 
-//This script has the JavaCompiler and JarFile class in it.
-make.includeCPMakeScript("java.bsh"); 
 make.setProperty(make.PROP_MULTI_THREAD_OUTPUT, "true");
 
 libJarFiles = make.createFileList(libdir, ".*\\.jar", (make.INCLUDE_PATH | make.RECURSE));
 
 classpath = new ClassPath(libJarFiles);
-jp = new JavaProgram(srcdir, blddir, jarfile, classpath);
+classpath.addPath("../../build/jar/genormous-1.1.jar");
+jp = make.initPlugin(new JavaProgram(srcdir, blddir, jarfile, classpath));
 jp.setManifest("manifest.txt");
 jp.createRules();
 jp.setDefaultTarget();
 target = jp.getJarFileTarget();
-
-classpath.addPath("../../build/jar/genormous.jar");
+jar = jp.getJarFile();
+jar.addFiles("log4j.properties");
 
 
 //-------------------------------------------------------------------
@@ -33,7 +35,7 @@ classpath.addPath("../../build/jar/genormous.jar");
 make.createPhonyRule("genorm", null, "genOrm");
 void genOrm(CPMakeRule rule)
 	{
-	make.exec("java -cp "+classpath+" genorm.Genormous -o tables.xml -d "+ormdir+" -p genorm.test.orm -s");
+	make.exec("java -cp "+classpath+" genorm.Genormous -s tables.xml -d "+ormdir);
 	}
 	
 //-------------------------------------------------------------------
@@ -46,7 +48,7 @@ void genQuery(CPMakeRule rule)
 	
 //-------------------------------------------------------------------
 //==-- GENERATE BOTH --==
-make.createPhonyRule("generate", new String[] {"genquery", "genorm"}, null);
+make.createPhonyRule("generate", new String[] {"genorm"}, null);
 
 
 //-------------------------------------------------------------------
