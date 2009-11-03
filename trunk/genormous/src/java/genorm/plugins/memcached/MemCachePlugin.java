@@ -9,6 +9,8 @@ import genorm.Query;
 
 public class MemCachePlugin extends TemplateHelper implements QueryPlugin
 	{
+	public static final String MEMCACHED_CLIENT_PROPERTY = "genorm.plugins.memcached.ClientProperaty";
+	
 	StringTemplateGroup m_templateGroup;
 	
 	public MemCachePlugin()
@@ -18,7 +20,7 @@ public class MemCachePlugin extends TemplateHelper implements QueryPlugin
 		m_templateGroup = loadTemplateGroup("templates/MemCacheTemplate.java");
 		}
 		
-	public void init(Element e)
+	public void init(Element e, Properties config)
 		{
 		System.out.println("Initialized Plugin");
 		}

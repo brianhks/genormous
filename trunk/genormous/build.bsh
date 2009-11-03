@@ -90,7 +90,7 @@ void genSrc(CPMakeRule rule)
 	{
 	print("Generating GenORM source");
 	//make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
-	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -s test/tables.xml -d "+gentestdir+" -p test -g build/tables.dot");
 	
 	print("Generating Query source");
 	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.QueryGen -s test/queries.xml -d "+gentestdir);

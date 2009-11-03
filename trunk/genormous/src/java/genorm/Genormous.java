@@ -1,21 +1,16 @@
 package genorm;
 
 import java.io.*;
-import org.dom4j.io.SAXReader;
 import org.dom4j.*;
 import java.util.*;
 import org.jargp.*;
 import org.antlr.stringtemplate.*;
+import genorm.runtime.GenOrmException;
 
 import static java.lang.System.out;
 
-public class Genormous extends TemplateHelper
+public class Genormous extends GenUtil
 	{
-	/**
-		Genorm property to not inherit global column definitions
-	*/
-	public static final String GENORM_INHERIT = "genorm.inherit";
-	
 	//XML elements and attribute names
 	public static final String NAME = "name";
 	public static final String COMMENT = "comment";
@@ -41,14 +36,13 @@ public class Genormous extends TemplateHelper
 	public static final String ON_DELETE = "on_delete";
 	
 	
-	private String m_source;
 	//private String m_destDir;
-	private Map<String, String> m_typeMap;
-	private Format m_formatter;
-	private String m_packageName;
-	private boolean m_includeStringSets;
-	private String m_graphVizFile;
-	private String m_databaseType;
+	//private Map<String, String> m_typeMap;
+	//private Format m_formatter;
+	//private String m_packageName;
+	//private boolean m_includeStringSets;
+	//private String m_graphVizFile;
+	//private String m_databaseType;
 	
 	
 	//===========================================================================
@@ -57,39 +51,39 @@ public class Genormous extends TemplateHelper
 		public String source;
 		public String destination;
 		public String targetPackage;
-		public boolean includeStringSets;
 		public String customTypeProperties;
 		public String customDBTypeProperties;
 		public String databaseType;
 		public String graphVizFile;
 		public boolean help;
+		public boolean verbose;
 		
 		public CommandLine()
 			{
 			source = null;
 			destination = null;
 			targetPackage = null;
-			includeStringSets = false;
 			customTypeProperties = null;
 			customDBTypeProperties = null;
 			graphVizFile = null;
 			databaseType = null;
 			help = false;
+			verbose = false;
 			}
 		}
 		
 	//===========================================================================
 	private static final ParameterDef[] PARAMETERS = 
 		{
-		new StringDef('o', "source"),
 		new StringDef('d', "destination"),
 		new StringDef('p', "targetPackage"),
-		new BoolDef('s', "includeStringSets"),
+		new StringDef('s', "source"),
 		new StringDef('c', "customTypeProperties"),
 		new StringDef('b', "customDBTypeProperties"),
-		new StringDef('t', "databaseType"),
+		//new StringDef('t', "databaseType"),
 		new StringDef('g', "graphVizFile"),
-		new BoolDef('?', "help")
+		new BoolDef('?', "help"),
+		new BoolDef('v', "verbose")
 		};
 		
 		
@@ -97,37 +91,23 @@ public class Genormous extends TemplateHelper
 	private static void printHelp()
 		{
 		out.println("GenORMous version X");
-		out.println("Usage: java -jar genormous.jar -o <source xml> -d <dest dir> -p <package>");
+		out.println("Usage: java -jar genormous.jar -o <source xml> -[d <dest dir>] [-p <package>]");
 		out.println("      [-s] [-c <custom type properties>] [-b <custom db properties>]");
 		out.println("      [-t <database type>] [-g <graphViz file>] [-?]");
 		out.println("  -o: Source xml containing table definitions.");
 		out.println("  -d: Destination dir to write generated files to.");
 		out.println("  -p: Package name of generated files.");
-		out.println("  -s: .");
-		out.println("  -c: Custom type properties file.");
+		//out.println("  -s: .");
+		out.println("  -c: Custom java type properties file.");
 		out.println("  -b: Custom DB type properties file.");
-		out.println("  -t: Database type.");
+		//out.println("  -t: Database type.");
 		out.println("  -g: Name of graphViz dot file to generate.");
+		out.println("  -v: Verbose output.");
 		}
 		
 	
 //==============================================================================
-	/*package*/ static Map<String, String> readPropertiesFile(PropertiesFile props)
-		{
-		if (!props.exists())
-			return (null);
-			
-		Map<String, String> map = new HashMap<String, String>();
-		
-		Iterator<Object> keys = props.keySet().iterator();
-		while (keys.hasNext())
-			{
-			String key = (String)keys.next();
-			map.put(key, (String)props.get(key));
-			}
-			
-		return (map);
-		}
+	
 		
 /* //------------------------------------------------------------------------------
 	private String getCreateCommands(Iterator<String> it)
@@ -157,22 +137,35 @@ public class Genormous extends TemplateHelper
 			return;
 			}
 			
-		
-		Genormous gen = new Genormous(cl.source, cl.destination, cl.targetPackage,
-				cl.includeStringSets, cl.graphVizFile);
-				
-		if (cl.databaseType != null)
-			gen.setDatabaseType(cl.databaseType);
-			
-		if (cl.customTypeProperties != null)
-			gen.setTypesFile(cl.customTypeProperties);
-			
-				
-		QueryGen qgen = new QueryGen(cl.source, cl.destination, cl.targetPackage);
-		qgen.setTypeMap(gen.m_typeMap);
-		
 		try
 			{
+			Genormous gen = new Genormous(cl.source); /* , cl.destination, cl.targetPackage,
+					cl.includeStringSets, cl.graphVizFile); */
+					
+			if (cl.destination != null)
+				gen.setDestination(cl.destination);
+				
+			if (cl.targetPackage != null)
+				gen.setPackage(cl.targetPackage);
+				
+			if (cl.graphVizFile != null)
+				gen.setGraphvizFile(cl.graphVizFile);
+					
+			if (cl.customTypeProperties != null)
+				gen.setTypesFile(cl.customTypeProperties);
+				
+					
+			QueryGen qgen = new QueryGen(cl.source);
+			
+			if (cl.destination != null)
+				qgen.setDestination(cl.destination);
+				
+			if (cl.targetPackage != null)
+				qgen.setPackage(cl.targetPackage);
+			
+			if (cl.customTypeProperties != null)
+				qgen.setTypesFile(cl.customTypeProperties);
+		
 			System.out.println("Generating classes");
 			gen.generateClasses();
 			System.out.println("Generating queries");
@@ -180,42 +173,33 @@ public class Genormous extends TemplateHelper
 			}
 		catch (Exception e)
 			{
-			System.out.println(e);
+			e.printStackTrace();
 			}
 		}
+
 		
-//------------------------------------------------------------------------------
-	public Genormous(String source, String destDir, String packageName, boolean includeStringSets, String graphVizFile)
+//==============================================================================
+	public Genormous(String source)
+			throws ConfigurationException
 		{
-		super.setDestinationDir(destDir);
+		super(source);
+		
+		/* super.setDestinationDir(destDir);
 		m_source = source;
 		m_typeMap = readPropertiesFile(new PropertiesFile("types.properties"));
 		m_formatter = new DefaultFormat();
 		m_packageName = packageName;
 		m_includeStringSets = includeStringSets;
 		m_graphVizFile = graphVizFile;
-		m_databaseType = "hsqldb";
+		m_databaseType = "hsqldb"; */
 		}
 		
-//------------------------------------------------------------------------------
-	/**
-		Used to set what *_types.properties and *_create.st file to use 
-	*/
-	public void setDatabaseType(String type)
-		{
-		m_databaseType = type;
-		}
+		
 		
 //------------------------------------------------------------------------------
-	public void setTypesFile(String typeFile)
+	public void setGraphvizFile(String graphvizFile)
 		{
-		m_typeMap = readPropertiesFile(new PropertiesFile(typeFile));
-		}
-		
-//------------------------------------------------------------------------------
-	public void setFormat(Format formatter)
-		{
-		m_formatter = formatter;
+		m_config.setProperty(PROP_GRAPHVIZ_FILE, graphvizFile);
 		}
 		
 		
@@ -228,39 +212,47 @@ public class Genormous extends TemplateHelper
 		//Table table;
 		Map<String, Table> tableNames = new HashMap<String, Table>();
 		
-		new File(m_destDir).mkdirs();
+		String destDir = getRequiredProperty(PROP_DESTINATION);
+		super.setDestinationDir(destDir);
+		new File(destDir).mkdirs();
+		
+		Format formatter = super.getFormat();
+		
+		//Look for the CreatePlugin for the db type
+		CreatePlugin createPlugin = null;
+		for (GenPlugin gp : m_pluginList)
+			{
+			if (gp instanceof CreatePlugin)
+				{
+				createPlugin = (CreatePlugin)gp;
+				break;
+				}
+			}
 		
 		try
 			{
 			StringTemplateGroup dataTypeMapGroup = loadTemplateGroup("templates/data_type_maps.st");
 			
 			//Switch on the type of database
-			String propFile = "templates/"+m_databaseType+"_types.properties";
-			dataTypeMapGroup.defineMap("typeToSQLTypeMap", new PropertiesFile(propFile));
-			String createFile = "templates/"+m_databaseType+"_create.st";
-			dataTypeMapGroup.defineTemplate("dbCreate", readResource(createFile));
+			//String propFile = "templates/"+m_databaseType+"_types.properties";
+			dataTypeMapGroup.defineMap("typeToSQLTypeMap", m_dbTypeMap);
 			
 			StringTemplateGroup ormBaseObjectTG = loadTemplateGroup("templates/ORMObject_base.java");
 			ormBaseObjectTG.setSuperGroup(dataTypeMapGroup);
 			StringTemplateGroup ormObjectTG = loadTemplateGroup("templates/ORMObject.java");
 			ormObjectTG.setSuperGroup(dataTypeMapGroup);
 			
-			SAXReader reader = new SAXReader();
-			reader.setValidation(false);
-			reader.setIncludeExternalDTDDeclarations(false);
-			/* reader.setProperty(org.apache.xerces.parsers.XML11Configuration.LOAD_EXTERNAL_DTD,
-					new ); */
-			Document xmldoc = reader.read(new File(m_source));
 			
 			//Read in global column definitions
 			ArrayList<Column> globalColumns = new ArrayList<Column>();
-			Iterator globColIt = xmldoc.selectNodes("/tables/global/col").iterator();
+			Iterator globColIt = m_source.selectNodes("/tables/global/col").iterator();
 			while (globColIt.hasNext())
 				{
 				Element cole = (Element)globColIt.next();
 				String colName = cole.attribute(NAME).getValue();
 				String type = cole.attribute(TYPE).getValue();
-				Column col = new Column(colName, m_typeMap.get(type), type, m_formatter);
+				Column col = new Column(colName, m_javaTypeMap.get(type), type, formatter,
+						m_dbTypeMap.get(type));
 				
 				if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
 					col.setAllowNull(false);
@@ -300,14 +292,14 @@ public class Genormous extends TemplateHelper
 				globalColumns.add(col);
 				}
 			
-			Iterator tableit = xmldoc.selectNodes("/tables/table").iterator();
+			Iterator tableit = m_source.selectNodes("/tables/table").iterator();
 			while (tableit.hasNext())
 				{
 				int dirtyFlag = 1;
 				Element e = (Element) tableit.next();
 				String tableName = e.attribute(NAME).getValue();
 				//System.out.println("Table "+tableName);
-				Table table = new Table(tableName, m_formatter);
+				Table table = new Table(tableName, formatter);
 				table.setComment(e.elementText(COMMENT));
 				
 				Iterator props = e.elementIterator(PROPERTY);
@@ -323,7 +315,8 @@ public class Genormous extends TemplateHelper
 					Element cole = (Element)cols.next();
 					String colName = cole.attribute(NAME).getValue();
 					String type = cole.attribute(TYPE).getValue();
-					Column col = new Column(colName, m_typeMap.get(type), type, m_formatter);
+					Column col = new Column(colName, m_javaTypeMap.get(type), type, 
+							formatter, m_dbTypeMap.get(type));
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag <<= 1;
 					
@@ -373,7 +366,7 @@ public class Genormous extends TemplateHelper
 					}
 					
 				//Add global columns to table
-				if (!"false".equals(table.getProperties().get(GENORM_INHERIT)))
+				if (!"false".equals(table.getProperties().get(PROP_INHERIT)))
 					{
 					Iterator<Column> globCols = globalColumns.iterator();
 					while (globCols.hasNext())
@@ -411,12 +404,12 @@ public class Genormous extends TemplateHelper
 						sqlQuery.append("\" = ?");
 						first = false;
 						
-						params.add(new Parameter(c.getName(), c.getType(), m_formatter));
+						params.add(new Parameter(c.getName(), c.getType(), formatter));
 						}
 						
 					String queryName = "by_"+fkeySet.getTableName();
 						
-					table.addQuery(new Query(m_formatter, queryName, params, sqlQuery.toString()));
+					table.addQuery(new Query(formatter, queryName, params, sqlQuery.toString()));
 					}
 					
 				//Get Unique definitions
@@ -437,7 +430,7 @@ public class Genormous extends TemplateHelper
 				Iterator queries = e.elementIterator(Query.TABLE_QUERY);
 				while (queries.hasNext())
 					{
-					Query q = new Query((Element)queries.next(), m_formatter, m_typeMap);
+					Query q = new Query((Element)queries.next(), formatter, m_javaTypeMap);
 					table.addQuery(q);
 					}
 				
@@ -445,7 +438,7 @@ public class Genormous extends TemplateHelper
 				queries = e.elementIterator(Query.QUERY);
 				while (queries.hasNext())
 					{
-					Query q = new Query((Element)queries.next(), m_formatter, m_typeMap);
+					Query q = new Query((Element)queries.next(), formatter, m_javaTypeMap);
 					table.addQuery(q);
 					}
 					
@@ -462,12 +455,10 @@ public class Genormous extends TemplateHelper
 
 				Map<String, Object> attributes = new HashMap<String, Object>();
 				
-				String className = m_formatter.formatClassName(t.getName());
+				String className = formatter.formatClassName(t.getName());
 				StringTemplate baseTemplate = ormBaseObjectTG.getInstanceOf("baseClass");
 				StringTemplate derivedTemplate = ormObjectTG.getInstanceOf("derivedClass");
 				
-				//ArrayList<ForeignKeySet> foreignKeySetList = new ArrayList<ForeignKeySet>();
-				//Map<String, ForeignKeySet> foreignKeySetMap = new HashMap<String, ForeignKeySet>();
 				ArrayList<Column> columns = t.getColumns();
 				Iterator<Column> colit = columns.iterator();
 				while (colit.hasNext())
@@ -485,7 +476,7 @@ public class Genormous extends TemplateHelper
 						}
 					}
 				
-				attributes.put("package", m_packageName);
+				attributes.put("package", m_config.getProperty(PROP_PACKAGE));
 				attributes.put("table", t);
 				attributes.put("columns", columns);
 				attributes.put("primaryKeys", t.getPrimaryKeys());
@@ -493,28 +484,31 @@ public class Genormous extends TemplateHelper
 				attributes.put("uniqueColumns", t.getUniqueColumnSets());
 				attributes.putAll(t.getProperties());
 				
-				/* replaceMap.put("TableName", t.getName());
-				replaceMap.put("ClassName", className);
-				replaceMap.put("Comment", t.getComment());
-				replaceMap.put("PackageName", m_packageName); */
-				
-				StringTemplate createTemplate = ormBaseObjectTG.getInstanceOf("dbCreate");
-				createTemplate.setAttributes(attributes);
-				String sql = createTemplate.toString().trim();
-				t.setCreateSQL(sql);
-				attributes.put("createSQL", sql.replaceAll("\\n+", "\\\\n").replace("\"", "\\\""));
-				
+								
+				//Get the table create statement
+				if (createPlugin != null)
+					{
+					String sql = createPlugin.getCreateSQL(t);
+					t.setCreateSQL(sql);
+					attributes.put("createSQL", sql.replaceAll("\\n+", "\\\\n").replace("\"", "\\\""));
+					}
+				else
+					{
+					t.setCreateSQL("");
+					attributes.put("createSQL", "");
+					}
+					
 				baseTemplate.setAttributes(attributes);
 				
 				m_generatedFileCount ++;
-				FileWriter fw = new FileWriter(m_destDir+"/"+className+"_base.java");
+				FileWriter fw = new FileWriter(destDir+"/"+className+"_base.java");
 				fw.write(baseTemplate.toString());
 				fw.close();
 				
 				derivedTemplate.setAttributes(attributes);
 				
 				m_generatedFileCount ++;
-				File derivedFile = new File(m_destDir+"/"+className+".java");
+				File derivedFile = new File(destDir+"/"+className+".java");
 				if (!derivedFile.exists())
 					{
 					fw = new FileWriter(derivedFile);
@@ -580,7 +574,7 @@ public class Genormous extends TemplateHelper
 				
 			//Write out the create.sql file
 			m_generatedFileCount ++;
-			FileWriter fw = new FileWriter(m_destDir+"/create.sql");
+			FileWriter fw = new FileWriter(destDir+"/create.sql");
 			Iterator<String> crIt = createList.iterator();
 			while (crIt.hasNext())
 				{
@@ -594,7 +588,7 @@ public class Genormous extends TemplateHelper
 			//new File(m_destDir+"/genorm").mkdir();
 				
 			Map<String, Object> attributes = new HashMap<String, Object>();
-			attributes.put("package", m_packageName);
+			attributes.put("package", m_config.getProperty(PROP_PACKAGE));
 			attributes.put("tables", savedTableList);
 			
 			writeTemplate("DSEnvelope.java", attributes);
@@ -623,12 +617,11 @@ public class Genormous extends TemplateHelper
 			writeTemplate("GenOrmQueryRecord.java", attributes);
 			 */
 			
-			if (m_graphVizFile != null)
-				writeTemplate(m_graphVizFile, "templates/tables.dot", attributes);
+			if (m_config.getProperty(PROP_GRAPHVIZ_FILE) != null)
+				writeTemplate(m_config.getProperty(PROP_GRAPHVIZ_FILE), "templates/tables.dot", attributes);
 			}
 		catch (Exception e)
 			{
-			System.out.println("Dude an exception");
 			e.printStackTrace();
 			return;
 			}

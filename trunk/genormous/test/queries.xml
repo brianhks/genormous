@@ -2,19 +2,20 @@
 
 <queries>
 	<configuration>
-		<querygen package="test">
-			<typeMap>
-				<type custom="integer" java="int"/>
-				<type custom="date" java="java.sql.Date"/>
-				<type custom="boolean" java="boolean"/>
-				<type custom="string" java="String"/>
-				<type custom="timestamp" java="java.sql.Timestamp"/>
-				<type custom="binary" java="byte[]"/>
-				<type custom="money" java="java.math.BigDecimal"/>
-				<type custom="version" java="Double"/>
-			</typeMap>
-			<plugin class="genorm.plugins.memcached.MemCachePlugin"/>
-		</querygen>
+		<option name="genorm.package" value="test"/>
+		
+		<javaTypeMap>
+			<type custom="integer" java="int"/>
+			<type custom="date" java="java.sql.Date"/>
+			<type custom="boolean" java="boolean"/>
+			<type custom="string" java="String"/>
+			<type custom="timestamp" java="java.sql.Timestamp"/>
+			<type custom="binary" java="byte[]"/>
+			<type custom="money" java="java.math.BigDecimal"/>
+			<type custom="version" java="Double"/>
+		</javaTypeMap>
+		
+		<plugin class="genorm.plugins.memcached.MemCachePlugin"/>
 	</configuration>
 	
 	<query name="latest_translation">

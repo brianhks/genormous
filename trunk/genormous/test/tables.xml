@@ -1,5 +1,22 @@
 
 <tables>
+	<configuration>
+		<option name="genorm.querygen.package" value="test"/>
+		
+		<typeMap>
+			<type custom="integer" java="int" db="INT"/>
+			<type custom="date" java="java.sql.Date" db="DATE"/>
+			<type custom="boolean" java="boolean" db="BOOLEAN"/>
+			<type custom="string" java="String" db="VARCHAR"/>
+			<type custom="timestamp" java="java.sql.Timestamp" db="TIMESTAMP"/>
+			<type custom="binary" java="byte[]" db="BYTEA"/>
+			<type custom="money" java="java.math.BigDecimal" db="DECIMAL"/>
+			<type custom="version" java="Double" db="DOUBLE PRECISION"/>
+		</typeMap>
+		
+		<plugin class="genorm.plugins.dbsupport.HSQLDB"/>
+	</configuration>
+
 	<global>
 		<col name="MTS" type="timestamp" auto_set="mts"/>
 		<col name="CTS" type="timestamp" auto_set="cts"/>

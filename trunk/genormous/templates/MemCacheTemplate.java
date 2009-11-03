@@ -95,6 +95,26 @@ public String getCacheKey()
 	
 	return (sb.toString().replaceAll("\\\\s", "_"));
 	}
+	
+	
+/**
+	Conviencience function when the <code>MemCachedClient</code> has been placed
+	on the connection using the method {@link GenOrmConnection#setProperty(String, Object) [GenOrmConnection.setProperty]}.
+	
+	The key used to store the client must be the value of
+	<code>genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY</code>
+	
+	This method retreives the client from the connection on the thread and then 
+	passes it to the {@link #getCachedQuery(MemCachedClient memClient, int exp) getCachedQuery(MemCachedClient, int)]} method.
+	
+*/
+public ResultSet getCachedQuery(int exp)
+	{
+	MemCachedClient client = (MemCachedClient)GenOrmDataSource.getGenOrmConnection().getProperty(
+			genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY);
+			
+	return (getCachedQuery(client, exp));
+	}
 
 /**
 	This call first checks the cache for the query results and if the results

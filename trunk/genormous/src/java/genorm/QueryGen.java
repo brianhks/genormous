@@ -10,19 +10,18 @@ import org.antlr.stringtemplate.*;
 
 import static java.lang.System.out;
 
-public class QueryGen extends TemplateHelper
+public class QueryGen extends GenUtil
 	{
-	public static final String SOURCE = "genorm.querygen.source";
 	public static final String DESTINATION = "genorm.querygen.destination";
 	public static final String PACKAGE = "genorm.querygen.package";
 	public static final String FORMATTER = "genomr.querygen.formatter";
 	public static final String TYPE_MAP = "genorm.querygen.typeMap";
 	
-	private Format m_formatter;
-	private String m_packageName;
-	private Map<String, String> m_typeMap;
-	private Properties m_config;
-	private ArrayList<QueryPlugin> m_pluginList;
+	//private Format formatter;
+	//private String m_packageName;
+	//private Map<String, String> m_typeMap;
+	//private Properties m_config;
+	//private ArrayList<QueryPlugin> m_pluginList;
 	
 	//===========================================================================
 	private static class CommandLine
@@ -83,58 +82,50 @@ public class QueryGen extends TemplateHelper
 		
 		proc.processArgs(args, cl);
 		
-		QueryGen og = new QueryGen(cl.source, cl.destination, cl.targetPackage);
 		
 		try
 			{
+			QueryGen og = new QueryGen(cl.source); //, cl.destination, cl.targetPackage);
+			
+			if (cl.destination != null)
+				og.setDestination(cl.destination);
+				
+			if (cl.targetPackage != null)
+				og.setPackage(cl.targetPackage);
+			
 			og.generateClasses();
 			}
 		catch (Exception e)
 			{
-			System.out.println(e);
+			e.printStackTrace();
 			}
 		}
 		
 //------------------------------------------------------------------------------
-	public QueryGen()
+	public QueryGen(String source)
+			throws ConfigurationException
 		{
-		m_config = new Properties();
-		m_pluginList = new ArrayList<QueryPlugin>();
+		super(source);
 		}
 		
 //------------------------------------------------------------------------------
-	public QueryGen(Properties configuration)
+	/* public QueryGen(Properties configuration)
 		{
 		m_config = configuration;
 		m_pluginList = new ArrayList<QueryPlugin>();
-		}
+		} */
 		
 //------------------------------------------------------------------------------
 	public QueryGen(String source, String destDir, String packageName)
-		{
-		m_config = new Properties();
-		m_config.setProperty(SOURCE, source);
-		if (destDir != null)
-			m_config.setProperty(DESTINATION, destDir);
-		if (packageName != null)
-			m_config.setProperty(PACKAGE, packageName);
-		m_pluginList = new ArrayList<QueryPlugin>();
-		}
-
-//------------------------------------------------------------------------------
-	private String getRequiredProperty(String prop)
 			throws ConfigurationException
 		{
-		String value = m_config.getProperty(prop);
-		
-		if (value == null)
-			throw new ConfigurationException(prop, "Option is required");
-			
-		return (value);
+		super(source);
 		}
 
+
+
 //------------------------------------------------------------------------------
-	private Object loadClass(String prop, String defaultClass)
+	/* private Object loadClass(String prop, String defaultClass)
 			throws ConfigurationException
 		{
 		Object ret = null;
@@ -160,7 +151,7 @@ public class QueryGen extends TemplateHelper
 			}
 			
 		return (ret);
-		}
+		} */
 		
 //------------------------------------------------------------------------------
 	public void setConfiguration(String configurationFile)
@@ -180,15 +171,10 @@ public class QueryGen extends TemplateHelper
 		m_config.setProperty(option, value);
 		}
 
-//------------------------------------------------------------------------------
-	/* package */ void setTypeMap(Map<String, String> typeMap)
-		{
-		m_typeMap = typeMap;
-		}
 		
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-	private void loadConfiguration(Element e)
+	/* private void loadConfiguration(Element e)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException
 		{
 		if (e.attributeValue("package") != null)
@@ -216,7 +202,7 @@ public class QueryGen extends TemplateHelper
 			qPlugin.init(plugin);
 			m_pluginList.add(qPlugin);
 			}
-		}
+		} */
 		
 //------------------------------------------------------------------------------
 	public void generateClasses()
@@ -225,24 +211,20 @@ public class QueryGen extends TemplateHelper
 		FileWriter fw;
 		int genfiles = 0;
 		
-		String source = getRequiredProperty(SOURCE);
+		String destDir = getRequiredProperty(PROP_DESTINATION);
 		
-		Format formatter = (Format)loadClass(FORMATTER, "genorm.DefaultFormat");
-		if (m_typeMap == null)
-			m_typeMap = Genormous.readPropertiesFile(new PropertiesFile(m_config.getProperty(TYPE_MAP)));
+		super.setDestinationDir(destDir);
+		new File(destDir).mkdirs();
+		
+		Format formatter = super.getFormat();
 			
 		try
 			{
-			SAXReader reader = new SAXReader();
-			Document xmldoc = reader.read(new File(source));
-			
-			Iterator config = xmldoc.selectNodes("/queries/configuration/querygen").iterator();
+			/* Iterator config = m_source.selectNodes("configuration/querygen").iterator();
 			if (config.hasNext())
-				loadConfiguration((Element)config.next());
+				loadConfiguration((Element)config.next()); */
 				
-			String destDir = getRequiredProperty(DESTINATION);
-			super.setDestinationDir(destDir);
-			String packageName = getRequiredProperty(PACKAGE);
+			String packageName = getRequiredProperty(PROP_PACKAGE);
 			
 			StringTemplateGroup dataTypeMapGroup = loadTemplateGroup("templates/data_type_maps.st");
 			
@@ -250,12 +232,12 @@ public class QueryGen extends TemplateHelper
 			queryObjectTG.setSuperGroup(dataTypeMapGroup);
 			
 			
-			//NodeList nl = xmldoc.getElementsByTagName(QUERY);
-			Iterator queryit = xmldoc.selectNodes("/*/query").iterator();
+			//NodeList nl = m_source.getElementsByTagName(QUERY);
+			Iterator queryit = m_source.selectNodes("/*/query").iterator();
 			while (queryit.hasNext())
 				{
 				Element e = (Element)queryit.next();
-				Query q = new Query(e, formatter, m_typeMap);
+				Query q = new Query(e, formatter, m_javaTypeMap);
 				
 				String fileName = q.getClassName() + "Query.java";
 				String dataFileName = q.getClassName() + "Data.java";
@@ -273,8 +255,14 @@ public class QueryGen extends TemplateHelper
 				Set<String> importSet = new TreeSet<String>();
 				Set<String> queryImplementSet = new TreeSet<String>();
 				Set<String> recordImplementSet = new TreeSet<String>();
-				for (QueryPlugin qp : m_pluginList)
+				for (GenPlugin gp : m_pluginList)
 					{
+					QueryPlugin qp;
+					if (gp instanceof QueryPlugin)
+						qp = (QueryPlugin)gp;
+					else
+						continue;
+						
 					importSet.addAll(qp.getQueryImports(attributes));
 					queryImplementSet.addAll(qp.getQueryImplements(attributes));
 					
@@ -299,18 +287,18 @@ public class QueryGen extends TemplateHelper
 				StringTemplate queryTemplate = queryObjectTG.getInstanceOf("objectQuery");
 				queryTemplate.setAttributes(attributes);
 				
-				fw = new FileWriter(m_destDir+"/"+fileName);
+				fw = new FileWriter(destDir+"/"+fileName);
 				fw.write(queryTemplate.toString());
 				fw.close();
 				
-				File dataFile = new File(m_destDir+"/"+dataFileName);
+				File dataFile = new File(destDir+"/"+dataFileName);
 				if (!q.isUpdate() && !dataFile.exists())
 					{
 					genfiles++;
 					queryTemplate = queryObjectTG.getInstanceOf("objectQueryData");
 					queryTemplate.setAttributes(attributes);
 					
-					fw = new FileWriter(m_destDir+"/"+dataFileName);
+					fw = new FileWriter(destDir+"/"+dataFileName);
 					fw.write(queryTemplate.toString());
 					fw.close();
 					}

@@ -12,6 +12,7 @@ public class GenOrmConnection
 	private boolean m_closeConnection;
 	private ArrayList<GenOrmRecord> m_transactionList;
 	private Map<String, GenOrmKeyGenerator> m_keyGenMap;
+	private GenOrmDSEnvelope m_envelope;
 	private Map<GenOrmRecordKey, GenOrmRecord> m_uniqueRecordMap;  //This map is used to ensure only one instance of a record exists in this trasaction
 	private boolean m_committed;
 	private boolean m_initializedConnection;
@@ -44,7 +45,7 @@ public class GenOrmConnection
 				m_connection = dse.getDataSource().getConnection();
 				m_closeConnection = true;
 				}
-			m_keyGenMap = dse.getKeyGeneratorMap();
+			m_envelope = dse;
 			m_connection.setAutoCommit(false);
 			m_committed = false;
 			m_initializedConnection = true;
@@ -114,6 +115,10 @@ public class GenOrmConnection
 		return (m_uniqueRecordMap.containsKey(key));
 		}
 		
+		
+	/**
+		Flush all modified records that are part of the current transaction
+	*/
 	public void flush()
 		{
 		GenOrmRecord currentRecord = null;
@@ -216,7 +221,7 @@ public class GenOrmConnection
 		
 	public GenOrmKeyGenerator getKeyGenerator(String table)
 		{
-		return (m_keyGenMap.get(table));
+		return (m_envelope.getKeyGenerator(table));
 		}
 		
 	public void addToTransaction(GenOrmRecord goi)
