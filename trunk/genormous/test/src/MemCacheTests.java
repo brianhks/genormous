@@ -44,7 +44,10 @@ public class MemCacheTests
 	public void openMemCacheClient()
 			throws IOException
 		{
-		m_cacheClient = new MemCachedClient(new InetSocketAddress("brolinux", 11211));
+		String memServer = System.getenv().get("memcached_server");
+		if (memServer == null)
+			memServer = "localhost";
+		m_cacheClient = new MemCachedClient(new InetSocketAddress(memServer, 11211));
 				
 		m_cacheClient.flushAll();
 		}
