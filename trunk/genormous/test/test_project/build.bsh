@@ -61,4 +61,6 @@ void test(CPMakeRule rule)
 	make.exec("java -cp "+classpath+" genorm.test.Main");
 	}	
 
-
+//-------------------------------------------------------------------
+//==-- COMPILE	 --==
+make.createPhonyRule("compile", target, null);

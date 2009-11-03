@@ -28,7 +28,7 @@
 				classpathref="cpmake-path" failonerror="true">
 			<arg value="clean"/>
 			<arg value="generate"/>
-			<arg value="test"/>
+			<arg value="compile"/>
 		</java>
 	</target>
 	
