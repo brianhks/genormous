@@ -84,7 +84,7 @@ public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type
 	$if(query.replaceQuery)$
 	HashMap<String, String> replaceMap = new HashMap<String, String>();
 	$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
-	query = replaceText(query, replaceMap);
+	query = QueryHelper.replaceText(query, replaceMap);
 	$endif$
 	
 	try
@@ -113,7 +113,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 	$if(query.replaceQuery)$
 	HashMap<String, String> replaceMap = new HashMap<String, String>();
 	$query.replacements:{rep | replaceMap.put("$rep.tag$", $rep.parameterName$);}$
-	query = replaceText(query, replaceMap);
+	query = QueryHelper.replaceText(query, replaceMap);
 	$endif$
 	
 	try

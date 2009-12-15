@@ -71,6 +71,18 @@
 				prev."source" = ?
 			</sql>
 		</table_query>
+		
+		<table_query name="replace_query" result_type="multi">
+			<intput>
+			</intput>
+			<replace>
+				<param name="order" type="String" tag="order" test="asc"/>
+			</replace>
+			<sql>
+				from segment this
+				order by "segment_id" %order%
+			</sql>
+		</table_query>
 	</table>
 	
 	
