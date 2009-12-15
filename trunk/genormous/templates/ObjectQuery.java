@@ -97,7 +97,7 @@ $if(query.hasParameters)$
 			$if(query.replaceQuery)$
 			HashMap<String, String> replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf($rep.parameterName$));}$
-			query = replaceText(query, replaceMap);
+			query = QueryHelper.replaceText(query, replaceMap);
 			$endif$
 			
 			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
@@ -125,7 +125,7 @@ $endif$
 			$if(query.replaceQuery)$
 			HashMap<String, String> replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf(m_$rep.parameterName$));}$
-			query = replaceText(query, replaceMap);
+			query = QueryHelper.replaceText(query, replaceMap);
 			$endif$
 			
 			java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
@@ -173,7 +173,7 @@ $if(query.hasParameters)$
 			$if(query.replaceQuery)$
 			HashMap<String, String> genorm_replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | genorm_replaceMap.put("$rep.tag$", String.valueOf($rep.parameterName$));}$
-			genorm_query = replaceText(genorm_query, genorm_replaceMap);
+			genorm_query = QueryHelper.replaceText(genorm_query, genorm_replaceMap);
 			$endif$
 			
 			java.sql.PreparedStatement genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
@@ -213,7 +213,7 @@ $endif$
 			$if(query.replaceQuery)$
 			HashMap<String, String> genorm_replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | genorm_replaceMap.put("$rep.tag$", String.valueOf(m_$rep.parameterName$));}$
-			genorm_query = replaceText(genorm_query, genorm_replaceMap);
+			genorm_query = QueryHelper.replaceText(genorm_query, genorm_replaceMap);
 			$endif$
 			
 			java.sql.PreparedStatement genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);

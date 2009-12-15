@@ -2,7 +2,6 @@ package genorm.runtime;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 public abstract class SQLQuery
@@ -29,35 +28,6 @@ public abstract class SQLQuery
 		}
 		
 	//---------------------------------------------------------------------------
-	protected String replaceText(String input, Map<String, String> replacements)
-		{
-		String token = "%";
-		StringBuilder sb = new StringBuilder();
-		String[] split = input.split(token);
-		String value;
-		int i = 0;
-		boolean tag = false;
-		
-		for (String s : split)
-			{
-			if ((value = (String)replacements.get(s)) != null)
-				{
-				tag = true;
-				sb.append(value);
-				}
-			else
-				{
-				if ((i != 0)&&(!tag))
-					sb.append(token);
-				sb.append(s);
-				tag = false;
-				}
-			i++;
-			}
-		
-		return (sb.toString());
-		}
-		
 	//---------------------------------------------------------------------------
 	public abstract String getQueryName();
 	public abstract String getQuery();
