@@ -167,6 +167,24 @@ public ResultSet getCachedQuery(MemCachedClient memClient, int exp)
 	}
 	
 /**
+	Conviencience function when the <code>MemCachedClient</code> has been placed
+	on the connection using the method {@link GenOrmConnection#setProperty(String, Object) [GenOrmConnection.setProperty]}.
+	
+	The key used to store the client must be the value of
+	<code>genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY</code>
+	
+	This method retreives the client from the connection on the thread and then 
+	passes it to the {@link #removeCachedQuery(MemCachedClient memClient) removeCachedQuery(MemCachedClient)]} method.
+*/
+public void removeCachedQuery()
+	{
+	MemCachedClient client = (MemCachedClient)GenOrmDataSource.getGenOrmConnection().getProperty(
+			genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY);
+			
+	removeCachedQuery(client);
+	}
+
+/**
 	Removes this query from the cache.
 	
 	@param memClient MemCachedClient if null this method does nothing
