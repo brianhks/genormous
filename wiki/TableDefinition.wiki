@@ -2,13 +2,179 @@
 
 = Tags =
 
-[TableDefinition#tables tables]<br/>
-[#configuration configuration]
+  * [TableDefinition#tables tables]<br/>
+
+  * [TableDefinition#configuration configuration?]<br/>
+    * [TableDefinition#option option*]<br/>
+    * [TableDefinition#typeMap typeMap?]<br/>
+      * [TableDefinition#type type+]<br/>
+    * [TableDefinition#plugin plugin*]<br/>
+
+  * [TableDefinition#global global?]<br/>
+    * [TableDefinition#col col+]<br/>
+
+  * [TableDefinition#table table+]<br/>
+    * [TableDefinition#comment comment?]<br/>
+    * [TableDefinition#property property*]<br/>
+    * [TableDefinition#col col+]<br/>
+      * [TableDefinition#comment comment?]<br/>
+      * [TableDefinition#property property*]<br/>
+      * [TableDefinition#reference reference?]<br/>
+    * [TableDefinition#primary_key primary_key?]<br/>
+      * [TableDefinition#colref colref+]<br/>
+    * [TableDefinition#unique unique*]<br/>
+      * [TableDefinition#colref colref+]<br/>
+    * [TableDefinition#table_query table_query*]<br/>
+      * [TableDefinition#comment comment?]<br/>
+      * [TableDefinition#input input?]<br/>
+      * [TableDefinition#replace replace?]<br/>
+      * [TableDefinition#sql sql]<br/>
+
+  * [TableDefinition#query query*]<br/>
+    * [TableDefinition#comment comment?]<br/>
+    * [TableDefinition#input input?]<br/>
+      * [TableDefinition#param param*]<br/>
+    * [TableDefinition#replace replace?]<br/>
+      * [TableDefinition#param param*]<br/>
+    * [TableDefinition#return return?]<br/>
+      * [TableDefinition#param param*]<br/>
+    * [TableDefinition#sql sql]<br/>
 
 
 
-= tables =
+----
+== tables ==
+
+This is the root tag in the definitions file.
+
+|| *sub tags* ||
+|| configuration? ||
+|| global? ||
+|| table+ ||
+|| query* ||
+
+----
+== configuration ==
+
+
+----
+== option ==
+
+|| *attributes* ||
+|| name ||
+|| value ||
+
+Specifies Genormous options used during code generations
+
+=== Possible options ===
+
+genorm.package
+
+genorm.destination
+
+genorm.graphvizFile
+
+----
+== typeMap ==
+
+----
+== type ==
+
+|| *attributes* ||
+|| custom ||
+|| java ||
+|| db ||
+
+----
+== plugin ==
+
+|| *attributes* ||
+|| class ||
+
+----
+== global ==
+
+----
+== table ==
+
+|| *attributes* ||
+|| name ||
+
+----
+== comment ==
+
+----
+== property ==
+
+|| *attributes* ||
+|| key ||
+|| value ||
+
+----
+== col ==
+
+|| *attributes* ||
+|| name ||
+|| type ||
+|| primary_key ||
+|| default_value ||
+|| allow_null ||
+|| unique ||
+|| auto_set ||
+
+----
+== reference ==
+
+|| *attributes* ||
+|| table ||
+|| column ||
+|| id ||
+|| on_delete ||
+|| on_update ||
+
+----
+== table_query ==
+
+|| *attributes* ||
+|| name ||
+|| result_type ||
+
+----
+== input == 
 
 
 
-= configuration =
+----
+== replace ==
+
+----
+== return ==
+
+----
+== param ==
+
+|| *attributes* ||
+|| name ||
+|| type ||
+|| test ||
+
+----
+== sql ==
+
+----
+== query ==
+
+|| *attributes* ||
+|| name ||
+
+----
+== primary_key ==
+
+----
+== unique ==
+
+----
+== colref ==
+
+|| *attributes* ||
+|| name ||
