@@ -2,6 +2,8 @@
 
 = Tags =
 
+The following is a layout of the tags that are and can be present in the definition xml.  The definition xml is used by Genormous to generate the ORM files as well as the create.sql file.
+
   * [TableDefinition#tables tables]<br/>
 
   * [TableDefinition#configuration configuration?]<br/>
