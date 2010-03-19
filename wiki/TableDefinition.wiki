@@ -8,7 +8,7 @@ The following is a layout of the tags that are and can be present in the definit
 
   * [TableDefinition#configuration configuration?]<br/>
     * [TableDefinition#option option*]<br/>
-    * [TableDefinition#typeMap typeMap?]<br/>
+    * [TableDefinition#type_map type_map?]<br/>
       * [TableDefinition#type type+]<br/>
     * [TableDefinition#plugin plugin*]<br/>
 
@@ -50,51 +50,95 @@ The following is a layout of the tags that are and can be present in the definit
 This is the root tag in the definitions file.
 
 || *sub tags* ||
-|| configuration? ||
-|| global? ||
-|| table+ ||
-|| query* ||
+|| [TableDefinition#configuration configuration?] ||
+|| [TableDefinition#global global?} ||
+|| [TableDefinition#table table+] ||
+|| [TableDefinition#query query*] ||
 
 ----
 == configuration ==
 
+|| *sub tags* ||
+|| [TableDefinition#option option*] ||
+|| [TableDefinition#type_map type_map?] ||
+|| [TableDefinition#plugin plugin*] ||
 
 ----
 == option ==
 
-|| *attributes* ||
-|| name ||
-|| value ||
-
 Specifies Genormous options used during code generations
+
+|| *attributes* || *description* ||
+|| name || Name of the property to set ||
+|| value || Value of the property ||
 
 === Possible options ===
 
-genorm.package
+genorm.package:  defines the package name to be placed in the generated code
 
-genorm.destination
+genorm.destination:  destination folder to place generated orm files into.
 
-genorm.graphvizFile
+genorm.graphvizFile:  name of the graphviz dot file to create
+
+{{{
+<option name="genorm.package" value="test.orm"/>
+<option name="genorm.destination" value="src/java/test/orm"/>
+<option name="genorm.graphvizFile" value="build/tables.dot"/>
+}}}
 
 ----
-== typeMap ==
+== type_map ==
+
+The type_map tag contains type definitions used to translate types used in the
+table definitions to java and database typtes
+
+|| *sub tags* ||
+|| [TableDefinition#type type] ||
 
 ----
 == type ==
+
+Defines a type used in the definition file and its equivalent java and database types
 
 || *attributes* ||
 || custom ||
 || java ||
 || db ||
 
+{{{
+<type custom="integer" java="int" db="INT"/>
+<type custom="date" java="java.sql.Date" db="DATE"/>
+<type custom="boolean" java="boolean" db="BOOLEAN"/>
+<type custom="string" java="String" db="VARCHAR"/>
+<type custom="timestamp" java="java.sql.Timestamp" db="TIMESTAMP"/>
+}}}
+
 ----
 == plugin ==
+
+Plugins are used to control/augment the generated code.  At least one plugin will need to be defined to specify the target database.
 
 || *attributes* ||
 || class ||
 
+{{{
+<plugin class="genorm.plugins.dbsupport.HSQLDB"/>
+}}}
+
 ----
 == global ==
+
+Defines columns that are applied to all tables.  A good place to put creation timestamps and such.
+
+|| *sub tags* ||
+|| [TableDefinition#col col+] ||
+
+{{{
+<global>
+	<col name="MTS" type="timestamp" auto_set="mts"/>
+	<col name="CST" type="timestamp" auto_set="cts"/>
+</global>
+}}}
 
 ----
 == table ==
@@ -102,40 +146,78 @@ genorm.graphvizFile
 || *attributes* ||
 || name ||
 
+|| *sub tags* ||
+|| [TableDefinition#col col+] ||
+
+
+{{{
+<table name="database_info">
+	<comment></comment>
+	<property key="hsqldb_tableType" value="CACHED"/>
+	<col name="INFO_ID" type="integer" primary_key="true">
+		<comment></comment>
+	</col>
+	<col name="VERSION" type="integer">
+		<comment></comment>
+	</col>
+</table>
+}}}
+
 ----
 == comment ==
 
+Used for adding comments to a column or table.  The comments show up in the javadoc for the class as well.
+
 ----
 == property ==
+
+Used for adding tables specific properties.  For HSQL databases it is used to define the table type.
 
 || *attributes* ||
 || key ||
 || value ||
 
+See [TableDefinition#table table] for an example.
+
 ----
 == col ==
 
-|| *attributes* ||
-|| name ||
-|| type ||
-|| primary_key ||
-|| default_value ||
-|| allow_null ||
-|| unique ||
-|| auto_set ||
+|| *attributes* || *default* || *description* ||
+|| name || || Name of the table ||
+|| type || || Type as defined in the type_map ||
+|| primary_key || false || (true/false) defines the column as the primary key ||
+|| default_value || || Sets a default value for the column ||
+|| allow_null || true || (true/false) defines if the column can be null or not ||
+|| unique || false || Specifies if a unique constraint is placed on this column ||
+|| auto_set || || Can set to either "mts" or "cts".  This defines the table to be automatically set with the modification time or creation time. ||
+
+|| *sub tags* ||
+|| [TableDefinition#comment comment?] ||
+|| [TableDefinition#property property*] ||
+|| [TableDefinition#reference reference?] ||
 
 ----
 == reference ==
 
-|| *attributes* ||
-|| table ||
-|| column ||
-|| id ||
-|| on_delete ||
-|| on_update ||
+Used to define a column as a foriegn key to another column.
+
+|| *attributes* || *default* || *description* ||
+|| table || || Foreign table this column refers to ||
+|| column || || Name of column on foreign table this column refers to ||
+|| id || || ||
+|| on_delete || default || (cascade, null, default) ||
+|| on_update || default || (cascade, null, default) ||
+
+{{{
+<col name="community" type="string">
+	<reference table="community" column="name" on_update="cascade"/>
+</col>
+}}}
 
 ----
 == table_query ==
+
+Defines queries specific to this table.
 
 || *attributes* ||
 || name ||
@@ -163,6 +245,8 @@ genorm.graphvizFile
 ----
 == sql ==
 
+Contains the sql query or update.
+
 ----
 == query ==
 
@@ -172,8 +256,54 @@ genorm.graphvizFile
 ----
 == primary_key ==
 
+Used to set a set of columns as the primary key
+
+|| *sub tags* ||
+|| [TableDefinition#colref colref+] ||
+
 ----
 == unique ==
+
+Used to define a set of columns as unique
+
+|| *sub tags* ||
+|| [TableDefinition#colref colref+] ||
+
+{{{
+<table name="role">
+	<comment></comment>
+	<col name="id" type="integer" primary_key="true"/>
+	<col name="name" type="string"/>
+	<col name="type" type="string"/>
+	<col name="owner" type="integer">
+		<reference column="client_id" table="client"/>
+	</col>
+	<col name="community" type="string">
+		<reference column="name" table="community"/>
+	</col>
+	<table_query name="role" result_type="single">
+		<input>
+			<param name="name" type="string" test="test"/>
+			<param name="type" type="string" test="user"/>
+			<param name="owner" type="integer" test="2"/>
+			<param name="community" type="string" test="Lingotek"/>
+		</input>
+		<sql>
+			from role this
+			where this.name = ? and
+			this.type = ? and
+			this.owner = ? and
+			this.community = ?
+		</sql>
+	</table_query>
+	<unique>
+		<colref name="name"/>
+		<colref name="type"/>
+		<colref name="owner"/>
+		<colref name="community"/>
+	</unique>
+</table>
+}}}
 
 ----
 == colref ==
