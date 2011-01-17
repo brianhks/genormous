@@ -83,7 +83,7 @@ public abstract class GenOrmRecord
 		if (!m_isDeleted)
 			{
 			m_isDeleted = true;
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			getGenOrmConnection().addToTransaction(this);
 			}
 		}
 		
@@ -110,7 +110,7 @@ public abstract class GenOrmRecord
 	public void setDirty()
 		{
 		if (m_dirtyFlags == 0)
-			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			getGenOrmConnection().addToTransaction(this);
 			
 		//This will mark all attributes as dirty
 		m_dirtyFlags = -1;
@@ -293,7 +293,7 @@ public abstract class GenOrmRecord
 			m_logger.debug("SQL Query: "+statement);
 			}
 			
-		PreparedStatement stmt = GenOrmDataSource.prepareStatement(statement);
+		PreparedStatement stmt = getGenOrmConnection().prepareStatement(statement);
 		
 		for (int I = 0; I < m_queryFields.size(); I++)
 			{
@@ -366,7 +366,7 @@ public abstract class GenOrmRecord
 			throws SQLException
 		{
 		boolean ret = false;
-		GenOrmConnection con = GenOrmDataSource.getGenOrmConnection();
+		GenOrmConnection con = getGenOrmConnection();
 		//System.out.println("Flushing record for "+m_tableName+" "+toString());
 		createIfNew(con);
 		ret = commitChanges();

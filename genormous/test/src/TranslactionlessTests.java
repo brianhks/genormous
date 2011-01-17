@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.*;
 import test.*;
 
-public class QueryTest
+public class TranslactionlessTests
 	{
 	private String m_queryName;
 	private String m_query;
@@ -12,7 +12,7 @@ public class QueryTest
 	
 	private Database m_database;
 	
-	public QueryTest()
+	public TranslactionlessTests()
 		{
 		}
 		
@@ -23,44 +23,19 @@ public class QueryTest
 		m_database = db;
 		}
 		
-	//Set methods for each query
-	public void setQueryName(String name) { m_queryName = name; }
-	public void setQuery(String query) { m_query = query; }
-	public void setInputParams(List<Object> params) { m_inputParams = params; }
 	
 	//---------------------------------------------------------------------------
 	@Test(
 		hardDependencyOn = { "HSQLDatabase.createDatabase" } )
-	public void testQuery()
-			throws SQLException
+	public void testObject()
 		{
-		System.out.println("    "+m_queryName);
-		Connection c = m_database.getConnection();
-		
-		PreparedStatement ps = c.prepareStatement(m_query);
-		
-		Iterator<Object> it = m_inputParams.iterator();
-		int pindex = 1;
-		while (it.hasNext())
-			{
-			Object param = it.next();
-			if (param instanceof Integer)
-				ps.setInt(pindex, (Integer)param);
-			else if (param instanceof String)
-				ps.setString(pindex, (String)param);
-				
-			pindex ++;
-			}
-			
-		ps.execute();
-		
-		ps.close();
+		UniqueSentence us = UniqueSentence.factory.create(123);
 		}
 		
 	//---------------------------------------------------------------------------
 	@Test(
 		hardDependencyOn = { "HSQLDatabase.createDatabase" } )
-	public void testConnectionlessQuery()
+	public void testQuery()
 		{
 		LanguageListQuery query = new LanguageListQuery();
 		
