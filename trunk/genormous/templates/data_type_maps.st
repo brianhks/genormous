@@ -1,7 +1,9 @@
 group gen_orm_data_maps;
 
 javaToGenOrmMap ::= [
+	"byte":"GenOrmByte",
 	"int":"GenOrmInt",
+	"long":"GenOrmLong",
 	"boolean":"GenOrmBoolean",
 	"String":"GenOrmString",
 	"double":"GenOrmDouble",
@@ -13,7 +15,9 @@ javaToGenOrmMap ::= [
 	]
 	
 javaToObjectType ::= [
+	"byte":"Byte",
 	"int":"Integer",
+	"long":"Long",
 	"boolean":"Boolean",
 	"String":"String",
 	"double":"Double",
@@ -25,7 +29,9 @@ javaToObjectType ::= [
 	]
 	
 javaToJDBCMap ::= [
+	"byte":"Byte",
 	"int":"Int",
+	"long":"Long",
 	"boolean":"Boolean",
 	"String":"String",
 	"double":"Double",

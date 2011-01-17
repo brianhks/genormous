@@ -8,6 +8,7 @@ import org.dom4j.*;
 import java.util.*;
 import genorm.Table;
 import genorm.Column;
+import genorm.ForeignKeySet;
 
 public class Postgres implements CreatePlugin
 	{
@@ -17,6 +18,8 @@ public class Postgres implements CreatePlugin
 		{
 		m_helper = new TemplateHelper();
 		}
+		
+	public String getFieldEscapeString() { return ("\\\""); }
 	
 	public String getCreateSQL(Table table)
 		{
@@ -29,6 +32,28 @@ public class Postgres implements CreatePlugin
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			attributes.put("table", table);
 			attributes.putAll(table.getProperties());
+			
+			createTemplate.setAttributes(attributes);
+			sql = createTemplate.toString().trim();
+			}
+		catch (IOException ioe)
+			{
+			ioe.printStackTrace();
+			}
+		
+		return (sql);
+		}
+		
+	public String getConstraintSQL(ForeignKeySet keySet)
+		{
+		String sql = "";
+		try
+			{
+			StringTemplateGroup tGroup = m_helper.loadTemplateGroup("templates/postgres_create.st");
+			StringTemplate createTemplate = tGroup.getInstanceOf("fkeyConstraint");
+			
+			Map<String, Object> attributes = new HashMap<String, Object>();
+			attributes.put("keyset", keySet);
 			
 			createTemplate.setAttributes(attributes);
 			sql = createTemplate.toString().trim();

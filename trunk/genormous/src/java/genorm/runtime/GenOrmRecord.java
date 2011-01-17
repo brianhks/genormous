@@ -65,6 +65,12 @@ public abstract class GenOrmRecord
 	*/
 	public abstract void setCTS();
 	
+	
+	/**
+		
+	*/
+	public abstract GenOrmConnection getGenOrmConnection();
+	
 	//---------------------------------------------------------------------------
 	protected boolean isEmptyReference(String s) { return (s == null); }
 	protected boolean isEmptyReference(int i) { return (i == 0); }

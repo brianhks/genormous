@@ -34,6 +34,9 @@ public interface GenOrmDSEnvelope
 		from.
 	*/
 	public DataSource getDataSource();
+	
+	
+	public void initialize();
 		
 	/**
 		Returns the key generator for the specified table

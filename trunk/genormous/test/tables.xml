@@ -175,6 +175,14 @@
 		</unique>
 	</table>
 	
+	<view name="segment_view">
+		<comment></comment>
+		<view_col name="" type=""/>
+		<sql>
+			
+		</sql>
+	</view>
+	
 	<!-- <table name="language_code">
 		<property key="hsqldb_tableType" value="CACHED"/>
 		<col name="language_code" type="string" primary_key="true">
