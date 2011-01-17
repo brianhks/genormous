@@ -1,0 +1,195 @@
+
+<tables>
+	<configuration>
+		<option name="genorm.querygen.package" value="test"/>
+		
+		<typeMap>
+			<type custom="integer" java="int" db="INT"/>
+			<type custom="date" java="java.sql.Date" db="DATE"/>
+			<type custom="boolean" java="boolean" db="BOOLEAN"/>
+			<type custom="string" java="String" db="VARCHAR"/>
+			<type custom="timestamp" java="java.sql.Timestamp" db="TIMESTAMP"/>
+			<type custom="binary" java="byte[]" db="BYTEA"/>
+			<type custom="money" java="java.math.BigDecimal" db="DECIMAL"/>
+			<type custom="version" java="Double" db="DOUBLE PRECISION"/>
+		</typeMap>
+		
+		<plugin class="genorm.plugins.dbsupport.HSQLDB"/>
+	</configuration>
+
+	<global>
+		<col name="MTS" type="timestamp" auto_set="mts"/>
+		<col name="CTS" type="timestamp" auto_set="cts"/>
+	</global>
+	
+	<table name="segment">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="segment_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="source" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="source_language" type="integer">
+			<comment></comment>
+			<reference table="language" column="language_id"/>
+		</col>
+		<col name="paragraph_id" type="string">
+			<comment></comment>
+		</col>
+		<col name="next_segment" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+		<col name="prev_segment" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="segment" column="segment_id" on_delete="cascade"/>
+		</col>
+		<col name="mergeable" type="boolean" default_value="false" allow_null="false">
+			<comment>Identifies this segment as being mergeable</comment>
+		</col>
+		<col name="double_value" type="double"/>
+		<table_query name="next_segment_on_source" result_type="single">
+			<input>
+				<param name="source" type="string" test="test value"/>
+			</input>
+			<sql>
+				from segment this, segment prev
+				where this."prev_segment" = prev."segment_id" and
+				prev."source" = ?
+			</sql>
+		</table_query>
+		
+		<table_query name="next_segment_on_source" result_type="single">
+			<input>
+				<param name="source" type="string" test="test value"/>
+			</input>
+			<sql>
+				from segment this, segment prev
+				where this."prev_segment" = prev."segment_id" and
+				prev."source" = ?
+			</sql>
+		</table_query>
+		
+		<table_query name="replace_query" result_type="multi">
+			<intput>
+			</intput>
+			<replace>
+				<param name="order" type="String" tag="order" test="asc"/>
+			</replace>
+			<sql>
+				from segment this
+				order by "segment_id" %order%
+			</sql>
+		</table_query>
+	</table>
+	
+	
+	<table name="note">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="note_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="translation" type="integer" primary_key="false" allow_null="false">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+		<col name="language" type="integer" primary_key="false">
+			<comment></comment>
+			<reference table="language" column="language_id"/> </col>
+		<col name="phase" type="integer" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="note" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+	</table>
+	
+	<table name="target">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="phase" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="segment" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="segment" column="segment_id"/>
+		</col>
+		<col name="language" type="integer" primary_key="true">
+			<comment></comment>
+			<reference table="language" column="language_id"/>
+		</col>
+		<col name="flags" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		<col name="text" type="string" primary_key="false">
+			<comment></comment>
+		</col>
+		
+		<table_query name="by_segment" result_type="multi">
+			<input>
+				<param name="segment" type="integer" test="1"/>
+			</input>
+			<sql>
+				from target this where this."segment" = ? order by this."text"
+			</sql>
+		</table_query>
+	</table>
+	
+	<table name="language">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="language_id" type="integer" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="language_code" type="string" primary_key="false">
+			<comment></comment>
+			<!-- <reference table="language_code" column="language_code"/> -->
+		</col>
+		<col name="country_code" type="string" primary_key="false">
+			<comment></comment>
+			<!-- <reference table="language_code" column="country_code"/> -->
+		</col>
+	</table>
+	
+	<table name="unique_sentence">
+		<comment></comment>
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="sentence_id" type="integer" primary_key="true"/>
+		<col name="sentence" type="string" unique="true">
+			<comment></comment>
+		</col>
+		
+	</table>
+	
+	<table name="unique_set_test">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="id" type="integer" primary_key="true"/>
+		<col name="str1" type="string"/>
+		<col name="str2" type="string"/>
+		<unique>
+			<colref name="str1"/>
+			<colref name="str2"/>
+		</unique>
+	</table>
+	
+	<view name="segment_view">
+		<comment></comment>
+		<view_col name="" type=""/>
+		<sql>
+			
+		</sql>
+	</view>
+	
+	<!-- <table name="language_code">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<col name="language_code" type="string" primary_key="true">
+			<comment></comment>
+		</col>
+		<col name="country_code" type="string" primary_key="true">
+			<comment></comment>
+		</col>
+	</table> -->
+</tables>

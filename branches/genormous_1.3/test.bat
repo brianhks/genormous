@@ -1,0 +1,2 @@
+cls 
+java make test 

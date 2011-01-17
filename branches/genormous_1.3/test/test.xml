@@ -1,0 +1,60 @@
+<!DOCTYPE suite SYSTEM "http://depunit.googlecode.com/svn/trunk/doc/depunit_1_0.dtd">
+
+<!--
+Needed test cases
+One method loops
+Loop at the beginning
+Loop at the end
+-->
+<suite name="Genormous Test Suite" verbose="1">
+	<!-- <run name="Error Handle Run">
+		<tag>errors</tag>
+		<classes>
+			<class name="PostgresDatabase">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="ErrorTests"/>
+			
+		</classes>
+	</run> -->
+	
+	<run name="Object Tests">
+		<classes>
+			<class name="SQLQueryTest">
+			</class>
+		</classes>
+	</run>
+	
+	<run name="First Run">
+		<classes>
+			<!-- <includeGroup>login_group</includeGroup> -->
+			
+			<class name="HSQLDatabase">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="Create"/>
+			<class name="QueryTest">
+				<driver class="genorm.unittest.QueryDataDriver">
+					<value name="QueryFile">test/queries.xml</value>
+				</driver>
+			</class>
+		</classes>
+		<!-- <tests>
+			<method>Create.foreignKeyTest</method>
+		</tests> -->
+	</run>
+	
+	<!-- <run name="Memcached Test">
+		<tag>memcached</tag>
+		<classes>
+			<class name="HSQLDatabase">
+				<value name="CreateSQL">build/gen/src/test/create.sql</value>
+				<value name="DatabaseDir">data</value>
+			</class>
+			<class name="MemCacheTests"/>
+		</classes>
+	</run> -->
+	
+</suite>

@@ -1,0 +1,9 @@
+digraph G {
+	node [shape=plaintext, fontsize=10];
+	$tables:{t | $t.name$ [label=<
+	<table><tr><td border="1" bgcolor="lawngreen">$t.name$</td></tr>
+	$t.columns:{c | <tr><td$if(c.key)$ port="p_$c.name$" $endif$ $if(c.foreignKey)$ bgcolor="lightyellow"$endif$>$if(c.primaryKey)$<font color="blue">$endif$$c.name$$if(c.primaryKey)$</font>$endif$</td></tr>}$</table>>];
+}$
+	$tables:{t | $t.foreignKeys:{fk | $t.name$:p_$first(fk.keys):{k|$k.name$}$ -> $fk.tableName$;
+}$}$
+}

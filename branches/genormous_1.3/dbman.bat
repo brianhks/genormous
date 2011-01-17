@@ -1,0 +1,1 @@
+java -cp lib\test_only\hsqldb.jar org.hsqldb.util.DatabaseManager
