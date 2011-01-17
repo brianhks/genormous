@@ -10,6 +10,7 @@ public interface GenOrmRecordFactory
 	*/
 	public String getCreateStatement();
 	public List<GenOrmFieldMeta> getFields();
+	public List<GenOrmConstraint> getForeignKeyConstraints();
 	public GenOrmRecord findRecord(Object keys);
 	public GenOrmRecord createRecord();
 	public GenOrmRecord createWithGeneratedKey();
