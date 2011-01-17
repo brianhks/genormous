@@ -10,7 +10,7 @@ import genorm.Table;
 import genorm.Column;
 import genorm.ForeignKeySet;
 
-public class HSQLDB implements CreatePlugin
+public class MySQL implements CreatePlugin
 	{
 	private TemplateHelper m_helper;
 	
@@ -19,14 +19,14 @@ public class HSQLDB implements CreatePlugin
 		m_helper = new TemplateHelper();
 		}
 		
-	public String getFieldEscapeString() { return ("\\\""); }
+	public String getFieldEscapeString() { return ("`"); }
 	
 	public String getCreateSQL(Table table)
 		{
 		String sql = "";
 		try
 			{
-			StringTemplateGroup tGroup = m_helper.loadTemplateGroup("templates/hsqldb_create.st");
+			StringTemplateGroup tGroup = m_helper.loadTemplateGroup("templates/mysql_create.st");
 			StringTemplate createTemplate = tGroup.getInstanceOf("tableCreate");
 			
 			Map<String, Object> attributes = new HashMap<String, Object>();
@@ -49,7 +49,7 @@ public class HSQLDB implements CreatePlugin
 		String sql = "";
 		try
 			{
-			StringTemplateGroup tGroup = m_helper.loadTemplateGroup("templates/hsqldb_create.st");
+			StringTemplateGroup tGroup = m_helper.loadTemplateGroup("templates/mysql_create.st");
 			StringTemplate createTemplate = tGroup.getInstanceOf("fkeyConstraint");
 			
 			Map<String, Object> attributes = new HashMap<String, Object>();

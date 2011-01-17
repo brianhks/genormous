@@ -46,6 +46,7 @@ public class HSQLDatabase implements Database
 		GenOrmDataSource.setDataSource(new DSEnvelope(m_dataSource));
 		}
 		
+	//---------------------------------------------------------------------------
 	@Test(
 		hardDependencyOn = { "createDataSource" },
 		cleanupMethod = "deleteDatabase" )

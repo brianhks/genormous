@@ -51,9 +51,27 @@ public class TableCreator
 			}
 		}
 		
-	public static void main(String[] args)
-		{
+	/**
 		
+	*/
+	public static void main(String[] args)
+			throws Exception
+		{
+		String driverClass = args[0];
+		String connectString = args[1];
+		String user = args[2];
+		String password = args[3];
+		String tableFile = args[4];
+		
+		Class.forName(driverClass);
+		
+		Connection con = DriverManager.getConnection(connectString,
+				user, password);
+				
+		TableCreator tc = new TableCreator();
+		tc.createTables(con, new File(tableFile));
+		
+		con.close();
 		}
 		
 	private void printResults(ResultSet rs)

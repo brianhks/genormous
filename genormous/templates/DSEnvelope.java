@@ -27,4 +27,17 @@ public class DSEnvelope implements GenOrmDSEnvelope
 		{
 		return (m_keyGenMap.get(table));
 		}
+	
+	public void initialize()
+		{
+		GenOrmDataSource.setDataSource(this);
+		}
+		
+	/**
+		Method for overriding the standard key generator
+	*/
+	public void setKeyGenerator(String table, GenOrmKeyGenerator generator)
+		{
+		m_keyGenMap.put(table, generator);
+		}
 	}

@@ -156,7 +156,7 @@ public class Table
 				
 			if (!added)
 				{
-				ForeignKeySet fks = new ForeignKeySet(ftable, m_formatter);
+				ForeignKeySet fks = new ForeignKeySet(m_tableName, ftable, m_formatter);
 				fks.addColumn(col);
 				m_foreignKeys.add(fks);
 				}

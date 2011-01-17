@@ -43,7 +43,10 @@ public class DefaultFormat
 		
 	public String formatStaticName(String columnName)
 		{
-		return (columnName.toUpperCase());
+		if (Character.isDigit(columnName.toCharArray()[0]))
+			return ("A_"+columnName.toUpperCase());
+		else
+			return (columnName.toUpperCase());
 		}
 		
 	/* public String formatStaticNameRef(String columnName)

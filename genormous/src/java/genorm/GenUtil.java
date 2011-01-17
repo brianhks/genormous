@@ -166,7 +166,10 @@ public class GenUtil extends TemplateHelper
 			}
 			
 		//Read in java types
-		Element jtm = config.element("typeMap");
+		Element jtm = config.element("typeMap"); //For compatibility
+		if (jtm == null)
+			jtm = config.element("type_map"); //This is the new name
+			
 		if (jtm != null)
 			{
 			Iterator tIt = jtm.elementIterator("type");
@@ -178,7 +181,10 @@ public class GenUtil extends TemplateHelper
 			}
 		
 		//Read in db types
-		Element dtm = config.element("typeMap");
+		Element dtm = config.element("typeMap"); //For compatibility
+		if (dtm == null)
+				dtm = config.element("type_map"); //This is the new name
+				
 		if (dtm != null)
 			{
 			Iterator tIt = dtm.elementIterator("type");

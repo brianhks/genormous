@@ -4,12 +4,13 @@ import java.util.*;
 
 public class ForeignKeySet
 	{
-	private String m_table;            //Foreign table name
+	private String m_ftable;            //Foreign table name
 	private HashSet<String> m_keySet;
 	private ArrayList<Column> m_keys;  //Local columns that point to foreign key
 	private Format m_formatter;
 	private String m_onDelete;
 	private String m_onUpdate;
+	private String m_thisTable;
 	
 	private String getOnCommand(String value)
 		{
@@ -24,15 +25,27 @@ public class ForeignKeySet
 		return (ret);
 		}
 	
-	public ForeignKeySet(String table, Format format)
+	public ForeignKeySet(String thisTable, String ftable, Format format)
 		{
+		m_thisTable = thisTable;
 		m_formatter = format;
-		m_table = table;
+		m_ftable = ftable;
 		m_keySet = new HashSet<String>();
 		m_keys = new ArrayList<Column>();
 		}
 		
-	public String getTableName() { return (m_table); }
+	public String getConstraintName()
+		{
+		StringBuilder name = new StringBuilder();
+		name.append(m_thisTable);
+		name.append("_").append(m_keys.get(0).getName());
+			
+		name.append("_fkey");
+			
+		return (name.toString());
+		}
+		
+	public String getTableName() { return (m_ftable); }
 	public Table getTable() { return (m_keys.get(0).getForeignTable()); }
 	public ArrayList<Column> getKeys() { return (m_keys); }
 	public String getMethodName() { return (m_formatter.formatForeignKeyMethod(this)); }

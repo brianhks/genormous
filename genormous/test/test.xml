@@ -46,7 +46,7 @@ Loop at the end
 		</tests> -->
 	</run>
 	
-	<run name="Memcached Test">
+	<!-- <run name="Memcached Test">
 		<tag>memcached</tag>
 		<classes>
 			<class name="HSQLDatabase">
@@ -55,6 +55,6 @@ Loop at the end
 			</class>
 			<class name="MemCacheTests"/>
 		</classes>
-	</run>
+	</run> -->
 	
 </suite>

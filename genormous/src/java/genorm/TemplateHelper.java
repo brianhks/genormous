@@ -39,6 +39,45 @@ public class TemplateHelper
 		}
 		
 	//------------------------------------------------------------------------------
+	/**
+		Writes the file if it does not already exist
+	*/
+	public void conditionalWriteTemplate(String templateName, Map<String, Object> attrs)
+			throws IOException
+		{
+		conditionalWriteTemplate(m_destDir+"/"+templateName, "templates/"+templateName, attrs);
+		}
+		
+	//------------------------------------------------------------------------------
+	/**
+		Writes the file if it does not already exist
+	*/
+	public void conditionalWriteTemplate(String fileName, String templateName, Map<String, Object> attrs)
+			throws IOException
+		{
+		if (new File(fileName).exists())
+			return;
+			
+		m_generatedFileCount ++;
+		StringTemplate template = new StringTemplate("",
+				org.antlr.stringtemplate.language.DefaultTemplateLexer.class);
+				
+		template.setName(fileName);
+		template.setTemplate(readResource(templateName));
+		
+				
+		template.setAttributes(attrs);
+		
+		File dir = new File(fileName).getParentFile();
+		if (!dir.exists())
+			dir.mkdirs();
+		
+		FileWriter fw = new FileWriter(fileName);
+		fw.write(template.toString());
+		fw.close();
+		}
+	
+	//------------------------------------------------------------------------------
 	public void writeTemplate(String templateName, Map<String, Object> attrs)
 			throws IOException
 		{

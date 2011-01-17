@@ -6,6 +6,7 @@ import java.util.*;
 import org.jargp.*;
 import org.antlr.stringtemplate.*;
 import genorm.runtime.GenOrmException;
+import genorm.runtime.GenOrmConstraint;
 
 import static java.lang.System.out;
 
@@ -484,6 +485,7 @@ public class Genormous extends GenUtil
 				attributes.put("uniqueColumns", t.getUniqueColumnSets());
 				attributes.putAll(t.getProperties());
 				
+				List<GenOrmConstraint> constraints = new ArrayList<GenOrmConstraint>();
 								
 				//Get the table create statement
 				if (createPlugin != null)
@@ -491,12 +493,23 @@ public class Genormous extends GenUtil
 					String sql = createPlugin.getCreateSQL(t);
 					t.setCreateSQL(sql);
 					attributes.put("createSQL", sql.replaceAll("\\n+", "\\\\n").replace("\"", "\\\""));
+					
+					for (ForeignKeySet keySet : t.getForeignKeys())
+						{
+						String csql = createPlugin.getConstraintSQL(keySet); 
+						constraints.add(new GenOrmConstraint(keySet.getTableName(), 
+								keySet.getConstraintName(),
+								csql.replaceAll("\\n+", "\\\\n").replace("\"", "\\\"")));
+						}
 					}
 				else
 					{
 					t.setCreateSQL("");
 					attributes.put("createSQL", "");
 					}
+					
+				attributes.put("constraints", constraints);
+				attributes.put("fieldEscape", createPlugin.getFieldEscapeString());
 					
 				baseTemplate.setAttributes(attributes);
 				

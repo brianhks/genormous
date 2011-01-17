@@ -57,7 +57,7 @@ public $table.className$ set$foreignKeys.methodName$($foreignKeys.table.classNam
 	//We add the record to the transaction if one of the key values change
 	$foreignKeys.keys:{key | if (m_$key.parameterName$.setValue(table.get$key.foreignTableColumnMethodName$()))
 	{
-	if (m_dirtyFlags == 0)
+	if ((m_dirtyFlags == 0) && (GenOrmDataSource.getGenOrmConnection() != null))
 		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 	
 	m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
@@ -95,6 +95,7 @@ public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type
 		s_logger.debug(statement.toString());
 		
 		rows = statement.executeUpdate();
+		statement.close();
 		}
 	catch (java.sql.SQLException sqle)
 		{
@@ -164,10 +165,10 @@ public class $table.className$_base extends GenOrmRecord
 }$
 	//Change this value to true to turn on warning messages
 	private static final boolean WARNINGS = false;
-	private static final String SELECT = "SELECT $columns:{col | this.\"$col.name$\"}; separator=", "$ ";
+	private static final String SELECT = "SELECT $columns:{col | this.$fieldEscape$$col.name$$fieldEscape$}; separator=", "$ ";
 	private static final String FROM = "FROM $table.name$ this ";
 	private static final String WHERE = "WHERE ";
-	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | \"$key.name$\" = ?}; separator=" AND "$";
+	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $fieldEscape$$key.name$$fieldEscape$ = ?}; separator=" AND "$";
 	
 	private static final String TABLE_NAME = "$table.name$";
 	
@@ -178,7 +179,7 @@ public class $table.className$_base extends GenOrmRecord
 	public static class $table.className$KeyGenerator
 			implements GenOrmKeyGenerator
 		{
-		private static final String MAX_QUERY = "SELECT MAX(\"$table.primaryKey.name$\") FROM $table.name$";
+		private static final String MAX_QUERY = "SELECT MAX($fieldEscape$$table.primaryKey.name$$fieldEscape$) FROM $table.name$";
 		
 		private volatile long m_nextKey;
 		private javax.sql.DataSource m_ds;
@@ -190,6 +191,7 @@ public class $table.className$_base extends GenOrmRecord
 			try
 				{
 				java.sql.Connection con = m_ds.getConnection();
+				con.setAutoCommit(false);
 				java.sql.Statement stmnt = con.createStatement();
 				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
 				if (rs.next())
@@ -252,11 +254,15 @@ public class $table.className$_base extends GenOrmRecord
 		public static final String CREATE_SQL = "$createSQL$";
 
 		private ArrayList<GenOrmFieldMeta> m_fieldMeta;
+		private ArrayList<GenOrmConstraint> m_foreignKeyConstraints;
 		
 		private $table.className$Factory()
 			{
 			m_fieldMeta = new ArrayList<GenOrmFieldMeta>();
 			$columns:{col | m_fieldMeta.add($col.nameCaps$_FIELD_META);
+}$
+			m_foreignKeyConstraints = new ArrayList<GenOrmConstraint>();
+			$constraints:{con | m_foreignKeyConstraints.add(new GenOrmConstraint("$con.foreignTable$", "$con.constraintName$", "$con.sql$"));
 }$
 			}
 			
@@ -276,6 +282,15 @@ public class $table.className$_base extends GenOrmRecord
 			return (m_fieldMeta);
 			}
 
+		//---------------------------------------------------------------------------
+		/**
+			Returns a list of foreign key constraints
+		*/
+		public List<GenOrmConstraint> getForeignKeyConstraints()
+			{
+			return (m_foreignKeyConstraints);
+			}
+			
 		//---------------------------------------------------------------------------
 		/**
 			Returns the SQL create statement for this table
@@ -718,7 +733,12 @@ m_foreignKeys.add(foreignKey);
 }; separator="\n"$
 		}
 	
-	//---------------------------------------------------------------------------	
+	//---------------------------------------------------------------------------
+	@Override
+	public GenOrmConnection getGenOrmConnection()
+		{
+		return (GenOrmDataSource.getGenOrmConnection());
+		}
 	//---------------------------------------------------------------------------
 	@Override
 	public void setMTS()

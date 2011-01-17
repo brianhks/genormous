@@ -2,6 +2,7 @@ import org.depunit.annotations.*;
 import org.depunit.*;
 import java.sql.*;
 import java.util.*;
+import test.*;
 
 public class QueryTest
 	{
@@ -18,7 +19,7 @@ public class QueryTest
 	//This gets set from the context
 	public void setDatabase(HSQLDatabase db)
 		{
-		System.out.println("Setting db in QueryTest");
+		//System.out.println("Setting db in QueryTest");
 		m_database = db;
 		}
 		
@@ -27,6 +28,7 @@ public class QueryTest
 	public void setQuery(String query) { m_query = query; }
 	public void setInputParams(List<Object> params) { m_inputParams = params; }
 	
+	//---------------------------------------------------------------------------
 	@Test(
 		hardDependencyOn = { "HSQLDatabase.createDatabase" } )
 	public void testQuery()
