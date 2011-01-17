@@ -1,10 +1,11 @@
-package genorm.runtime;
+package $package$;
 
 import java.sql.*;
 import javax.sql.DataSource;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
+import genorm.runtime.*;
 
 /**
 	<p>This class is at the heart of handling database connections for all Genormous
@@ -67,6 +68,22 @@ public class GenOrmDataSource
 				return (new LinkedList<GenOrmConnection>());
 				}
 			};
+			
+	/**
+		Gets the default data source
+	*/
+	public static GenOrmDSEnvelope getDataSource()
+		{
+		return (s_dsEnvelope);
+		}
+		
+	/**
+		Gets the data source for the particular key
+	*/
+	public static GenOrmDSEnvelope getDataSource(String key)
+		{
+		return (s_dataSourceMap.get(key));
+		}
 		
 	/**
 		Sets the default data source used to create connections for each thread
@@ -95,7 +112,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(String source)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmConnection(s_dataSourceMap.get(source)));
+		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dataSourceMap.get(source)));
 		}
 		
 	/**
@@ -104,7 +121,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(GenOrmDSEnvelope source)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmConnection(source));
+		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(source));
 		}
 		
 	/**
@@ -113,7 +130,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(Connection con)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmConnection(s_dsEnvelope, con));
+		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dsEnvelope, con));
 		}
 
 	/**
@@ -122,7 +139,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin()
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmConnection(s_dsEnvelope));
+		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dsEnvelope));
 		}
 
 	/**
@@ -163,7 +180,12 @@ public class GenOrmDataSource
 	*/
 	public static GenOrmConnection getGenOrmConnection()
 		{
-		return (s_tlConnectionList.get().peek());
+		GenOrmConnection goCon = s_tlConnectionList.get().peek();
+		
+		if (goCon == null)
+			goCon = new GenOrmDudConnection(s_dsEnvelope);
+			
+		return (goCon);
 		}
 		
 	/**
@@ -206,10 +228,7 @@ public class GenOrmDataSource
 			throws SQLException
 		{
 		GenOrmConnection genCon = getGenOrmConnection();
-		if (genCon != null)
-			return (genCon.getConnection().createStatement());
-		else
-			throw new SQLException("Transaction has not been started");
+		return (genCon.createStatement());
 		}
 		
 	/**
@@ -221,11 +240,8 @@ public class GenOrmDataSource
 	public static PreparedStatement prepareStatement(String sql)
 			throws SQLException
 		{
-		GenOrmConnection goc = s_tlConnectionList.get().peek();
-		if (goc != null)
-			return (goc.getConnection().prepareStatement(sql));
-		else
-			throw new SQLException("Transaction has not been started");
+		GenOrmConnection goc = getGenOrmConnection();
+		return (goc.prepareStatement(sql));
 		}
 	
 	/**

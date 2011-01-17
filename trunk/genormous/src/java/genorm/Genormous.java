@@ -607,6 +607,9 @@ public class Genormous extends GenUtil
 			writeTemplate("DSEnvelope.java", attributes);
 			writeTemplate("GenOrmUnitTest.java", attributes);
 			
+			conditionalWriteTemplate("GenOrmDataSource.java", attributes);
+			
+			
 			/* writeTemplate("GenOrmKeyGenerator.java", attributes);
 			writeTemplate("GenOrmConnection.java", attributes);
 			writeTemplate("GenOrmDataSource.java", attributes);
