@@ -80,8 +80,13 @@ public class Query
 		
 		m_sqlQuery = queryRoot.elementTextTrim("sql");
 		m_comment = queryRoot.elementTextTrim(COMMENT);
+		
+		//Option to not parse sql
+		boolean parse = queryRoot.element("sql").attributeValue("parse", "yes").equals("yes");
+		//The rest of this is just to sanity check the query to make sure 
+		//the parameters match up with the query
 		Matcher m = selectPattern.matcher(m_sqlQuery);
-		if (m.matches())
+		if (parse && m.matches())
 			{
 			String select = m.group(1).trim();
 			

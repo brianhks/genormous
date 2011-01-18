@@ -1,0 +1,120 @@
+<queries>
+	<configuration>
+		<option name="genorm.package" value="test"/>
+		<option name="genorm.destination" value="build/unittest/test"/>
+
+		<typeMap>
+			<type custome="integer" java="int"/>
+			<type custome="string" java="String"/>
+			<type custome="timestamp" java="java.sql.Timestamp"/>
+			<type custome="UUID" java="String"/>
+			<type custome="boolean" java="boolean"/>
+			<type custome="date" java="java.sql.Date"/>
+			<type custome="binary" java="byte[]"/>
+			<type custome="version" java="double"/>
+			<type custome="money" java="java.math.BigDecimal"/>
+		</typeMap>
+		
+	</configuration>
+
+	<query name="team_summary">
+		<comment>Returns a summary of all teams in the given community</comment>
+		<input>
+			<param name="community" type="String" test="ABCDEFGH"/>
+		</input>
+		<replace>
+			<param name="order_by" type="String" tag="order_by" test="t.team_id"/>
+			<param name="offset" type="String" tag="offset" test=""/>
+			<param name="limit" type="String" tag="limit" test=""/>
+		</replace>
+		<return>
+			<param name="team_id" type="int"/>
+			<param name="name" type="String"/>
+			<param name="description" type="String"/>
+			<param name="avatar_id" type="int"/>
+			<param name="members" type="int"/>
+			<param name="owner" type="int"/>
+			<param name="points" type="int"/>
+			<param name="owner_name" type="String"/>
+			<param name="owner_email" type="String"/>
+		</return>
+		<sql parse="no">
+            SELECT
+                t.team_id,
+                t.name,
+                t.description,
+                t.avatar_id,
+                (SELECT count(ta.team_id) FROM team_assignment ta WHERE ta.team_id = t.team_id) AS members,
+                t.owner,
+                (
+                    SELECT sum(cp.points)
+                    FROM client_points cp
+                    INNER JOIN team_assignment ta
+                        ON ta.client_id = cp.client_id
+                    WHERE cp.community = t.community
+                    AND ta.team_id = t.team_id
+                ) as points,
+                c.name as owner_name,
+                c.email as owner_email
+            FROM teams t
+            LEFT JOIN client c
+                ON t.owner = c.client_id
+            WHERE t.community = ?
+            order by %order_by%
+            %offset% %limit%
+        </sql>
+    </query>
+
+    <query name="client_team_summary">
+        <comment>Returns a summary of a client's teams in the given community</comment>
+        <input>
+            <param name="client_id" type="int" test="1"/>
+            <param name="community" type="String" test="ABCDEFGH"/>
+        </input>
+        <replace>
+            <param name="order_by" type="String" tag="order_by" test="t.team_id"/>
+            <param name="offset" type="String" tag="offset" test=""/>
+            <param name="limit" type="String" tag="limit" test=""/>
+        </replace>
+        <return>
+            <param name="team_id" type="int"/>
+            <param name="name" type="String"/>
+            <param name="description" type="String"/>
+            <param name="avatar_id" type="int"/>
+            <param name="members" type="int"/>
+            <param name="owner" type="int"/>
+            <param name="points" type="int"/>
+            <param name="owner_name" type="String"/>
+            <param name="owner_email" type="String"/>
+        </return>
+        <sql parse="no">
+            SELECT
+                t.team_id,
+                t.name,
+                t.description,
+                t.avatar_id,
+                (SELECT count(ta.team_id) FROM team_assignment ta WHERE ta.team_id = t.team_id) AS members,
+                t.owner,
+                (
+                    SELECT sum(cp.points)
+                    FROM client_points cp
+                    INNER JOIN team_assignment ta
+                        ON ta.client_id = cp.client_id
+                    WHERE cp.community = t.community
+                    AND ta.team_id = t.team_id
+                ) as points,
+                c.name as owner_name,
+                c.email as owner_email
+            FROM teams t
+            INNER JOIN client c
+                ON t.owner = c.client_id
+            INNER JOIN team_assignment ta
+                ON t.team_id = ta.team_id
+            WHERE ta.client_id = ?
+            AND t.community = ?
+            order by %order_by%
+            %offset% %limit%
+        </sql>
+    </query>
+    
+</queries>
