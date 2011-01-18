@@ -1,6 +1,7 @@
 import genorm.runtime.*;
 import org.depunit.annotations.*;
 import java.util.*;
+import genorm.QueryGen;
 
 import static org.junit.Assert.*;
 
@@ -26,4 +27,11 @@ public class SQLQueryTest extends SQLQuery
 		
 	public String getQueryName() { return (""); }
 	public String getQuery() { return (""); }
+	
+	@Test
+	public void testSelectInSelect() throws Exception
+		{
+		QueryGen qg = new QueryGen("test/test_queries_1.xml");
+		qg.generateClasses();
+		}
 	}
