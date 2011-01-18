@@ -161,6 +161,7 @@ depunitDefinition = make.getDefinition("depunit");
 void doUnitTests(Rule rule)
 	{
 	classpath.addPath(testbuilddir);
+	classpath.addPath(".");
 	depunitDefinition.set("classpath", classpath.toString())
 			.set("xmlInput", "test/test.xml")
 			.set("reportFile", "build/report.xml")
