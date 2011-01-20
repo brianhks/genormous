@@ -1,6 +1,7 @@
 ===Main Menu===
 ==Documentation==
   * Getting Started
+  * [Compatibility Database Compatibility]
   * Configuration
   * API JavaDoc
     * 1.3.1
