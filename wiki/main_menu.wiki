@@ -1,6 +1,6 @@
 ===Main Menu===
 ===Documentation===
-  * Getting Started
+  * [GettingStarted Getting Started]
   * [Compatibility Database Compatibility]
   * Configuration
   * API !JavaDoc
