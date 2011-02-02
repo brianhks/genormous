@@ -103,7 +103,7 @@ $if(query.hasParameters)$
 			java.sql.PreparedStatement genorm_statement;
 			
 			genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
-			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+			$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
 			
 			int ret = genorm_statement.executeUpdate();
