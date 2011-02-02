@@ -46,6 +46,48 @@ import genorm.runtime.*;
 */
 public class GenOrmDataSource
 	{
+	private static class GenOrmThreadLocal extends ThreadLocal<LinkedList<GenOrmConnection>>
+		{
+		@Override
+		protected synchronized LinkedList<GenOrmConnection> initialValue()
+			{
+			return (new LinkedList<GenOrmConnection>());
+			}
+			
+		/**
+			Adds a connection to the thread
+		*/
+		public void addConnection(GenOrmConnection connection)
+			{
+			get().addFirst(connection);
+			}
+			
+		/**
+			Gets the current connection on the thread or null if none
+		*/
+		public GenOrmConnection getConnection()
+			{
+			GenOrmConnection con = get().peek();
+			return (con);
+			}
+			
+		/**
+			Removes the connection from the thread.
+			If it is the last connection on the stack the thread local data is 
+			removed.
+		*/
+		public GenOrmConnection removeConnection()
+			{
+			GenOrmConnection con = get().remove();
+			
+			//If it is the last connection we are going to clean up the thread local data
+			if (get().size() == 0)
+				remove();
+				
+			return (con);
+			}
+		}
+		
 	/**
 		The default data source to use
 	*/
@@ -60,15 +102,9 @@ public class GenOrmDataSource
 		The linked list acts as a stack for multiple connections on the same thread.
 		Only the top connection is used at a time.
 	*/
-	private static ThreadLocal<LinkedList<GenOrmConnection>> s_tlConnectionList = new ThreadLocal<LinkedList<GenOrmConnection>>()
-			{
-			@Override
-			protected synchronized LinkedList<GenOrmConnection> initialValue()
-				{
-				return (new LinkedList<GenOrmConnection>());
-				}
-			};
-			
+	private static GenOrmThreadLocal s_tlConnectionList = new GenOrmThreadLocal();
+
+	
 	/**
 		Gets the default data source
 	*/
@@ -112,7 +148,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(String source)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dataSourceMap.get(source)));
+		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dataSourceMap.get(source)));
 		}
 		
 	/**
@@ -121,7 +157,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(GenOrmDSEnvelope source)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(source));
+		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(source));
 		}
 		
 	/**
@@ -130,7 +166,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin(Connection con)
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dsEnvelope, con));
+		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dsEnvelope, con));
 		}
 
 	/**
@@ -139,7 +175,7 @@ public class GenOrmDataSource
 	*/
 	public static void begin()
 		{
-		s_tlConnectionList.get().addFirst(new GenOrmTransactionConnection(s_dsEnvelope));
+		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dsEnvelope));
 		}
 
 	/**
@@ -147,7 +183,7 @@ public class GenOrmDataSource
 	*/
 	public static void flush()
 		{
-		s_tlConnectionList.get().peek().flush();
+		s_tlConnectionList.getConnection().flush();
 		}
 		
 	/**
@@ -155,7 +191,7 @@ public class GenOrmDataSource
 	*/
 	public static void commit()
 		{
-		s_tlConnectionList.get().peek().commit();
+		s_tlConnectionList.getConnection().commit();
 		}
 		
 	/**
@@ -163,7 +199,7 @@ public class GenOrmDataSource
 	*/
 	public static void close()
 		{
-		s_tlConnectionList.get().remove().close();
+		s_tlConnectionList.removeConnection().close();
 		}
 		
 	/**
@@ -171,7 +207,7 @@ public class GenOrmDataSource
 	*/
 	public static void rollback()
 		{
-		s_tlConnectionList.get().peek().rollback();
+		s_tlConnectionList.getConnection().rollback();
 		}
 		
 	/**

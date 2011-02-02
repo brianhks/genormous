@@ -44,9 +44,22 @@
 		</sql>
 	</query>
 	
+	<query name="ref_test">
+		<comment>This is a test of reference parameters</comment>
+		<input>
+			<param name="note_id" type="int" test="123"/>
+			<param ref="note_id"/>
+		</input>
+		<return>
+			<param name="note" type="String"/>
+		</return>
+		<sql>
+			select "note" from note where "note_id" = ? and "note_id" = ?
+		</sql>
+	</query>
+	
 	<!-- query with no input -->
 	<query name="language_list">
-		<input></input>
 		<return>
 			<param name="language_id" type="int"/>
 			<param name="code" type="String"/>

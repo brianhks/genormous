@@ -9,12 +9,14 @@ public class Parameter
 	public static final String TYPE = "type";
 	public static final String TAG = "tag";
 	public static final String TEST = "test";
+	public static final String REF = "ref";
 	
 	private String m_name;
 	private String m_type;
 	private String m_tag;
 	private Format m_formatter;
 	private String m_testParam;
+	private boolean m_reference = false;;
 	
 	public Parameter(Element p, Format formatter, Map<String, String> typeMap)
 		{
@@ -29,11 +31,13 @@ public class Parameter
 		m_testParam = p.attributeValue(TEST);
 		}
 		
+	//---------------------------------------------------------------------------
 	public Parameter(String name, String type, Format formatter)
 		{
 		this(name, type, null, formatter);
 		}
 		
+	//---------------------------------------------------------------------------
 	public Parameter(String name, String type, String tag, Format formatter)
 		{
 		m_formatter = formatter;
@@ -41,7 +45,21 @@ public class Parameter
 		m_type = type;
 		m_tag = tag;
 		}
+		
+	//---------------------------------------------------------------------------
+	/*
+		Creates a reference parameter
+	*/
+	public Parameter(Parameter other)
+		{
+		m_formatter = other.m_formatter;
+		m_name = other.m_name;
+		m_type = other.m_type;
+		m_tag = other.m_tag;
+		m_reference = true;
+		}
 	
+	//---------------------------------------------------------------------------
 	public String getName() { return (m_name); }
 	public String getXmlName() { return (m_formatter.formatParameterName(m_name)); }
 	public String getParameterName() { return (m_formatter.formatParameterName(m_name)); }
@@ -49,6 +67,7 @@ public class Parameter
 	public String getType() { return (m_type); }
 	public String getTag() { return (m_tag); }
 	public boolean isBooleanType() { return (m_type.equals("boolean")); }
+	public boolean isReference() { return (m_reference); }
 	public String getTestParam() 
 		{
 		if (m_type.equals("String"))

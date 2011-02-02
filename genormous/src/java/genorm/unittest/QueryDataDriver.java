@@ -67,22 +67,29 @@ public class QueryDataDriver extends DataDriver
 				
 					
 				//Get the input params
-				Iterator inputs = e.element("input").elementIterator("param");
-				context = baseContext+"/input/param";
 				ArrayList<Object> inputList = new ArrayList<Object>();
-				while (inputs.hasNext())
+				
+				Element inputElement = e.element("input");
+				if (inputElement != null)
 					{
-					Element p = (Element)inputs.next();
-					String type = p.attributeValue("type");
-					String test = p.attributeValue("test");
-					if (test == null)
-						throw new IllegalArgumentException("No test attribute for "+context+"[@"+p.attributeValue("name")+"]");
-					if (type.equals("int"))
-						inputList.add(new Integer(test));
-					else if (type.equals("String"))
-						inputList.add(test);
-					else if (type.equals("java.sql.Timestamp"))
-						inputList.add(java.sql.Timestamp.valueOf(test));
+					Iterator inputs = inputElement.elementIterator("param");
+					context = baseContext+"/input/param";
+					while (inputs.hasNext())
+						{
+						Element p = (Element)inputs.next();
+						if (p.attributeValue("ref") != null)
+							continue;
+						String type = p.attributeValue("type");
+						String test = p.attributeValue("test");
+						if (test == null)
+							throw new IllegalArgumentException("No test attribute for "+context+"[@"+p.attributeValue("name")+"]");
+						if (type.equals("int"))
+							inputList.add(new Integer(test));
+						else if (type.equals("String"))
+							inputList.add(test);
+						else if (type.equals("java.sql.Timestamp"))
+							inputList.add(java.sql.Timestamp.valueOf(test));
+						}
 					}
 					
 				queryData.put(INPUT_PARAMS, inputList);
