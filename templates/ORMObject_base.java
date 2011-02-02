@@ -23,6 +23,10 @@ public $table.className$ set$col.methodName$($col.type$ data)
 	}
 	
 $if(col.allowNull)$
+public boolean is$col.methodName$Null()
+	{
+	return (m_$col.parameterName$.isNull());
+	}
 public $table.className$ set$col.methodName$Null()
 	{
 	m_$col.parameterName$.setNull();
@@ -171,6 +175,8 @@ public class $table.className$_base extends GenOrmRecord
 	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $fieldEscape$$key.name$$fieldEscape$ = ?}; separator=" AND "$";
 	
 	private static final String TABLE_NAME = "$table.name$";
+	
+	private static final String s_fieldEscapeString = "$fieldEscape$"; 
 	
 	$columns:declarMetaFields()$
 	
@@ -739,6 +745,14 @@ m_foreignKeys.add(foreignKey);
 		{
 		return (GenOrmDataSource.getGenOrmConnection());
 		}
+		
+	//---------------------------------------------------------------------------
+	@Override
+	public String getFieldEscapeString()
+		{
+		return (s_fieldEscapeString);
+		}
+		
 	//---------------------------------------------------------------------------
 	@Override
 	public void setMTS()

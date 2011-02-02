@@ -1,4 +1,4 @@
-<!ELEMENT tables (configuration?,global?,table+,query*)>
+<!ELEMENT tables (configuration?,global?,table+,view*,query*)>
 <!ELEMENT configuration (option*,type_map?,plugin*)>
 
 <!ELEMENT option EMPTY>
@@ -70,9 +70,26 @@
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
 	test CDATA #IMPLIED
+	ref CDATA #IMPLIED <!-- Makes the parameter reference another param -->
+	position CDATA #IMPLIED <!-- Used for procedure -->
 	>
 	
 <!ELEMENT sql (#PCDATA)>
+<!ATTLIST sql
+	parse (yes|no) "yes"
+	>
+
+
+<!ELEMENT view (comment?,view_col+,sql)>
+<!ATTLIST view 
+	name CDATA #REQUIRED
+	>
+	
+<!ELEMENT view_col (comment?,reference?)>
+<!ATTLIST view_col
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	>
 
 <!ELEMENT query (comment?,input?,replace?,return?,sql)>
 <!ATTLIST query
@@ -83,5 +100,10 @@
 <!ELEMENT unique (colref+)>
 <!ELEMENT colref EMPTY>
 <!ATTLIST colref
+	name CDATA #REQUIRED
+	>
+	
+<!ELEMENT procedure (comment?,input?,return?,sql)>
+<!ATTLIST procedure
 	name CDATA #REQUIRED
 	>

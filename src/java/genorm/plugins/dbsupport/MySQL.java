@@ -21,6 +21,7 @@ public class MySQL implements CreatePlugin
 		
 	public String getFieldEscapeString() { return ("`"); }
 	
+	//---------------------------------------------------------------------------
 	public String getCreateSQL(Table table)
 		{
 		String sql = "";
@@ -44,6 +45,7 @@ public class MySQL implements CreatePlugin
 		return (sql);
 		}
 		
+	//---------------------------------------------------------------------------
 	public String getConstraintSQL(ForeignKeySet keySet)
 		{
 		String sql = "";
