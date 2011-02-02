@@ -23,6 +23,7 @@ gendir = bldoutdir+"/gen";
 gensrcdir = gendir+"/src";
 genbuilddir = gendir+"/build";
 gentestdir = gensrcdir+"/test";
+javadocGenSrcDir = bldoutdir+"/javadocgen";
 srcdir = "src/java";
 targetjar = jaroutdir+"/genormous-"+version+".jar";
 extdir = "lib";
@@ -64,6 +65,7 @@ new DirectoryRule(distdir);
 new DirectoryRule(gentestdir);
 new DirectoryRule(genbuilddir);
 new DirectoryRule(gensrcdir);
+new DirectoryRule(javadocGenSrcDir);
 
 //-------------------------------------------------------------------
 //==-- CREATE JAR FILE --==
@@ -90,10 +92,22 @@ jf.addFiles("etc", "."); */
 
 //-------------------------------------------------------------------
 //==-- CREATE JAVADOCS --==
-new SimpleRule("javadoc").setMakeAction("javadoc").setDescription("Create javadocs");
+genJavaDocRule = new SimpleRule().setMakeAction("genJavaDoc")
+		.addDepend(jf)
+		.addDepend(javadocGenSrcDir);
+void genJavaDoc(Rule rule)
+	{
+	print("Generating GenORM source");
+	//make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
+	make.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -s test/javadoctables.xml");
+	}
+
+new SimpleRule("javadoc").setMakeAction("javadoc").setDescription("Create javadocs")
+		.addDepend(genJavaDocRule);
 void javadoc(Rule rule)
 	{
-	cmd = "javadoc -public -d doc/javadoc -sourcepath "+srcdir+" -subpackages genorm.runtime";
+	cmd = "javadoc -public -d doc/javadoc -sourcepath "+srcdir+":"+javadocGenSrcDir+
+			" -subpackages genorm.runtime:test";
 	make.exec(cmd);
 	//make.exec(srcdir, "javadoc -public -d ../doc "+make.arrayToString(sourceFiles), true);
 	}

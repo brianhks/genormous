@@ -510,6 +510,7 @@ public class Genormous extends GenUtil
 					
 				attributes.put("constraints", constraints);
 				attributes.put("fieldEscape", createPlugin.getFieldEscapeString());
+				attributes.put("createPlugin", createPlugin.getClass().getName());
 					
 				baseTemplate.setAttributes(attributes);
 				

@@ -67,9 +67,15 @@ public abstract class GenOrmRecord
 	
 	
 	/**
-		
+		This returns the GenOrmConnection object that is specific to the generated
+		code.
 	*/
 	public abstract GenOrmConnection getGenOrmConnection();
+	
+	/**
+		Returns the plugin used to create the SQL for this set of generated objects.
+	*/
+	public abstract String getFieldEscapeString();
 	
 	//---------------------------------------------------------------------------
 	protected boolean isEmptyReference(String s) { return (s == null); }
@@ -189,9 +195,9 @@ public abstract class GenOrmRecord
 					}
 					
 				first = false;
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				sb.append(meta.getFieldName());
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				m_queryFields.add(gof);
 				valuesSB.append("?");
 				}
@@ -222,9 +228,9 @@ public abstract class GenOrmRecord
 					sb.append(" ");
 					
 				first = false;
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				sb.append(meta.getFieldName());
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				sb.append(" = ");
 				sb.append("?");
 				m_queryFields.add(gof);
@@ -255,9 +261,9 @@ public abstract class GenOrmRecord
 					sb.append(" ");
 					
 				first = false;
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				sb.append(meta.getFieldName());
-				sb.append("\"");
+				sb.append(getFieldEscapeString());
 				sb.append(" = ");
 				sb.append("?");
 				m_queryFields.add(gof);

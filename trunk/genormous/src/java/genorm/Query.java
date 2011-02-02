@@ -24,6 +24,7 @@ public class Query
 	private Format m_formatter;
 	private String m_queryName;
 	private ArrayList<Parameter> m_inputs;
+	private ArrayList<Parameter> m_queryInputs;
 	private ArrayList<Parameter> m_replacements;
 	private ArrayList<Parameter> m_outputs;
 	private String m_sqlQuery;
@@ -39,6 +40,7 @@ public class Query
 		m_formatter = formatter;
 		m_queryName = name;
 		m_inputs = params;
+		m_queryInputs = params;
 		m_replacements = new ArrayList<Parameter>();
 		m_outputs = new ArrayList<Parameter>();
 		m_sqlQuery = sql;
@@ -48,13 +50,16 @@ public class Query
 		}
 	
 	public Query(Element queryRoot, Format formatter)
+			throws QueryConfigException
 		{
 		this(queryRoot, formatter, null);
 		}
 	
 	public Query(Element queryRoot, Format formatter, Map<String, String> typeMap)
+			throws QueryConfigException
 		{
 		m_skipTest = false;
+		m_inputs = new ArrayList<Parameter>();
 		m_comment = "";
 		m_typeMap = typeMap;
 		m_formatter = formatter;
@@ -70,68 +75,81 @@ public class Query
 		m_resultTypeSingle = RESULT_SINGLE.equals(resultType);
 		m_resultTypeMulti = RESULT_MULTI.equals(resultType);
 		
-		m_inputs = getParameters(queryRoot.element(INPUT));
-		m_replacements = getParameters(queryRoot.element(REPLACE));
-		m_outputs = getParameters(queryRoot.element(RETURN));
-		
-		//Validate the outputs with what is in the select
-		Pattern selectPattern = Pattern.compile("select(.+?)from.*", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-		Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
-		
-		m_sqlQuery = queryRoot.elementTextTrim("sql");
-		m_comment = queryRoot.elementTextTrim(COMMENT);
-		
-		//Option to not parse sql
-		boolean parse = queryRoot.element("sql").attributeValue("parse", "yes").equals("yes");
-		//The rest of this is just to sanity check the query to make sure 
-		//the parameters match up with the query
-		Matcher m = selectPattern.matcher(m_sqlQuery);
-		if (parse && m.matches())
+		try
 			{
-			String select = m.group(1).trim();
-			
-			String split[] = splitSelect(select);
-			
-			// Check split length with m_outputs length to make sure they match
-			if (split.length != m_outputs.size())
+			m_queryInputs = getParameters(queryRoot.element(INPUT));
+			for (Parameter p : m_queryInputs)
 				{
-				System.out.println("Warning, in query \""+m_queryName+"\" output parameter count does not match the select statement");
-				
-				System.out.println("Select parameters:");
-				for (int I = 0; I < split.length; I++)
-					System.out.println("  "+split[I].trim());
-					
-				System.out.println("Declared parameters:");
-				for (Parameter par : m_outputs)
-					System.out.println("  "+par.getName());
+				if (!p.isReference())
+					m_inputs.add(p);
 				}
-			else
+			m_replacements = getParameters(queryRoot.element(REPLACE));
+			m_outputs = getParameters(queryRoot.element(RETURN));
+			
+			//Validate the outputs with what is in the select
+			Pattern selectPattern = Pattern.compile("select(.+?)from.*", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+			Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
+			
+			m_sqlQuery = queryRoot.elementTextTrim("sql");
+			m_comment = queryRoot.elementTextTrim(COMMENT);
+			
+			//Option to not parse sql
+			boolean parse = queryRoot.element("sql").attributeValue("parse", "yes").equals("yes");
+			//The rest of this is just to sanity check the query to make sure 
+			//the parameters match up with the query
+			Matcher m = selectPattern.matcher(m_sqlQuery);
+			if (parse && m.matches())
 				{
-				for (int I = 0; I < split.length; I++)
+				String select = m.group(1).trim();
+				
+				String split[] = splitSelect(select);
+				
+				// Check split length with m_outputs length to make sure they match
+				if (split.length != m_outputs.size())
 					{
-					String param = split[I];
-					m = paramPattern.matcher(param.trim());
-					if (m.matches())
-						{
-						int group;
-						for (group = 1; group <= 3; group++)
-							if (m.group(group) != null)
-								break;
+					System.out.println("Warning, in query \""+m_queryName+"\" output parameter count does not match the select statement");
+					
+					System.out.println("Select parameters:");
+					for (int I = 0; I < split.length; I++)
+						System.out.println("  "+split[I].trim());
 						
-						String paramName = m_outputs.get(I).getName();
-						String selectParam = m.group(group);
-						if ((selectParam.startsWith("\"") && selectParam.endsWith("\"")))
-							selectParam = selectParam.substring(1, selectParam.length() -1);
-							
-						if (!paramName.equals(selectParam))
+					System.out.println("Declared parameters:");
+					for (Parameter par : m_outputs)
+						System.out.println("  "+par.getName());
+					}
+				else
+					{
+					for (int I = 0; I < split.length; I++)
+						{
+						String param = split[I];
+						m = paramPattern.matcher(param.trim());
+						if (m.matches())
 							{
-							System.out.println("Query "+m_queryName+": Param "+paramName+" does not match select statement "+selectParam);
+							int group;
+							for (group = 1; group <= 3; group++)
+								if (m.group(group) != null)
+									break;
+							
+							String paramName = m_outputs.get(I).getName();
+							String selectParam = m.group(group);
+							if ((selectParam.startsWith("\"") && selectParam.endsWith("\"")))
+								selectParam = selectParam.substring(1, selectParam.length() -1);
+								
+							if (!paramName.equals(selectParam))
+								{
+								System.out.println("Query "+m_queryName+": Param "+paramName+" does not match select statement "+selectParam);
+								}
 							}
+						else
+							System.out.println("Query "+m_queryName+": Select param \""+param+"\" does not match regular expression");
 						}
-					else
-						System.out.println("Query "+m_queryName+": Select param \""+param+"\" does not match regular expression");
 					}
 				}
+			}
+		catch (QueryConfigException qce)
+			{
+			qce.setQuery(m_queryName);
+			throw qce;
 			}
 		}
 		
@@ -213,16 +231,34 @@ public class Query
 		}
 		
 		
+	//---------------------------------------------------------------------------
 	private ArrayList<Parameter> getParameters(Element e)
+			throws QueryConfigException
 		{
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
 		if (e != null)
 			{
+			Map<String, Parameter> paramMap = new HashMap<String, Parameter>();
 			Iterator it = e.elementIterator(PARAM);
 			while (it.hasNext())
 				{
 				Element p = (Element)it.next();
-				params.add(new Parameter(p, m_formatter, m_typeMap));
+				Parameter param;
+				if (p.attributeValue(Parameter.REF) != null)
+					{
+					String refName = p.attributeValue(Parameter.REF);
+					if (paramMap.get(refName) != null)
+						param = new Parameter(paramMap.get(refName));
+					else
+						throw new QueryConfigException(refName, "A reference must reference a parameter previously declared");
+					}
+				else
+					{
+					param = new Parameter(p, m_formatter, m_typeMap);
+					paramMap.put(param.getName(), param);
+					}
+					
+				params.add(param);
 				/* String type = p.attributeValue(TYPE);
 				if (m_typeMap != null)
 					type = (String)m_typeMap.get(type);
@@ -240,6 +276,7 @@ public class Query
 		
 	public String getQueryName() { return (m_queryName); }
 	public ArrayList<Parameter> getInputs() { return (m_inputs); }
+	public ArrayList<Parameter> getQueryInputs() { return (m_queryInputs); }
 	public ArrayList<Parameter> getReplacements() { return (m_replacements); }
 	public ArrayList<Parameter> getOutputs() { return (m_outputs); }
 	public boolean isHasParameters() { return (m_inputs.size() + m_replacements.size() > 0); }
@@ -271,7 +308,7 @@ public class Query
 		{
 		Query other = (Query)obj;
 		
-		return (other.m_queryName.equals(m_queryName) && other.m_inputs.equals(m_inputs) &&
+		return (other.m_queryName.equals(m_queryName) && other.m_queryInputs.equals(m_queryInputs) &&
 				other.m_replacements.equals(m_replacements));
 		}
 	}
