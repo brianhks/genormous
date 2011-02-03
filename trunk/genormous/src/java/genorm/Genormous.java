@@ -400,9 +400,9 @@ public class Genormous extends GenUtil
 						{
 						if (!first)
 							sqlQuery.append(" AND ");
-						sqlQuery.append("this.\"");
+						sqlQuery.append("this.").append(createPlugin.getFieldEscapeString());
 						sqlQuery.append(c.getName());
-						sqlQuery.append("\" = ?");
+						sqlQuery.append(createPlugin.getFieldEscapeString()).append(" = ?");
 						first = false;
 						
 						params.add(new Parameter(c.getName(), c.getType(), formatter));
