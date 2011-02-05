@@ -70,8 +70,8 @@
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
 	test CDATA #IMPLIED
-	ref CDATA #IMPLIED <!-- Makes the parameter reference another param -->
-	position CDATA #IMPLIED <!-- Used for procedure -->
+	ref CDATA #IMPLIED 
+	position CDATA #IMPLIED
 	>
 	
 <!ELEMENT sql (#PCDATA)>
