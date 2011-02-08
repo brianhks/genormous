@@ -1,13 +1,14 @@
 package genorm.runtime;
 
 import java.util.*;
+import java.io.Serializable;
 
 /**
 	The Key is used to identify the uniqueness of this particular record.
 	The Key is made up of the table name and a list of primary keys for the 
 	record.
 */
-public class GenOrmRecordKey
+public class GenOrmRecordKey implements Serializable
 	{
 	private String m_tableName;
 	private Map<String, GenOrmField> m_keyFields;
