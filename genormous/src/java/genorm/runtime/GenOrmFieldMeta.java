@@ -1,7 +1,8 @@
 package genorm.runtime;
 
+import java.io.Serializable;
 
-public class GenOrmFieldMeta
+public class GenOrmFieldMeta implements Serializable
 	{
 	private String m_fieldName;
 	private String m_fieldType;

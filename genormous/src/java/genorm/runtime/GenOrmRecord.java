@@ -2,8 +2,9 @@ package genorm.runtime;
 
 import java.util.*;
 import java.sql.*;
+import java.io.Serializable;
 
-public abstract class GenOrmRecord
+public abstract class GenOrmRecord implements Serializable
 	{
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
 	protected boolean                  m_isNewRecord;   //Identifies if this is a new record
@@ -11,7 +12,7 @@ public abstract class GenOrmRecord
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
 	protected boolean                  m_isIgnored;     //This record should not be committed in this transaction
 	protected GenOrmRecordKey          m_recordKey;
-	protected Logger                   m_logger;
+	protected transient Logger         m_logger;
 	
 	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
 	
@@ -46,6 +47,35 @@ public abstract class GenOrmRecord
 	public Iterator<GenOrmField> getFieldIterator()
 		{
 		return (m_fields.iterator());
+		}
+		
+	/**
+		Returns a read only list of the fields that are associated with this record.
+	*/
+	public List<GenOrmField> getFields()
+		{
+		return (Collections.unmodifiableList(m_fields));
+		}
+		
+	//---------------------------------------------------------------------------
+	/**
+		Returns all fields that have been modified
+	*/
+	public List<GenOrmField> getDirtyFields()
+		{
+		List<GenOrmField> ret = new ArrayList<GenOrmField>();
+		Iterator<GenOrmField> it = m_fields.iterator();
+		while (it.hasNext())
+			{
+			GenOrmField gof = it.next();
+			GenOrmFieldMeta meta = gof.getFieldMeta();
+			if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
+				{
+				ret.add(gof);
+				}
+			}
+			
+		return (ret);
 		}
 		
 	/**
@@ -294,7 +324,7 @@ public abstract class GenOrmRecord
 			throws SQLException
 		{
 		boolean ret = false;
-		if (m_logger.isDebug())
+		if (m_logger != null && m_logger.isDebug())
 			{
 			m_logger.debug("SQL Query: "+statement);
 			}
@@ -303,7 +333,7 @@ public abstract class GenOrmRecord
 		
 		for (int I = 0; I < m_queryFields.size(); I++)
 			{
-			if (m_logger.isDebug())
+			if (m_logger != null && m_logger.isDebug())
 				{
 				GenOrmField field = m_queryFields.get(I);
 				m_logger.debug(field.getFieldMeta().getFieldName()+" : "+field.toString());
@@ -369,15 +399,22 @@ public abstract class GenOrmRecord
 		and false if it wasn't.
 	*/
 	public boolean flush()
-			throws SQLException
 		{
 		boolean ret = false;
-		GenOrmConnection con = getGenOrmConnection();
-		//System.out.println("Flushing record for "+m_tableName+" "+toString());
-		createIfNew(con);
-		ret = commitChanges();
-		m_dirtyFlags = 0;
-		m_isNewRecord = false;
+	
+		try
+			{
+			GenOrmConnection con = getGenOrmConnection();
+			//System.out.println("Flushing record for "+m_tableName+" "+toString());
+			createIfNew(con);
+			ret = commitChanges();
+			m_dirtyFlags = 0;
+			m_isNewRecord = false;
+			}
+		catch (SQLException sqle)
+			{
+			throw new GenOrmException(sqle);
+			}
 		
 		return (ret);
 		}

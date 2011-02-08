@@ -27,14 +27,18 @@ public boolean is$col.methodName$Null()
 	{
 	return (m_$col.parameterName$.isNull());
 	}
+	
 public $table.className$ set$col.methodName$Null()
 	{
-	m_$col.parameterName$.setNull();
+	boolean changed = m_$col.parameterName$.setNull();
 	
-	if (m_dirtyFlags == 0)
-		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
-		
-	m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+	if (changed)
+		{
+		if (m_dirtyFlags == 0)
+			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
+			
+		m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+		}
 	
 	return (($table.className$)this);
 	}
@@ -405,14 +409,7 @@ public class $table.className$_base extends GenOrmRecord
 				{
 				rec = ($table.className$)con.getUniqueRecord(rec);  //This adds the record to the cache
 				rec.delete();
-				try
-					{
-					ret = rec.flush();
-					}
-				catch (java.sql.SQLException sqle)
-					{
-					throw new GenOrmException(sqle);
-					}
+				ret = rec.flush();
 				rec.setIgnored(true); //So the system does not try to delete it again at commmit
 				}
 				

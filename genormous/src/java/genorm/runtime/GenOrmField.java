@@ -2,8 +2,9 @@ package genorm.runtime;
 
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.io.Serializable;
 
-public abstract class GenOrmField
+public abstract class GenOrmField implements Serializable
 	{
 	protected GenOrmFieldMeta m_fieldMeta;
 	protected boolean m_isNull;
@@ -18,9 +19,15 @@ public abstract class GenOrmField
 		
 	public GenOrmFieldMeta getFieldMeta() { return (m_fieldMeta); }
 	
-	public void setNull()
+	public boolean setNull()
 		{
-		m_isNull = true;
+		if (!m_isNull)
+			{
+			m_isNull = true;
+			return (true);
+			}
+		else
+			return (false);
 		}
 		
 	public boolean isNull() { return (m_isNull); }
