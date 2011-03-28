@@ -95,7 +95,7 @@ public class Column implements Cloneable
 	public String getType() { return (m_type); }
 	public String getCustomType() { return (m_customType); }
 	public String getSQLType() { return (m_sqlType); }
-	public String getDirtyFlag() { return ("0x"+Integer.toHexString(m_dirtyFlag)); }
+	public int getDirtyFlag() { return (m_dirtyFlag); }
 	public boolean isPrimaryKey() { return (m_primaryKey); }
 	public boolean isForeignKey() { return (m_foreignKey); }
 	public boolean isKey() { return (m_primaryKey || m_foreignKey); }

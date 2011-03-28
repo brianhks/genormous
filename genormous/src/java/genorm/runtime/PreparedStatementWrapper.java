@@ -20,7 +20,7 @@ import java.sql.ParameterMetaData;
 public class PreparedStatementWrapper extends StatementWrapper
 		implements PreparedStatement
 	{
-	PreparedStatement m_statement;
+	protected PreparedStatement m_statement;
 	
 	public PreparedStatementWrapper(PreparedStatement statement)
 		{

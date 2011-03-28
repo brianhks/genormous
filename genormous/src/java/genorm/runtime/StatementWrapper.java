@@ -10,7 +10,7 @@ import java.sql.Connection;
 
 public class StatementWrapper implements Statement
 	{
-	private Statement m_statement;
+	protected Statement m_statement;
 	
 	public StatementWrapper(Statement statement)
 		{

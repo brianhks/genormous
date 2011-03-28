@@ -34,10 +34,19 @@ public abstract class GenOrmField implements Serializable
 	
 	public abstract void setValue(ResultSet rs, int pos) throws java.sql.SQLException;
 	public abstract void placeValue(PreparedStatement ps, int pos) throws java.sql.SQLException;
+	public abstract void placePrevValue(PreparedStatement ps, int pos) throws java.sql.SQLException;
 	//public abstract String getSQLValue();
 	public abstract int hashCode();
 	public abstract boolean equals(Object obj);
+	
+	public abstract Object getPrevValue();
+	
+	/**
+		Returns the value of the field as a string
+	*/
 	public abstract String toString();
+	
+	public abstract String getPrevValueAsString();
 	
 	public void setRecordKey(GenOrmRecordKey recordKey) { m_recordKey = recordKey; }
 	public GenOrmRecordKey getRecordKey() { return (m_recordKey); }

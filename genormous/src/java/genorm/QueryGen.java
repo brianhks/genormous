@@ -12,10 +12,10 @@ import static java.lang.System.out;
 
 public class QueryGen extends GenUtil
 	{
-	public static final String DESTINATION = "genorm.querygen.destination";
+	/* public static final String DESTINATION = "genorm.querygen.destination";
 	public static final String PACKAGE = "genorm.querygen.package";
 	public static final String FORMATTER = "genomr.querygen.formatter";
-	public static final String TYPE_MAP = "genorm.querygen.typeMap";
+	public static final String TYPE_MAP = "genorm.querygen.typeMap"; */
 	
 	//private Format formatter;
 	//private String m_packageName;
@@ -248,6 +248,7 @@ public class QueryGen extends GenUtil
 				
 				attributes.put("package", packageName);
 				attributes.put("query", q);
+				attributes.put("dsPackage", m_config.getProperty(PROP_DATASOURCE_PACKAGE, packageName)+".");
 				
 				//StringBuilder pluginIncludes = new StringBuilder();
 				StringBuilder pluginQueryBodies = new StringBuilder();

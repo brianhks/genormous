@@ -3,75 +3,43 @@ package genorm.runtime;
 import java.sql.ResultSet;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Types;
 
-public class GenOrmDate extends GenOrmField
+public class GenOrmDate extends GenOrmFieldTemplate<Date>
 	{
-	private Date m_value;
-	
 	public GenOrmDate(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
 		}
 		
-	public boolean setValue(Date value)
-		{
-		if (((m_value == null) && (value != null)) || 
-				((m_value != null) && (!m_value.equals(value))))
-			{
-			m_value = value;
-			if (m_value == null)
-				setNull();
-			else
-				m_isNull = false;
-			return (true);
-			}
-		else
-			return (false);
-		}
-		
-	public Date getValue()
-		{
-		return (m_value);
-		}
-		
+	//---------------------------------------------------------------------------
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
 		m_value = rs.getDate(pos);
 		m_isNull = rs.wasNull();
+		if (!m_isNull)
+			m_prevValue = m_value;
 		}
 		
+	//---------------------------------------------------------------------------
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setDate(pos, m_value);
-		}
-		
-	public String getSQLValue()
-		{
-		return (String.valueOf(m_value));
-		}
-		
-	public int hashCode()
-		{
-		if (m_value == null)
-			return (0);
+		if (m_isNull)
+			ps.setNull(pos, Types.DATE);
 		else
-			return (m_value.hashCode());
+			ps.setDate(pos, m_value);
 		}
 		
-	public boolean equals(Object obj)
+	//---------------------------------------------------------------------------
+	public void placePrevValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
 		{
-		if (!(obj instanceof GenOrmDate))
-			return (false);
-			
-		GenOrmDate other = (GenOrmDate)obj;
-		return (m_value.equals(other.m_value));
+		if (m_prevValue == null)
+			ps.setNull(pos, Types.DATE);
+		else
+			ps.setDate(pos, m_prevValue);
 		}
 		
-	public String toString()
-		{
-		return (String.valueOf(m_value));
-		}
 	}

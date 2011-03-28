@@ -146,38 +146,58 @@ public class GenOrmDataSource
 		data source with the <code>source</code> parameter.
 		@param source Key used to lookup the data source to use to create the connection.
 	*/
-	public static void begin(String source)
+	public static void attachAndBegin(String source)
 		{
-		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dataSourceMap.get(source)));
+		attach(s_dataSourceMap.get(source)).begin();
 		}
 		
+	//---------------------------------------------------------------------------
 	/**
 		Begin a transaction using the data source passed into the method
 		@param source Data source used to create a connection.
 	*/
-	public static void begin(GenOrmDSEnvelope source)
+	public static void attachAndBegin(GenOrmDSEnvelope source)
 		{
-		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(source));
+		attach(source).begin();
 		}
 		
+	//---------------------------------------------------------------------------
 	/**
 		Begin a transaction using the Connection passed in.
 		@param con Connection to use
 	*/
-	public static void begin(Connection con)
+	public static void attachAndBegin(Connection con)
 		{
-		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dsEnvelope, con));
+		GenOrmTransactionConnection gcon = attach(s_dsEnvelope);
+		gcon.setConnection(con);
+		gcon.begin();
 		}
-
+		
+	//---------------------------------------------------------------------------
 	/**
 		Begin a transaction using the default data source that was set using
 		{@link #setDataSource(GenOrmDataSource)}
 	*/
-	public static void begin()
+	public static void attachAndBegin()
 		{
-		s_tlConnectionList.addConnection(new GenOrmTransactionConnection(s_dsEnvelope));
+		attach().begin();
+		}
+		
+	//---------------------------------------------------------------------------
+	public static GenOrmTransactionConnection attach(GenOrmDSEnvelope source)
+		{
+		GenOrmTransactionConnection con = new GenOrmTransactionConnection(source);
+		s_tlConnectionList.addConnection(con);
+		return (con);
+		}
+		
+	//---------------------------------------------------------------------------
+	public static GenOrmTransactionConnection attach()
+		{
+		return (attach(s_dsEnvelope));
 		}
 
+	//---------------------------------------------------------------------------
 	/**
 		Flush all modified records on the current connection
 	*/
@@ -211,8 +231,10 @@ public class GenOrmDataSource
 		}
 		
 	/**
-		Return the {@link GenOrmConnection} from off the thread local data
-		@return Returns the GenOrmConnection or null if one is not set
+		Return the {@link GenOrmConnection} from off the thread local data.
+		If no connection exists then a {@link GenOrmDudConnection} is returned.
+		The GenOrmDudConnection can be used for transactionless db communication.
+		@return Returns the GenOrmConnection
 	*/
 	public static GenOrmConnection getGenOrmConnection()
 		{

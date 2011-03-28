@@ -25,7 +25,7 @@ public class MemCacheTests
 		hardDependencyOn = { "HSQLDatabase.createDatabase" })
 	public void loadData()
 		{
-		GenOrmDataSource.begin();
+		GenOrmDataSource.attachAndBegin();
 		
 		Language lang = Language.factory.createWithGeneratedKey();
 		lang.setLanguageCode("en");
@@ -65,7 +65,7 @@ public class MemCacheTests
 		hardDependencyOn = { "loadData", "openMemCacheClient" })
 	public void firstCacheQuery()
 		{
-		GenOrmDataSource.begin();
+		GenOrmDataSource.attachAndBegin();
 		
 		SimilarLanguagesQuery slq = new SimilarLanguagesQuery("en");
 		SimilarLanguagesQuery.ResultSet rs = slq.getCachedQuery(m_cacheClient, 0);
@@ -82,7 +82,7 @@ public class MemCacheTests
 		hardDependencyOn = { "firstCacheQuery" } )
 	public void modifyDB()
 		{
-		GenOrmDataSource.begin();
+		GenOrmDataSource.attachAndBegin();
 		
 		Language lang = Language.factory.createWithGeneratedKey();
 		lang.setLanguageCode("en");
@@ -99,7 +99,7 @@ public class MemCacheTests
 		/*
 			This should pull from cache and not see the en_AU language
 		*/
-		GenOrmDataSource.begin();
+		GenOrmDataSource.attachAndBegin();
 		
 		SimilarLanguagesQuery slq = new SimilarLanguagesQuery("en");
 		SimilarLanguagesQuery.ResultSet rs = slq.getCachedQuery(m_cacheClient, 0);

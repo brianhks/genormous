@@ -164,6 +164,14 @@
 		
 	</table>
 	
+	<table name="keys">
+		<property key="hsqldb_tableType" value="CACHED"/>
+		<property key="genorm.inherit" value="false"/>
+		<col name="key1" type="integer" primary_key="true"/>
+		<col name="key2" type="integer" primary_key="true"/>
+		<col name="note" type="string"/>
+	</table>
+	
 	<table name="unique_set_test">
 		<property key="hsqldb_tableType" value="CACHED"/>
 		<col name="id" type="integer" primary_key="true"/>
@@ -182,6 +190,7 @@
 			
 		</sql>
 	</view>
+	
 	
 	<!-- <table name="language_code">
 		<property key="hsqldb_tableType" value="CACHED"/>
