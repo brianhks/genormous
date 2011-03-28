@@ -6,22 +6,35 @@ import java.io.Serializable;
 
 public abstract class GenOrmRecord implements Serializable
 	{
+	private class QueryValue
+		{
+		public boolean usePrev;
+		public GenOrmField field;
+		
+		public QueryValue(GenOrmField field, boolean usePrev)
+			{
+			this.usePrev = usePrev;
+			this.field = field;
+			}
+		}
+		
+	
 	protected ArrayList<GenOrmField>   m_fields;        //Column values for this table
 	protected boolean                  m_isNewRecord;   //Identifies if this is a new record
-	protected int                      m_dirtyFlags;    //Identifies which field is dirty
+	protected BitSet                   m_dirtyFlags;    //Identifies which field is dirty
 	protected boolean                  m_isDeleted;     //Identifies if this record is deleted
 	protected boolean                  m_isIgnored;     //This record should not be committed in this transaction
 	protected GenOrmRecordKey          m_recordKey;
 	protected transient Logger         m_logger;
 	
-	private ArrayList<GenOrmField>     m_queryFields;   //Used for creating the prepared queries
+	private ArrayList<QueryValue>      m_queryFields;   //Used for creating the prepared queries
 	
 	public GenOrmRecord(String tableName)
 		{
 		m_recordKey = new GenOrmRecordKey(tableName);
 		m_fields = new ArrayList<GenOrmField>();
 		m_isNewRecord = false;
-		m_queryFields = new ArrayList<GenOrmField>();
+		m_queryFields = new ArrayList<QueryValue>();
 		m_isIgnored = false;
 		}
 		
@@ -69,7 +82,7 @@ public abstract class GenOrmRecord implements Serializable
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if ((m_dirtyFlags & meta.getDirtyFlag()) != 0)
+			if (m_dirtyFlags.get(meta.getDirtyFlag()))
 				{
 				ret.add(gof);
 				}
@@ -135,7 +148,7 @@ public abstract class GenOrmRecord implements Serializable
 	*/
 	public boolean isDirty()
 		{
-		return (m_dirtyFlags != 0);
+		return (!m_dirtyFlags.isEmpty());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -145,11 +158,11 @@ public abstract class GenOrmRecord implements Serializable
 	*/
 	public void setDirty()
 		{
-		if (m_dirtyFlags == 0)
+		if (m_dirtyFlags.isEmpty())
 			getGenOrmConnection().addToTransaction(this);
 			
 		//This will mark all attributes as dirty
-		m_dirtyFlags = -1;
+		m_dirtyFlags.set(0, m_fields.size());
 		}
 	//---------------------------------------------------------------------------
 	/**
@@ -214,10 +227,10 @@ public abstract class GenOrmRecord implements Serializable
 					}
 				}
 			
-			if (((m_dirtyFlags & meta.getDirtyFlag()) != 0) &&
+			if (m_dirtyFlags.get(meta.getDirtyFlag()) &&
 					( (meta.isPrimaryKey()) || (!meta.isForeignKey()) || addForeignKey ) )
 				{
-				m_dirtyFlags ^= meta.getDirtyFlag(); //Clear dirty flag on value
+				m_dirtyFlags.clear(meta.getDirtyFlag()); //Clear dirty flag on value
 				if (!first)
 					{
 					sb.append(",");
@@ -228,7 +241,7 @@ public abstract class GenOrmRecord implements Serializable
 				sb.append(getFieldEscapeString());
 				sb.append(meta.getFieldName());
 				sb.append(getFieldEscapeString());
-				m_queryFields.add(gof);
+				m_queryFields.add(new QueryValue(gof, false));
 				valuesSB.append("?");
 				}
 			}
@@ -243,9 +256,9 @@ public abstract class GenOrmRecord implements Serializable
 	//---------------------------------------------------------------------------
 	private void addKeyedWhereStatement(StringBuilder sb)
 		{
-		sb.append(" WHERE ");
 		Iterator<GenOrmField> it = m_fields.iterator();
 		boolean first = true;
+			
 		while (it.hasNext())
 			{
 			GenOrmField gof = it.next();
@@ -255,7 +268,7 @@ public abstract class GenOrmRecord implements Serializable
 				if (!first)
 					sb.append(" AND ");
 				else
-					sb.append(" ");
+					sb.append(" WHERE ");
 					
 				first = false;
 				sb.append(getFieldEscapeString());
@@ -263,7 +276,7 @@ public abstract class GenOrmRecord implements Serializable
 				sb.append(getFieldEscapeString());
 				sb.append(" = ");
 				sb.append("?");
-				m_queryFields.add(gof);
+				m_queryFields.add(new QueryValue(gof, true));
 				}
 			}
 		}
@@ -283,7 +296,7 @@ public abstract class GenOrmRecord implements Serializable
 			{
 			GenOrmField gof = it.next();
 			GenOrmFieldMeta meta = gof.getFieldMeta();
-			if ((!meta.isPrimaryKey()) && (m_dirtyFlags & meta.getDirtyFlag()) != 0)
+			if (m_dirtyFlags.get(meta.getDirtyFlag()))
 				{
 				if (!first)
 					sb.append(", ");
@@ -296,7 +309,7 @@ public abstract class GenOrmRecord implements Serializable
 				sb.append(getFieldEscapeString());
 				sb.append(" = ");
 				sb.append("?");
-				m_queryFields.add(gof);
+				m_queryFields.add(new QueryValue(gof, false));
 				}
 			}
 			
@@ -328,23 +341,44 @@ public abstract class GenOrmRecord implements Serializable
 			{
 			m_logger.debug("SQL Query: "+statement);
 			}
+		//System.out.println(statement);
 			
 		PreparedStatement stmt = getGenOrmConnection().prepareStatement(statement);
 		
-		for (int I = 0; I < m_queryFields.size(); I++)
+		try
 			{
-			if (m_logger != null && m_logger.isDebug())
+			for (int I = 0; I < m_queryFields.size(); I++)
 				{
-				GenOrmField field = m_queryFields.get(I);
-				m_logger.debug(field.getFieldMeta().getFieldName()+" : "+field.toString());
+				if (m_logger != null && m_logger.isDebug())
+					{
+					GenOrmField field = m_queryFields.get(I).field;
+					m_logger.debug(field.getFieldMeta().getFieldName()+" : "+field.toString());
+					}
+					
+				QueryValue qv = m_queryFields.get(I);
+				
+				if (qv.usePrev)
+					{
+					//System.out.println("USING PREV "+qv.field.getPrevValue());
+					qv.field.placePrevValue(stmt, I+1);
+					}
+				else
+					{
+					//System.out.println("USING CURRENT");
+					qv.field.placeValue(stmt, I+1);
+					}
 				}
 				
-			m_queryFields.get(I).placeValue(stmt, I+1);
+			int result = stmt.executeUpdate();
+			//System.out.println(result);
+				
+			ret = (result != 0);
+			}
+		finally
+			{
+			stmt.close();
 			}
 			
-		ret = (stmt.executeUpdate() != 0);
-			
-		stmt.close();
 		return (ret);
 		}
 		
@@ -378,7 +412,7 @@ public abstract class GenOrmRecord implements Serializable
 				
 			ret = runStatement(createDeleteStatement());
 			}
-		else if (m_dirtyFlags != 0)
+		else if (!m_dirtyFlags.isEmpty())
 			{
 			//System.out.println("it is dirty");
 			setMTS();
@@ -408,7 +442,7 @@ public abstract class GenOrmRecord implements Serializable
 			//System.out.println("Flushing record for "+m_tableName+" "+toString());
 			createIfNew(con);
 			ret = commitChanges();
-			m_dirtyFlags = 0;
+			m_dirtyFlags.clear();
 			m_isNewRecord = false;
 			}
 		catch (SQLException sqle)

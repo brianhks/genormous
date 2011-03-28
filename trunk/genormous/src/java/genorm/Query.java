@@ -34,6 +34,7 @@ public class Query
 	private boolean m_resultTypeMulti;
 	private Map<String, String> m_typeMap;
 	private boolean m_skipTest;
+	private boolean m_escape = true;;
 	
 	public Query(Format formatter, String name, ArrayList<Parameter> params, String sql)
 		{
@@ -273,6 +274,7 @@ public class Query
 		}
 		
 	public boolean isSkipTest() { return (m_skipTest); }
+	public void setEscape(boolean escape) {m_escape = escape; }
 		
 	public String getQueryName() { return (m_queryName); }
 	public ArrayList<Parameter> getInputs() { return (m_inputs); }
@@ -283,7 +285,13 @@ public class Query
 	public boolean isUpdate() { return (m_outputs.size() == 0); }
 	public int getOutputsCount() { return (m_outputs.size()); }
 	public boolean isReplaceQuery() { return (m_replacements.size() > 0); }
-	public String getSqlQuery() { return (m_sqlQuery.replaceAll("\\n+", "\\\\n").replace("\"", "\\\"")); }
+	public String getSqlQuery() 
+		{
+		if (m_escape)
+			return (m_sqlQuery.replaceAll("\\n+", "\\\\n").replace("\"", "\\\""));
+		else
+			return (m_sqlQuery);
+		}
 	public String getComment() { return (m_comment); }
 	
 	public boolean isNoneResult() { return (m_resultTypeNone); }

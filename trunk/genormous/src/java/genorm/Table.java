@@ -189,6 +189,7 @@ public class Table
 		
 	public boolean getMultiplePrimaryKeys() { return (m_primaryKeys.size() > 1); }
 	public ArrayList<Column> getColumns() { return (m_columns); }
+	public int getNumberOfColumns() { return (m_columns.size()); }
 	public ArrayList<Column> getPrimaryKeys() { return (m_primaryKeys); }
 	public ArrayList<ForeignKeySet> getForeignKeys() { return (m_foreignKeys); }
 	

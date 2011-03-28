@@ -3,75 +3,42 @@ package genorm.runtime;
 import java.sql.ResultSet;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.Types;
 
-public class GenOrmBigDecimal extends GenOrmField
+public class GenOrmBigDecimal extends GenOrmFieldTemplate<BigDecimal>
 	{
-	private BigDecimal m_value;
-	
 	public GenOrmBigDecimal(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
 		}
 		
-	public boolean setValue(BigDecimal value)
-		{
-		if (((m_value == null) && (value != null)) || 
-				((m_value != null) && (!m_value.equals(value))))
-			{
-			m_value = value;
-			if (m_value == null)
-				setNull();
-			else
-				m_isNull = false;
-			return (true);
-			}
-		else
-			return (false);
-		}
-		
-	public BigDecimal getValue()
-		{
-		return (m_value);
-		}
-		
+	//---------------------------------------------------------------------------
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
 		m_value = rs.getBigDecimal(pos);
 		m_isNull = rs.wasNull();
+		if (!m_isNull)
+			m_prevValue = m_value;
 		}
 		
+	//---------------------------------------------------------------------------
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setBigDecimal(pos, m_value);
-		}
-		
-	public String getSQLValue()
-		{
-		return (String.valueOf(m_value));
-		}
-		
-	public int hashCode()
-		{
-		if (m_value == null)
-			return (0);
+		if (m_isNull)
+			ps.setNull(pos, Types.BIGINT);
 		else
-			return (m_value.hashCode());
+			ps.setBigDecimal(pos, m_value);
 		}
 		
-	public boolean equals(Object obj)
+	//---------------------------------------------------------------------------
+	public void placePrevValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
 		{
-		if (!(obj instanceof GenOrmBigDecimal))
-			return (false);
-			
-		GenOrmBigDecimal other = (GenOrmBigDecimal)obj;
-		return (m_value.equals(other.m_value));
-		}
-		
-	public String toString()
-		{
-		return (String.valueOf(m_value));
+		if (m_prevValue == null)
+			ps.setNull(pos, Types.BIGINT);
+		else
+			ps.setBigDecimal(pos, m_prevValue);
 		}
 	}

@@ -91,6 +91,9 @@ $if(query.hasParameters)$
 	//Deprecated
 	public int runUpdate($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 		{
+		int ret = 0;
+		java.sql.PreparedStatement genorm_statement = null;
+		
 		try
 			{
 			String genorm_query = QUERY;
@@ -100,27 +103,35 @@ $if(query.hasParameters)$
 			genorm_query = QueryHelper.replaceText(query, replaceMap);
 			$endif$
 			
-			java.sql.PreparedStatement genorm_statement;
-			
-			genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
 			$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
 			
-			int ret = genorm_statement.executeUpdate();
-			
-			genorm_statement.close();
-			return (ret);
+			ret = genorm_statement.executeUpdate();
 			}
 		catch (java.sql.SQLException sqle)
 			{
 			throw new GenOrmException(sqle);
 			}
+		finally
+			{
+			try
+				{
+				if (genorm_statement != null)
+					genorm_statement.close();
+				}
+			catch (java.sql.SQLException sqle2) { }
+			}
+			
+		return (ret);
 		}
 $endif$
 	
 	//---------------------------------------------------------------------------
 	public int runUpdate()
 		{
+		int ret = 0;
+		java.sql.PreparedStatement genorm_statement = null;
 		try
 			{
 			String genorm_query = QUERY;
@@ -130,21 +141,26 @@ $endif$
 			genorm_query = QueryHelper.replaceText(query, replaceMap);
 			$endif$
 			
-			java.sql.PreparedStatement genorm_statement;
-			
-			genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
 			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
 }$
 			
-			int ret = genorm_statement.executeUpdate();
-			
-			genorm_statement.close();
-			return (ret);
+			ret = genorm_statement.executeUpdate();
 			}
 		catch (java.sql.SQLException sqle)
 			{
 			throw new GenOrmException(sqle);
 			}
+		finally
+			{
+			try
+				{
+				genorm_statement.close();
+				}
+			catch (java.sql.SQLException sqle2) { }
+			}
+			
+		return (ret);
 		}
 $else$
 
@@ -171,6 +187,7 @@ $if(query.hasParameters)$
 	//Deprecated
 	public ResultSet runQuery($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$)
 		{
+		java.sql.PreparedStatement genorm_statement = null;
 		try
 			{
 			String genorm_query = QUERY;
@@ -180,9 +197,7 @@ $if(query.hasParameters)$
 			genorm_query = QueryHelper.replaceText(genorm_query, genorm_replaceMap);
 			$endif$
 			
-			java.sql.PreparedStatement genorm_statement;
-			
-			genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
 			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
 			long genorm_queryTimeStart = 0L;
@@ -205,6 +220,13 @@ $if(query.hasParameters)$
 			}
 		catch (java.sql.SQLException sqle)
 			{
+			try
+				{
+				if (genorm_statement != null)
+					genorm_statement.close();
+				}
+			catch (java.sql.SQLException sqle2) { }
+				
 			throw new GenOrmException(sqle);
 			}
 		}
@@ -213,6 +235,7 @@ $endif$
 	//---------------------------------------------------------------------------
 	public ResultSet runQuery()
 		{
+		java.sql.PreparedStatement genorm_statement = null;
 		try
 			{
 			String genorm_query = QUERY;
@@ -222,9 +245,7 @@ $endif$
 			genorm_query = QueryHelper.replaceText(genorm_query, genorm_replaceMap);
 			$endif$
 			
-			java.sql.PreparedStatement genorm_statement;
-			
-			genorm_statement = GenOrmDataSource.prepareStatement(genorm_query);
+			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
 			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
 }$
 			long genorm_queryTimeStart = 0L;
@@ -247,6 +268,13 @@ $endif$
 			}
 		catch (java.sql.SQLException sqle)
 			{
+			try
+				{
+				if (genorm_statement != null)
+					genorm_statement.close();
+				}
+			catch (java.sql.SQLException sqle2) { }
+				
 			throw new GenOrmException(sqle);
 			}
 		}

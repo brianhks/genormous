@@ -4,38 +4,16 @@ import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.Date;
 import java.util.Arrays;
+import java.sql.Types;
 
-public class GenOrmBinary extends GenOrmField
+public class GenOrmBinary extends GenOrmFieldTemplate<byte[]>
 	{
-	private byte[] m_value;
-	
 	public GenOrmBinary(GenOrmFieldMeta fieldMeta)
 		{
 		super(fieldMeta);
-		m_value = null;
 		}
 		
-	public boolean setValue(byte[] value)
-		{
-		if (((m_value == null) && (value != null)) || 
-				((m_value != null) && (!m_value.equals(value))))
-			{
-			m_value = value;
-			if (m_value == null)
-				setNull();
-			else
-				m_isNull = false;
-			return (true);
-			}
-		else
-			return (false);
-		}
-		
-	public byte[] getValue()
-		{
-		return (m_value);
-		}
-		
+	//---------------------------------------------------------------------------	
 	public void setValue(ResultSet rs, int pos)
 			throws java.sql.SQLException
 		{
@@ -43,36 +21,23 @@ public class GenOrmBinary extends GenOrmField
 		m_isNull = rs.wasNull();
 		}
 		
+	//---------------------------------------------------------------------------
 	public void placeValue(PreparedStatement ps, int pos) 
 			throws java.sql.SQLException
 		{
-		ps.setBytes(pos, m_value);
-		}
-		
-	public String getSQLValue()
-		{
-		return ("");
-		}
-		
-	public int hashCode()
-		{
 		if (m_value == null)
-			return (0);
+			ps.setNull(pos, Types.BINARY);
 		else
-			return (Arrays.hashCode(m_value));
+			ps.setBytes(pos, m_value);
 		}
 		
-	public boolean equals(Object obj)
+	//---------------------------------------------------------------------------
+	public void placePrevValue(PreparedStatement ps, int pos) 
+			throws java.sql.SQLException
 		{
-		if (!(obj instanceof GenOrmBinary))
-			return (false);
-			
-		GenOrmBinary other = (GenOrmBinary)obj;
-		return (Arrays.equals(m_value, other.m_value));
-		}
-		
-	public String toString()
-		{
-		return ("");
+		if (m_prevValue == null)
+			ps.setNull(pos, Types.BINARY);
+		else
+			ps.setBytes(pos, m_prevValue);
 		}
 	}

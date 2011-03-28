@@ -13,10 +13,13 @@ public $table.className$ set$col.methodName$($col.type$ data)
 	//Add the now dirty record to the transaction only if it is not previously dirty
 	if (changed)
 		{
-		if (m_dirtyFlags == 0)
+		if (m_dirtyFlags.isEmpty())
 			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 			
-		m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+		m_dirtyFlags.set($col.nameCaps$_FIELD_META.getDirtyFlag());
+		
+		if (m_isNewRecord) //Force set the prev value
+			m_$col.parameterName$.setPrevValue(data);
 		}
 		
 	return (($table.className$)this);
@@ -34,10 +37,10 @@ public $table.className$ set$col.methodName$Null()
 	
 	if (changed)
 		{
-		if (m_dirtyFlags == 0)
+		if (m_dirtyFlags.isEmpty())
 			GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 			
-		m_dirtyFlags |= $col.nameCaps$_FIELD_META.getDirtyFlag();
+		m_dirtyFlags.set($col.nameCaps$_FIELD_META.getDirtyFlag());
 		}
 	
 	return (($table.className$)this);
@@ -65,10 +68,10 @@ public $table.className$ set$foreignKeys.methodName$($foreignKeys.table.classNam
 	//We add the record to the transaction if one of the key values change
 	$foreignKeys.keys:{key | if (m_$key.parameterName$.setValue(table.get$key.foreignTableColumnMethodName$()))
 	{
-	if ((m_dirtyFlags == 0) && (GenOrmDataSource.getGenOrmConnection() != null))
+	if ((m_dirtyFlags.isEmpty()) && (GenOrmDataSource.getGenOrmConnection() != null))
 		GenOrmDataSource.getGenOrmConnection().addToTransaction(this);
 	
-	m_dirtyFlags |= $key.nameCaps$_FIELD_META.getDirtyFlag();
+	m_dirtyFlags.set($key.nameCaps$_FIELD_META.getDirtyFlag());
 	}
 
 }$
@@ -95,21 +98,35 @@ public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type
 	query = QueryHelper.replaceText(query, replaceMap);
 	$endif$
 	
+	java.sql.PreparedStatement genorm_statement = null;
+	
 	try
 		{
-		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(update);
-		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+		genorm_statement = GenOrmDataSource.prepareStatement(update);
+		$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+}$
 		
-		s_logger.debug(statement.toString());
+		s_logger.debug(genorm_statement.toString());
 		
-		rows = statement.executeUpdate();
-		statement.close();
+		rows = genorm_statement.executeUpdate();
 		}
 	catch (java.sql.SQLException sqle)
 		{
 		if (s_logger.isDebug())
 			sqle.printStackTrace();
 		throw new GenOrmException(sqle);
+		}
+	finally
+		{
+		try
+			{
+			if (genorm_statement != null)
+				genorm_statement.close();
+			}
+		catch (java.sql.SQLException sqle2)
+			{
+			throw new GenOrmException(sqle2);
+			}
 		}
 		
 	return (rows);
@@ -125,14 +142,16 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 	query = QueryHelper.replaceText(query, replaceMap);
 	$endif$
 	
+	java.sql.PreparedStatement genorm_statement = null;
+	
 	try
 		{
-		java.sql.PreparedStatement statement = GenOrmDataSource.prepareStatement(query);
-		$query.inputs:{in | statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+		genorm_statement = GenOrmDataSource.prepareStatement(query);
+		$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
 		
-		s_logger.debug(statement.toString());
+		s_logger.debug(genorm_statement.toString());
 		
-		ResultSet rs = new SQLResultSet(statement.executeQuery(), query, statement);
+		ResultSet rs = new SQLResultSet(genorm_statement.executeQuery(), query, genorm_statement);
 		
 		$if(query.singleResult)$
 		return (rs.getOnlyRecord());
@@ -142,6 +161,13 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 		}
 	catch (java.sql.SQLException sqle)
 		{
+		try
+			{
+			if (genorm_statement != null)
+				genorm_statement.close();
+			}
+		catch (java.sql.SQLException sqle2) { }
+			
 		if (s_logger.isDebug())
 			sqle.printStackTrace();
 		throw new GenOrmException(sqle);
@@ -178,7 +204,9 @@ public class $table.className$_base extends GenOrmRecord
 	private static final String WHERE = "WHERE ";
 	private static final String KEY_WHERE = "WHERE $primaryKeys:{key | $fieldEscape$$key.name$$fieldEscape$ = ?}; separator=" AND "$";
 	
-	private static final String TABLE_NAME = "$table.name$";
+	public static final String TABLE_NAME = "$table.name$";
+	public static final int NUMBER_OF_COLUMNS = $table.numberOfColumns$;
+	
 	
 	private static final String s_fieldEscapeString = "$fieldEscape$"; 
 	
@@ -192,31 +220,40 @@ public class $table.className$_base extends GenOrmRecord
 		private static final String MAX_QUERY = "SELECT MAX($fieldEscape$$table.primaryKey.name$$fieldEscape$) FROM $table.name$";
 		
 		private volatile long m_nextKey;
-		private javax.sql.DataSource m_ds;
 		
 		public $table.className$KeyGenerator(javax.sql.DataSource ds)
 			{
-			m_ds = ds;
 			m_nextKey = 0;
+			java.sql.Connection con = null;
+			java.sql.Statement stmnt = null;
 			try
 				{
-				java.sql.Connection con = m_ds.getConnection();
-				con.setAutoCommit(false);
-				java.sql.Statement stmnt = con.createStatement();
+				con = ds.getConnection();
+				con.setAutoCommit(true);
+				stmnt = con.createStatement();
 				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
 				if (rs.next())
 					m_nextKey = rs.getLong(1);
 				
 				rs.close();
-				stmnt.close();
-				con.commit();
-				con.close();
 				}
 			catch (java.sql.SQLException sqle)
 				{
 				//The exception may occur if the table does not yet exist
 				if (WARNINGS)
 					System.out.println(sqle);
+				}
+			finally
+				{
+				try
+					{
+					if (stmnt != null)
+						stmnt.close();
+						
+					if (con != null)
+						con.close();
+					}
+				catch (java.sql.SQLException sqle) {}
 				}
 			}
 			
@@ -228,22 +265,36 @@ public class $table.className$_base extends GenOrmRecord
 		public synchronized void reset()
 			{
 			m_nextKey = 0;
+			java.sql.Statement stmnt = null;
+			java.sql.ResultSet rs = null;
 			try
 				{
-				java.sql.Connection con = GenOrmDataSource.getConnection();
-				java.sql.Statement stmnt = con.createStatement();
-				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
+				stmnt = GenOrmDataSource.createStatement();
+				rs = stmnt.executeQuery(MAX_QUERY);
+				
 				if (rs.next())
 					m_nextKey = rs.getLong(1);
-				
-				rs.close();
-				stmnt.close();
 				}
 			catch (java.sql.SQLException sqle)
 				{
 				//The exception may occur if the table does not yet exist
 				if (WARNINGS)
 					System.out.println(sqle);
+				}
+			finally
+				{
+				try
+					{
+					if (rs != null)
+						rs.close();
+						
+					if (stmnt != null)
+						stmnt.close();
+					}
+				catch (java.sql.SQLException sqle2)
+					{
+					throw new GenOrmException(sqle2);
+					}
 				}
 			}
 			
@@ -318,9 +369,10 @@ public class $table.className$_base extends GenOrmRecord
 		public $table.className$ create($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
 			$table.className$ rec = new $table.className$();
+			rec.m_isNewRecord = true;
+			
 			$primaryKeys:{key | (($table.className$_base)rec).set$key.methodName$($key.parameterName$);
 }$
-			rec.m_isNewRecord = true;
 			
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			}
@@ -429,26 +481,41 @@ public class $table.className$_base extends GenOrmRecord
 			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
 			rec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec.getRecordKey());
 			
+			java.sql.PreparedStatement genorm_statement = null;
+			java.sql.ResultSet genorm_rs = null;
+			
 			if (rec == null)
 				{
 				try
 					{
 					//No cached object so look in db
-					java.sql.PreparedStatement ps = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
-					$primaryKeys:{key | ps.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
+					genorm_statement = GenOrmDataSource.prepareStatement(SELECT+FROM+KEY_WHERE);
+					$primaryKeys:{key | genorm_statement.set$javaToJDBCMap.(key.type)$($i$, $key.parameterName$);
 }$
-					s_logger.debug(ps.toString());
+					s_logger.debug(genorm_statement.toString());
 						
-					java.sql.ResultSet rs = ps.executeQuery();
-					if (rs.next())
-						rec = new$table.className$(rs);
-						
-					rs.close();
-					ps.close();
+					genorm_rs = genorm_statement.executeQuery();
+					if (genorm_rs.next())
+						rec = new$table.className$(genorm_rs);
 					}
 				catch (java.sql.SQLException sqle)
 					{
 					throw new GenOrmException(sqle);
+					}
+				finally
+					{
+					try
+						{
+						if (genorm_rs != null)
+							genorm_rs.close();
+							
+						if (genorm_statement != null)
+							genorm_statement.close();
+						}
+					catch (java.sql.SQLException sqle2)
+						{
+						throw new GenOrmException(sqle2);
+						}
 					}
 				}
 				
@@ -492,10 +559,11 @@ public class $table.className$_base extends GenOrmRecord
 		public ResultSet select(String where, String orderBy)
 			{
 			ResultSet rs = null;
+			java.sql.Statement stmnt = null;
 			
 			try
 				{
-				java.sql.Statement stmnt = GenOrmDataSource.createStatement();
+				stmnt = GenOrmDataSource.createStatement();
 				StringBuilder sb = new StringBuilder();
 				sb.append(SELECT);
 				sb.append(FROM);
@@ -516,6 +584,13 @@ public class $table.className$_base extends GenOrmRecord
 				}
 			catch (java.sql.SQLException sqle)
 				{
+				try
+					{
+					if (stmnt != null)
+						stmnt.close();
+					}
+				catch (java.sql.SQLException sqle2) { }
+					
 				throw new GenOrmException(sqle);
 				}
 				
@@ -703,7 +778,8 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 	//---------------------------------------------------------------------------
 	private void initialize($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 		{
-		$primaryKeys:{col | m_$col.parameterName$.setValue($col.parameterName$);$\n$}$
+		$primaryKeys:{col | m_$col.parameterName$.setValue($col.parameterName$);
+m_$col.parameterName$.setPrevValue($col.parameterName$);$\n$}$
 		}
 		
 	//---------------------------------------------------------------------------
@@ -711,6 +787,14 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		{
 		try
 			{
+			if (s_logger.isDebug())
+				{
+				java.sql.ResultSetMetaData meta = rs.getMetaData();
+				for (int I = 1; I <= meta.getColumnCount(); I++)
+					{
+					s_logger.debug("Reading - "+meta.getColumnName(I) +" : "+rs.getString(I));
+					}
+				}
 			$columns:{col | m_$col.parameterName$.setValue(rs, $i$);$\n$}$
 			}
 		catch (java.sql.SQLException sqle)
@@ -725,6 +809,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		super(TABLE_NAME);
 		m_logger = s_logger;
 		m_foreignKeys = new ArrayList<GenOrmRecordKey>();
+		m_dirtyFlags = new java.util.BitSet(NUMBER_OF_COLUMNS);
 		
 		$columns:{col | 
 m_$col.parameterName$ = new $javaToGenOrmMap.(col.type)$($col.nameCaps$_FIELD_META);

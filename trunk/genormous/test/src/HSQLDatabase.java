@@ -8,11 +8,19 @@ import java.io.*;
 import genorm.runtime.*;
 import test.*;
 
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.DataSourceConnectionFactory;
+
+
 import static org.junit.Assert.*;
 
 public class HSQLDatabase implements Database
 	{
-	private DataSource m_dataSource;
+	private LeakDetectorDataSource m_dataSource;
 	
 	private String m_databaseDir;
 	private String m_createSQL;
@@ -28,7 +36,8 @@ public class HSQLDatabase implements Database
 		context.setParam("Database", this);
 		}
 	
-	@Test
+	@Test(
+		cleanupMethod = "dumpOpenConnections" )
 	public void createDataSource()
 			throws Exception
 		{
@@ -42,8 +51,16 @@ public class HSQLDatabase implements Database
 		assertNotNull(c);
 		c.close();
 		
-		m_dataSource = ds;
+		
+		m_dataSource = new LeakDetectorDataSource(ds, 3, 8);
 		GenOrmDataSource.setDataSource(new DSEnvelope(m_dataSource));
+		}
+		
+	@Test
+	public void dumpOpenConnections()
+			throws Exception
+		{
+		assertEquals(0, m_dataSource.listOpenConnections());
 		}
 		
 	//---------------------------------------------------------------------------

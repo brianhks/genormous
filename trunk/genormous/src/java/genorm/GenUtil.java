@@ -32,6 +32,13 @@ public class GenUtil extends TemplateHelper
 	*/
 	public static final String PROP_FORMATTER = "genorm.formatter";
 	
+	/**
+		Sets the package for the GenOrmDataSource class.  This defaults to the 
+		output package but if the queries are generated into a separate package
+		then the orm objects this can be used to identify that other package.
+	*/
+	public static final String PROP_DATASOURCE_PACKAGE = "genorm.datasourcePackage";
+	
 	
 	
 

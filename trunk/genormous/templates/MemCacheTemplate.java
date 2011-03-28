@@ -110,7 +110,7 @@ public String getCacheKey()
 */
 public ResultSet getCachedQuery(int exp)
 	{
-	MemCachedClient client = (MemCachedClient)GenOrmDataSource.getGenOrmConnection().getProperty(
+	MemCachedClient client = (MemCachedClient)$dsPackage$GenOrmDataSource.getGenOrmConnection().getProperty(
 			genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY);
 			
 	return (getCachedQuery(client, exp));
@@ -178,7 +178,7 @@ public ResultSet getCachedQuery(MemCachedClient memClient, int exp)
 */
 public void removeCachedQuery()
 	{
-	MemCachedClient client = (MemCachedClient)GenOrmDataSource.getGenOrmConnection().getProperty(
+	MemCachedClient client = (MemCachedClient)$dsPackage$GenOrmDataSource.getGenOrmConnection().getProperty(
 			genorm.plugins.memcached.MemCachePlugin.MEMCACHED_CLIENT_PROPERTY);
 			
 	removeCachedQuery(client);

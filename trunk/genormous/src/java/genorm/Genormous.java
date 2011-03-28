@@ -296,7 +296,7 @@ public class Genormous extends GenUtil
 			Iterator tableit = m_source.selectNodes("/tables/table").iterator();
 			while (tableit.hasNext())
 				{
-				int dirtyFlag = 1;
+				int dirtyFlag = 0;
 				Element e = (Element) tableit.next();
 				String tableName = e.attribute(NAME).getValue();
 				//System.out.println("Table "+tableName);
@@ -319,7 +319,7 @@ public class Genormous extends GenUtil
 					Column col = new Column(colName, m_javaTypeMap.get(type), type, 
 							formatter, m_dbTypeMap.get(type));
 					col.setDirtyFlag(dirtyFlag);
-					dirtyFlag <<= 1;
+					dirtyFlag ++;
 					
 					
 					if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
@@ -374,7 +374,7 @@ public class Genormous extends GenUtil
 						{
 						Column col = globCols.next().getCopy();
 						col.setDirtyFlag(dirtyFlag);
-						dirtyFlag <<= 1;
+						dirtyFlag ++;
 						
 						if ("mts".equals(col.getAutoSet()))
 							table.setMTColumn(col);
@@ -410,7 +410,9 @@ public class Genormous extends GenUtil
 						
 					String queryName = "by_"+fkeySet.getTableName();
 						
-					table.addQuery(new Query(formatter, queryName, params, sqlQuery.toString()));
+					Query query = new Query(formatter, queryName, params, sqlQuery.toString());
+					query.setEscape(false);
+					table.addQuery(query);
 					}
 					
 				//Get Unique definitions
@@ -608,7 +610,7 @@ public class Genormous extends GenUtil
 			writeTemplate("DSEnvelope.java", attributes);
 			writeTemplate("GenOrmUnitTest.java", attributes);
 			
-			conditionalWriteTemplate("GenOrmDataSource.java", attributes);
+			writeTemplate("GenOrmDataSource.java", attributes);
 			
 			
 			/* writeTemplate("GenOrmKeyGenerator.java", attributes);

@@ -23,4 +23,9 @@ public class GenOrmPreparedStatement extends PreparedStatementWrapper
 		m_connection.close();
 		}
 	
+	@Override
+	public String toString()
+		{
+		return (m_statement.toString());
+		}
 	}

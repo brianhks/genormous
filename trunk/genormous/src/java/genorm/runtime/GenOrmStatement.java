@@ -22,5 +22,10 @@ public class GenOrmStatement extends StatementWrapper
 		super.close();
 		m_connection.close();
 		}
-	
+
+	@Override
+	public String toString()
+		{
+		return (m_statement.toString());
+		}
 	}

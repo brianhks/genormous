@@ -19,7 +19,7 @@ public class ErrorTests
 	public void closedConnection()
 			throws Exception
 		{
-		GenOrmDataSource.begin();
+		GenOrmDataSource.attachAndBegin();
 		
 		try
 			{
