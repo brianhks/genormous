@@ -55,7 +55,7 @@ The above steps are mostly automated so the computer tells you where the problem
 
 The idea of GenORMous had it origins in SimpleORM.  SimpleORM is easy to use but the setup is a bit tedious.  The other drawback of SimpleORM is that it used generic parameters and return types so a lot of casting is required to use it.  These are not serous flaws but, it can be done better.
 
-GenORMous generates the ORM from an XML file that defines the tables like this one:
+GenORMous generates the ORM code from an XML file that defines the tables like this one:
 {{{
 <table name="segment">
   <comment></comment>
