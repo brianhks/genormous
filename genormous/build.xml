@@ -1,7 +1,7 @@
 <project name="depunit" basedir="." default="compile">
 
 	<path id="cpmake-path">
-		<pathelement location="tools/cpmake.jar"/>
+		<pathelement location="tools/cpmake2.jar"/>
 		<pathelement location="tools/bsh-2.0b4.jar"/>
 	</path>
 
