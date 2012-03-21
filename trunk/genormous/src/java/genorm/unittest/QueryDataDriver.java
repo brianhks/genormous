@@ -6,6 +6,7 @@ import org.dom4j.*;
 import java.util.*;
 import java.io.*;
 import genorm.TextReplace;
+import genorm.GenUtil;
 
 public class QueryDataDriver extends DataDriver
 	{
@@ -26,16 +27,20 @@ public class QueryDataDriver extends DataDriver
 		{
 		String baseContext = "";
 		String context = "";
+		List<String> testParams = new ArrayList<String>();
 		try
 			{
 			m_queries = new ArrayList<Map<String, ? extends Object>>();
 			
+			GenUtil genUtil = new GenUtil(file);
+			
 			SAXReader reader = new SAXReader();
 			Document xmldoc = reader.read(new File(file));
 			
-			Iterator it = xmldoc.getRootElement().elementIterator("query");
+			Iterator it = xmldoc.selectNodes("//query").iterator();
 			while (it.hasNext())
 				{
+				testParams.clear();
 				Map<String, Object> queryData = new HashMap<String, Object>();
 				Element e = (Element)it.next();
 				
@@ -69,6 +74,9 @@ public class QueryDataDriver extends DataDriver
 				//Get the input params
 				ArrayList<Object> inputList = new ArrayList<Object>();
 				
+				//Map of real params that references may point to
+				Map<String, Element> realParams = new HashMap<String, Element>();
+				
 				Element inputElement = e.element("input");
 				if (inputElement != null)
 					{
@@ -78,17 +86,29 @@ public class QueryDataDriver extends DataDriver
 						{
 						Element p = (Element)inputs.next();
 						if (p.attributeValue("ref") != null)
-							continue;
-						String type = p.attributeValue("type");
+							{
+							String ref = p.attributeValue("ref");
+							p = realParams.get(ref);
+							}
+							
+						String name = p.attributeValue("name");
+						realParams.put(name, p);
+						String type = genUtil.getJavaType(p.attributeValue("type"));
 						String test = p.attributeValue("test");
 						if (test == null)
 							throw new IllegalArgumentException("No test attribute for "+context+"[@"+p.attributeValue("name")+"]");
+							
+						testParams.add(test);
 						if (type.equals("int"))
 							inputList.add(new Integer(test));
 						else if (type.equals("String"))
 							inputList.add(test);
+						else if (type.equals("boolean"))
+							inputList.add(new Boolean(test));
 						else if (type.equals("java.sql.Timestamp"))
 							inputList.add(java.sql.Timestamp.valueOf(test));
+						else if (type.equals("java.util.UUID"))
+							inputList.add(UUID.fromString(test));
 						}
 					}
 					
@@ -101,6 +121,9 @@ public class QueryDataDriver extends DataDriver
 			}
 		catch (Exception e)
 			{
+			System.out.println("Test Parameters:");
+			for (String t : testParams)
+				System.out.println("   '"+t+"'");
 			System.out.println(context);
 			throw e;
 			}

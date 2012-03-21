@@ -91,14 +91,15 @@ public class Query
 			Pattern selectPattern = Pattern.compile("select(.+?)from.*", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 			Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
 			
-			m_sqlQuery = queryRoot.elementTextTrim("sql");
+			//m_sqlQuery = queryRoot.elementTextTrim("sql");
+			m_sqlQuery = queryRoot.elementText("sql").trim();
 			m_comment = queryRoot.elementTextTrim(COMMENT);
 			
 			//Option to not parse sql
 			boolean parse = queryRoot.element("sql").attributeValue("parse", "yes").equals("yes");
 			//The rest of this is just to sanity check the query to make sure 
 			//the parameters match up with the query
-			Matcher m = selectPattern.matcher(m_sqlQuery);
+			Matcher m = selectPattern.matcher(queryRoot.elementTextTrim("sql"));
 			if (parse && m.matches())
 				{
 				String select = m.group(1).trim();

@@ -31,6 +31,7 @@ public class Genormous extends GenUtil
 	public static final String VALUE = "value";
 	public static final String QUERY = "query";
 	public static final String DEFAULT_VALUE = "default_value";
+	public static final String DEFAULT_VALUE_NO_QUOTE = "default_value_no_quote";
 	public static final String ALLOW_NULL = "allow_null";
 	public static final String AUTO_SET = "auto_set";
 	public static final String ON_UPDATE = "on_update";
@@ -44,6 +45,7 @@ public class Genormous extends GenUtil
 	//private boolean m_includeStringSets;
 	//private String m_graphVizFile;
 	//private String m_databaseType;
+	private List<ORMPlugin> m_ormPlugins = new ArrayList<ORMPlugin>();
 	
 	
 	//===========================================================================
@@ -226,7 +228,11 @@ public class Genormous extends GenUtil
 			if (gp instanceof CreatePlugin)
 				{
 				createPlugin = (CreatePlugin)gp;
-				break;
+				}
+				
+			if (gp instanceof ORMPlugin)
+				{
+				m_ormPlugins.add((ORMPlugin)gp);
 				}
 			}
 		
@@ -258,8 +264,17 @@ public class Genormous extends GenUtil
 				if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
 					col.setAllowNull(false);
 					
+				if (cole.attribute(DEFAULT_VALUE) != null && cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
+					throw new Exception("On global column definition: "+colName+", do not set "+DEFAULT_VALUE+" and "+DEFAULT_VALUE_NO_QUOTE+" on the same column definition");
+					
 				if (cole.attribute(DEFAULT_VALUE) != null)
 					col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
+					
+				if (cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
+					{
+					col.setDefault(cole.attribute(DEFAULT_VALUE_NO_QUOTE).getValue());
+					col.setQuoteDefault(false);
+					}
 				
 				if ((cole.attribute(UNIQUE) != null) && (cole.attribute(UNIQUE).getValue().equals("true")))
 					col.setUnique();
@@ -325,8 +340,17 @@ public class Genormous extends GenUtil
 					if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
 						col.setAllowNull(false);
 						
+					if (cole.attribute(DEFAULT_VALUE) != null && cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
+						throw new Exception("On table "+tableName+" column definition: "+colName+", do not set "+DEFAULT_VALUE+" and "+DEFAULT_VALUE_NO_QUOTE+" on the same column definition");
+					
 					if (cole.attribute(DEFAULT_VALUE) != null)
 						col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
+						
+					if (cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
+						{
+						col.setDefault(cole.attribute(DEFAULT_VALUE_NO_QUOTE).getValue());
+						col.setQuoteDefault(false);
+						}
 					
 					if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
 						col.setUnique();
@@ -513,6 +537,15 @@ public class Genormous extends GenUtil
 				attributes.put("constraints", constraints);
 				attributes.put("fieldEscape", createPlugin.getFieldEscapeString());
 				attributes.put("createPlugin", createPlugin.getClass().getName());
+				
+				//Add plugin code
+				StringBuilder pluginCode = new StringBuilder();
+				for (ORMPlugin op : m_ormPlugins)
+					{
+					pluginCode.append(op.getBody(attributes));
+					}
+					
+				attributes.put("plugins", pluginCode.toString());
 					
 				baseTemplate.setAttributes(attributes);
 				

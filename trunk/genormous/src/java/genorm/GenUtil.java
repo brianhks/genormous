@@ -100,6 +100,16 @@ public class GenUtil extends TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
+	public String getJavaType(String custom)
+		{
+		String ret = m_javaTypeMap.get(custom);
+		if (ret == null)
+			ret = custom;
+			
+		return (ret);
+		}
+		
+//------------------------------------------------------------------------------
 	public void setFormat(Format formatter)
 		{
 		m_formatter = formatter;

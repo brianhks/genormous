@@ -32,6 +32,13 @@ private static class MemCacheResultSet implements ResultSet, Externalizable
 		
 	//---------------------------------------------------------------------------
 	/* ResultSet */
+	public List<$query.className$Data> getArrayList()
+		{
+		return (m_memCacheResults);
+		}
+		
+	//---------------------------------------------------------------------------
+	/* ResultSet */
 	public $query.className$Data getRecord()
 		{
 		return (m_memCacheResults.get(m_position));

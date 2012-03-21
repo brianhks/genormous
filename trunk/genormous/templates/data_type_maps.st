@@ -11,6 +11,7 @@ javaToGenOrmMap ::= [
 	"java.math.BigDecimal":"GenOrmBigDecimal",
 	"java.sql.Date":"GenOrmDate",
 	"java.sql.Timestamp":"GenOrmTimestamp",
+	"java.util.UUID":"GenOrmUUID",
 	default:"null"
 	]
 	
@@ -25,6 +26,7 @@ javaToObjectType ::= [
 	"java.math.BigDecimal":"java.math.BigDecimal",
 	"java.sql.Date":"java.sql.Date",
 	"java.sql.Timestamp":"java.sql.Timestamp",
+	"java.util.UUID":"java.util.UUID",
 	default:"null"
 	]
 	
@@ -39,8 +41,9 @@ javaToJDBCMap ::= [
 	"java.math.BigDecimal":"BigDecimal",
 	"java.sql.Date":"Date",
 	"java.sql.Timestamp":"Timestamp",
+	"java.util.UUID":"Object",
 	default:"null"
 	]
-
+	
 
 	

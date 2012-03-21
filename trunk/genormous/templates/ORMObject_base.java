@@ -51,7 +51,7 @@ $endif$
 >>
 	
 declarMetaFields(col) ::= <<
-private static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", "$col.customType$", $col.dirtyFlag$, $col.primaryKey$, $col.foreignKey$);
+public static final GenOrmFieldMeta $col.nameCaps$_FIELD_META = new GenOrmFieldMeta("$col.name$", "$col.customType$", $col.dirtyFlag$, $col.primaryKey$, $col.foreignKey$);
 
 >>
 
@@ -103,7 +103,7 @@ public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type
 	try
 		{
 		genorm_statement = GenOrmDataSource.prepareStatement(update);
-		$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+		$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
 		
 		s_logger.debug(genorm_statement.toString());
@@ -147,7 +147,7 @@ public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query
 	try
 		{
 		genorm_statement = GenOrmDataSource.prepareStatement(query);
-		$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
+		$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);}$
 		
 		s_logger.debug(genorm_statement.toString());
 		
@@ -219,7 +219,7 @@ public class $table.className$_base extends GenOrmRecord
 		{
 		private static final String MAX_QUERY = "SELECT MAX($fieldEscape$$table.primaryKey.name$$fieldEscape$) FROM $table.name$";
 		
-		private volatile long m_nextKey;
+		private volatile $table.primaryKey.type$ m_nextKey;
 		
 		public $table.className$KeyGenerator(javax.sql.DataSource ds)
 			{
@@ -233,7 +233,7 @@ public class $table.className$_base extends GenOrmRecord
 				stmnt = con.createStatement();
 				java.sql.ResultSet rs = stmnt.executeQuery(MAX_QUERY);
 				if (rs.next())
-					m_nextKey = rs.getLong(1);
+					m_nextKey = rs.get$javaToJDBCMap.(table.primaryKey.type)$(1);
 				
 				rs.close();
 				}
@@ -273,7 +273,7 @@ public class $table.className$_base extends GenOrmRecord
 				rs = stmnt.executeQuery(MAX_QUERY);
 				
 				if (rs.next())
-					m_nextKey = rs.getLong(1);
+					m_nextKey = rs.get$javaToJDBCMap.(table.primaryKey.type)$(1);
 				}
 			catch (java.sql.SQLException sqle)
 				{
@@ -298,7 +298,7 @@ public class $table.className$_base extends GenOrmRecord
 				}
 			}
 			
-		public synchronized long generateKey()
+		public synchronized Object generateKey()
 			{
 			m_nextKey++;
 			return (m_nextKey);
@@ -317,7 +317,7 @@ public class $table.className$_base extends GenOrmRecord
 		private ArrayList<GenOrmFieldMeta> m_fieldMeta;
 		private ArrayList<GenOrmConstraint> m_foreignKeyConstraints;
 		
-		private $table.className$Factory()
+		protected $table.className$Factory()
 			{
 			m_fieldMeta = new ArrayList<GenOrmFieldMeta>();
 			$columns:{col | m_fieldMeta.add($col.nameCaps$_FIELD_META);
@@ -391,20 +391,25 @@ public class $table.className$_base extends GenOrmRecord
 			
 		//---------------------------------------------------------------------------
 		/**
-		If the table has a primary key that is auto generated this method will 
+		If the table has a primary key that has a key generator this method will 
 		return a new table entry with a generated primary key.
 		@return $table.className$ with generated primary key
 		*/
 		public $table.className$ createWithGeneratedKey()
 			{
-			$if(!table.generatedKey)$
+			$if(!table.singleKey)$
 			throw new UnsupportedOperationException("$table.className$ does not support a generated primary key");
 			$else$
 			$table.className$ rec = new $table.className$();
 			
 			rec.m_isNewRecord = true;
-			rec.set$table.primaryKey.methodName$(
-					($table.primaryKey.type$)GenOrmDataSource.getKeyGenerator("$table.name$").generateKey());
+			
+			GenOrmKeyGenerator keyGen = GenOrmDataSource.getKeyGenerator("$table.name$");
+			if (keyGen != null)
+				{
+				rec.set$table.primaryKey.methodName$(
+						($javaToObjectType.(table.primaryKey.type)$)keyGen.generateKey());
+				}
 			
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 			$endif$
@@ -619,6 +624,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 	public static interface ResultSet extends GenOrmResultSet
 		{
 		public ArrayList<$table.className$> getArrayList(int maxRows);
+		public ArrayList<$table.className$> getArrayList();
 		public $table.className$ getRecord();
 		public $table.className$ getOnlyRecord();
 		}
@@ -663,6 +669,8 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		/**
 			Returns the reults as an ArrayList of Record objects.
 			The Result set is closed within this call
+			@param maxRows if the result set contains more than this param
+				then an exception is thrown
 		*/
 		public ArrayList<$table.className$> getArrayList(int maxRows)
 			{
@@ -685,6 +693,33 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 					
 				if (m_resultSet.next())
 					throw new GenOrmException("Bound of "+maxRows+" is too small for query ["+m_query+"]");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				sqle.printStackTrace();
+				throw new GenOrmException(sqle);
+				}
+				
+			close();
+			return (results);
+			}
+		
+		//------------------------------------------------------------------------
+		/**
+			Returns the reults as an ArrayList of Record objects.
+			The Result set is closed within this call
+		*/
+		public ArrayList<$table.className$> getArrayList()
+			{
+			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
+			
+			try
+				{
+				if (m_onFirstResult)
+					results.add(factory.new$table.className$(m_resultSet));
+					
+				while (m_resultSet.next())
+					results.add(factory.new$table.className$(m_resultSet));
 				}
 			catch (java.sql.SQLException sqle)
 				{
@@ -776,14 +811,14 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 	
 	
 	//---------------------------------------------------------------------------
-	private void initialize($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
+	protected void initialize($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 		{
 		$primaryKeys:{col | m_$col.parameterName$.setValue($col.parameterName$);
 m_$col.parameterName$.setPrevValue($col.parameterName$);$\n$}$
 		}
 		
 	//---------------------------------------------------------------------------
-	private void initialize(java.sql.ResultSet rs)
+	protected void initialize(java.sql.ResultSet rs)
 		{
 		try
 			{
@@ -865,7 +900,14 @@ sb.append("\" ");
 		
 		return (sb.toString().trim());
 		}
+		
+	//===========================================================================
+
+	$plugins$	
+	
 	}
+	
+	
 >>
 
 

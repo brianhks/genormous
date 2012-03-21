@@ -16,7 +16,7 @@ public class Parameter
 	private String m_tag;
 	private Format m_formatter;
 	private String m_testParam;
-	private boolean m_reference = false;;
+	private boolean m_reference = false;
 	
 	public Parameter(Element p, Format formatter, Map<String, String> typeMap)
 		{
@@ -72,6 +72,16 @@ public class Parameter
 		{
 		if (m_type.equals("String"))
 			return ("\""+m_testParam+"\"");
+		else if (m_type.equals("java.util.UUID"))
+			{
+			try
+				{
+				UUID.fromString(m_testParam);
+				return ("UUID.fromString(\""+m_testParam+"\")");
+				}
+			catch (IllegalArgumentException iae) {	}
+			return (m_testParam);
+			}
 		else
 			return (m_testParam);
 		}

@@ -272,9 +272,10 @@ public class GenOrmTransactionConnection implements GenOrmConnection
 		}
 		
 	//---------------------------------------------------------------------------
-	public void addToTransaction(GenOrmRecord goi)
+	public boolean addToTransaction(GenOrmRecord goi)
 		{
 		m_transactionList.add(goi);
+		return (true);
 		}
 		
 	//---------------------------------------------------------------------------
