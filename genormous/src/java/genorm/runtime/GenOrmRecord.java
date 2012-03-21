@@ -132,7 +132,10 @@ public abstract class GenOrmRecord implements Serializable
 		if (!m_isDeleted)
 			{
 			m_isDeleted = true;
-			getGenOrmConnection().addToTransaction(this);
+			
+			//If no transaction exists then we flush the record
+			if (!getGenOrmConnection().addToTransaction(this))
+				flush();
 			}
 		}
 		
@@ -419,6 +422,26 @@ public abstract class GenOrmRecord implements Serializable
 			
 			runStatement(createUpdateStatement());
 			}
+			
+		return (ret);
+		}
+		
+	//---------------------------------------------------------------------------
+	/**
+		If there is a connection on the thread this will do nothing.  The idea is 
+		that if there is a connection this record will be flushed when the transaction
+		is committed.
+		
+		If no connection exits then this record will be flushed
+		
+		@return Returns the same as flush
+	*/
+	public boolean flushIfNonTransaction()
+		{
+		boolean ret = true;
+		
+		if (getGenOrmConnection() instanceof GenOrmDudConnection)
+			ret = flush();
 			
 		return (ret);
 		}

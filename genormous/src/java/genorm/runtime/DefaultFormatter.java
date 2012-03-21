@@ -81,5 +81,12 @@ public class DefaultFormatter implements Formatter
 		return ("");
 		}
 		
+	public String toString(String name, java.util.UUID val)
+		{
+		if (val == null)
+			return ("");
+		else
+			return (val.toString());
+		}
 	
 	}

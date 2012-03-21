@@ -15,6 +15,7 @@
 		</typeMap>
 		
 		<plugin class="genorm.plugins.dbsupport.HSQLDB"/>
+		<plugin class="genorm.plugins.web.WebFieldSetterPlugin"/>
 	</configuration>
 
 	<global>

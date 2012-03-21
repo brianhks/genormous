@@ -100,7 +100,7 @@ $if(query.hasParameters)$
 			$if(query.replaceQuery)$
 			HashMap<String, String> replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf($rep.parameterName$));}$
-			genorm_query = QueryHelper.replaceText(query, replaceMap);
+			genorm_query = QueryHelper.replaceText(genorm_query, replaceMap);
 			$endif$
 			
 			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
@@ -138,11 +138,11 @@ $endif$
 			$if(query.replaceQuery)$
 			HashMap<String, String> replaceMap = new HashMap<String, String>();
 			$query.replacements:{rep | replaceMap.put("$rep.tag$", String.valueOf(m_$rep.parameterName$));}$
-			genorm_query = QueryHelper.replaceText(query, replaceMap);
+			genorm_query = QueryHelper.replaceText(genorm_query, replaceMap);
 			$endif$
 			
 			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
-			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
+			$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
 }$
 			
 			ret = genorm_statement.executeUpdate();
@@ -179,6 +179,7 @@ $else$
 			ch.endElement("", tagName, tagName);
 			}
 			
+		rs.close();
 		m_serializable = prevSerializeState;
 		}
 	
@@ -198,7 +199,7 @@ $if(query.hasParameters)$
 			$endif$
 			
 			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
-			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
+			$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, $in.parameterName$);
 }$
 			long genorm_queryTimeStart = 0L;
 			if (s_logger.isInfo())
@@ -246,7 +247,7 @@ $endif$
 			$endif$
 			
 			genorm_statement = $dsPackage$GenOrmDataSource.prepareStatement(genorm_query);
-			$query.inputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
+			$query.queryInputs:{in | genorm_statement.set$javaToJDBCMap.(in.type)$($i$, m_$in.parameterName$);
 }$
 			long genorm_queryTimeStart = 0L;
 			if (s_logger.isInfo())
@@ -287,6 +288,7 @@ $endif$
 	public interface ResultSet extends GenOrmQueryResultSet
 		{
 		public List<$query.className$Data> getArrayList(int maxRows);
+		public List<$query.className$Data> getArrayList();
 		public $query.className$Data getRecord();
 		public $query.className$Data getOnlyRecord();
 		}
@@ -355,6 +357,32 @@ $endif$
 					
 				if (m_resultSet.next())
 					throw new GenOrmException("Bound of "+maxRows+" is too small for query ["+m_query+"]");
+				}
+			catch (java.sql.SQLException sqle)
+				{
+				throw new GenOrmException(sqle);
+				}
+				
+			close();
+			return (results);
+			}
+			
+		//------------------------------------------------------------------------
+		/**
+			Returns the reults as an ArrayList of Record objects.
+			The Result set is closed within this call
+		*/
+		public List<$query.className$Data> getArrayList()
+			{
+			ArrayList<$query.className$Data> results = new ArrayList<$query.className$Data>();
+			
+			try
+				{
+				if (m_onFirstResult)
+					results.add(new $query.className$Data($query.className$Query.this, m_resultSet));
+					
+				while (m_resultSet.next())
+					results.add(new $query.className$Data($query.className$Query.this, m_resultSet));
 				}
 			catch (java.sql.SQLException sqle)
 				{
@@ -451,7 +479,7 @@ $endif$
 		protected Record(java.sql.ResultSet rs)
 				throws java.sql.SQLException
 			{
-			$query.outputs:{ o | m_$o.parameterName$ = rs.get$javaToJDBCMap.(o.type)$($i$);
+			$query.outputs:{ o | m_$o.parameterName$ = ($o.type$)rs.get$javaToJDBCMap.(o.type)$($i$);
 }$
 			if (m_serializable)
 				{

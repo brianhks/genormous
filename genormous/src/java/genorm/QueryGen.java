@@ -233,7 +233,7 @@ public class QueryGen extends GenUtil
 			
 			
 			//NodeList nl = m_source.getElementsByTagName(QUERY);
-			Iterator queryit = m_source.selectNodes("/*/query").iterator();
+			Iterator queryit = m_source.selectNodes("//queries/query").iterator();
 			while (queryit.hasNext())
 				{
 				Element e = (Element)queryit.next();

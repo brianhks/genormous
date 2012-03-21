@@ -1,6 +1,7 @@
 package genorm.servlet;
 
 import genorm.runtime.GenOrmDSEnvelope;
+import genorm.runtime.GenOrmServletDSEnvelope;
 
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
@@ -47,6 +48,11 @@ public class ContextListener implements ServletContextListener
 				Constructor constructor = envClass.getDeclaredConstructor(DataSource.class);
 				
 				GenOrmDSEnvelope envObj = (GenOrmDSEnvelope)constructor.newInstance(ds);
+				if (envObj instanceof GenOrmServletDSEnvelope)
+					{
+					((GenOrmServletDSEnvelope)envObj).setServletContext(context);
+					}
+					
 				envObj.initialize();
 				}
 			}

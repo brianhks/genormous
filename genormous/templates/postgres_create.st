@@ -7,7 +7,7 @@ CONSTRAINT $keyset.constraintName$ FOREIGN KEY ($keyset.keys:{key | "$key.name$"
 
 tableCreate(table) ::= <<
 CREATE TABLE $table.name$ (
-	$table.columns:{col | "$col.name$" $col.sQLType$ $if(col.defaultSet)$DEFAULT '$col.default$'$endif$ $if(!col.allowNull)$NOT $endif$NULL}; separator=",\n"$$if(table.hasPrimaryKey)$,
+	$table.columns:{col | "$col.name$" $col.sQLType$ $if(col.defaultSet)$DEFAULT $if(col.quoteDefault)$'$col.default$'$else$$col.default$$endif$$endif$ $if(!col.allowNull)$NOT $endif$NULL}; separator=",\n"$$if(table.hasPrimaryKey)$,
 	PRIMARY KEY ($table.primaryKeys:{key | "$key.name$"}; separator=", "$)$endif$$if(table.hasForeignKey)$,
 	$table.foreignKeys:fkeyConstraint(); separator=",\n"$ 
 	$endif$$if(table.hasUniqueColumns)$,

@@ -17,6 +17,7 @@ public class Column implements Cloneable
 	private int m_dirtyFlag;
 	private String m_default;
 	private boolean m_isDefaultSet;
+	private boolean m_quoteDefault;
 	private boolean m_allowNull;
 	private Format m_formatter;
 	private boolean m_unique;
@@ -43,6 +44,7 @@ public class Column implements Cloneable
 		m_comment = "";
 		m_dirtyFlag = 0;
 		m_default = "";
+		m_quoteDefault = true;
 		m_isDefaultSet = false;
 		m_allowNull = true;
 		m_unique = false;
@@ -81,6 +83,8 @@ public class Column implements Cloneable
 		}
 		
 	public boolean isDefaultSet() { return (m_isDefaultSet); }
+	public void setQuoteDefault(boolean quote) { m_quoteDefault = quote; }
+	public boolean isQuoteDefault() { return (m_quoteDefault); }
 	public void setDefault(String def) 
 		{
 		m_isDefaultSet = true;

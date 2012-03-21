@@ -14,5 +14,6 @@ public interface Formatter
 	public String toString(String name, BigDecimal bd);
 	public String toString(String name, Timestamp ts);
 	public String toString(String name, byte[] bytes);
+	public String toString(String name, java.util.UUID val);
 	public void setLocale(Locale locale);
 	}

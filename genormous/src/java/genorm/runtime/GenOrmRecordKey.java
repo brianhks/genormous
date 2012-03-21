@@ -65,6 +65,11 @@ public class GenOrmRecordKey implements Serializable
 		GenOrmRecordKey otherKey = (GenOrmRecordKey)obj;
 		if (!otherKey.m_tableName.equals(m_tableName))
 			return (false);
+			
+		//if m_keyFields is empty then there is no primary key and all records
+		//do not equal each other.
+		if (m_keyFields.size() == 0)
+			return (false);
 		
 		return (otherKey.m_keyFields.equals(m_keyFields));
 		}

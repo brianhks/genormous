@@ -81,6 +81,11 @@ public class Table
 		return (m_formatter.formatClassName(m_tableName));
 		}
 		
+	public boolean isSingleKey()
+		{
+		return (m_primaryKeys.size() == 1);
+		}
+		
 	public boolean isGeneratedKey()
 		{
 		return ((m_primaryKeys.size() == 1) && ((m_primaryKeys.get(0).getType().equals("int")) 

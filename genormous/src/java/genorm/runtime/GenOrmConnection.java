@@ -56,7 +56,11 @@ public interface GenOrmConnection
 		
 	public GenOrmKeyGenerator getKeyGenerator(String table);
 		
-	public void addToTransaction(GenOrmRecord goi);
+	/**
+		Returns true if the record was added to a transaction
+		returns false if there is no transaction
+	*/
+	public boolean addToTransaction(GenOrmRecord goi);
 	
 	public Statement createStatement()
 			throws SQLException;

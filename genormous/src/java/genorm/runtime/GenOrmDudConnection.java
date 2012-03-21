@@ -72,7 +72,7 @@ public class GenOrmDudConnection implements GenOrmConnection
 		return (m_envelope.getKeyGenerator(table));
 		}
 		
-	public void addToTransaction(GenOrmRecord goi) {}
+	public boolean addToTransaction(GenOrmRecord goi) { return (false); }
 	
 	/**
 		The connection will be closed when the statement is closed

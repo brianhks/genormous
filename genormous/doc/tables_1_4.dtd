@@ -39,6 +39,7 @@
 	type CDATA #REQUIRED
 	primary_key CDATA "false"
 	default_value CDATA #IMPLIED
+	default_value_no_quote CDATA #IMPLIED
 	allow_null CDATA "true"
 	unique CDATA "false"
 	auto_set (mts|cts) #IMPLIED 
