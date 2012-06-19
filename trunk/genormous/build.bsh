@@ -29,9 +29,14 @@ targetjar = jaroutdir+"/genormous-"+version+".jar";
 extdir = "lib";
 distdir = bldoutdir+"/dist";
 templatedir = "templates";
+jdbcdir = "jdbc3";
 
 testsrc = "test/src";
 testbuilddir = bldoutdir+"/test";
+
+//Check java version for setting jdbc
+if (!System.getProperty("java.vm.version").startsWith("1.5"))
+	jdbcdir = "jdbc4";
 
 //make.setProperty(make.PROP_MULTI_THREAD_OUTPUT, "true");
 
@@ -47,7 +52,8 @@ classpath.addPath(classoutdir);
 jc = new JavaCompiler("compile", classoutdir)
 		.setDescription("Compile java files")
 		.addClasspath(classpath)
-		.addSourceDir(srcdir);
+		.addSourceDir(srcdir)
+		.addSourceDir("src/"+jdbcdir);
 		
 //JavaCompiler jc = make.initPlugin(new JavaCompiler(srcdir, classoutdir, classpath));
 //classFiles = jc.getClassFiles();

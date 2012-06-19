@@ -5,9 +5,8 @@ import java.sql.Connection;
 import java.util.*;
 import java.io.PrintWriter;
 
-public class LeakDetectorDataSource implements DataSource
+public class LeakDetectorDataSource extends DataSourceWrapper
 	{
-	private DataSource m_dataSource;
 	private Set<Connection> m_connectionSet;
 	private Map<Connection, String> m_connectionStack;
 	private int m_stackStart;
@@ -15,7 +14,7 @@ public class LeakDetectorDataSource implements DataSource
 	
 	public LeakDetectorDataSource(DataSource ds, int stackStart, int stackStop)
 		{
-		m_dataSource = ds;
+		super(ds);
 		m_connectionSet = new HashSet<Connection>();
 		m_connectionStack = new HashMap<Connection, String>();
 		m_stackStart = stackStart;
@@ -23,6 +22,7 @@ public class LeakDetectorDataSource implements DataSource
 		}
 		
 	//---------------------------------------------------------------------------
+	@Override
 	public synchronized Connection getConnection()
 			throws java.sql.SQLException
 		{
@@ -56,38 +56,5 @@ public class LeakDetectorDataSource implements DataSource
 		return (count);
 		}
 		
-	//---------------------------------------------------------------------------
-	public Connection getConnection(String user, String pass)
-			throws java.sql.SQLException
-		{
-		return (m_dataSource.getConnection(user, pass));
-		}
-		
-	//---------------------------------------------------------------------------
-	public int getLoginTimeout()
-			throws java.sql.SQLException
-		{
-		return (m_dataSource.getLoginTimeout());
-		}
-		
-	//---------------------------------------------------------------------------
-	public PrintWriter getLogWriter()
-			throws java.sql.SQLException
-		{
-		return (m_dataSource.getLogWriter());
-		}
-		
-	//---------------------------------------------------------------------------
-	public void setLoginTimeout(int seconds)
-			throws java.sql.SQLException
-		{
-		m_dataSource.setLoginTimeout(seconds);
-		}
-		
-	//---------------------------------------------------------------------------
-	public void setLogWriter(PrintWriter out)
-			throws java.sql.SQLException
-		{
-		m_dataSource.setLogWriter(out);
-		}
+	
 	}
