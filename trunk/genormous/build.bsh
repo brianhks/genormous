@@ -29,14 +29,30 @@ targetjar = jaroutdir+"/genormous-"+version+".jar";
 extdir = "lib";
 distdir = bldoutdir+"/dist";
 templatedir = "templates";
-jdbcdir = "jdbc3";
+jdbcdir = "";
 
 testsrc = "test/src";
 testbuilddir = bldoutdir+"/test";
 
 //Check java version for setting jdbc
-if (!System.getProperty("java.vm.version").startsWith("1.5"))
+print(System.getProperties());
+javaVersion = System.getProperty("java.version");
+print(javaVersion);
+if (javaVersion.startsWith("1.5"))
+	{
+	print("Configuring for JDBC 3");
+	jdbcdir = "jdbc3";
+	}
+else if (javaVersion.startsWith("1.6"))
+	{
+	print("Configuring for JDBC 4");
 	jdbcdir = "jdbc4";
+	}
+else
+	{
+	print("Configuring for JDBC 4.1");
+	jdbcdir = "jdbc4.1";
+	}
 
 //make.setProperty(make.PROP_MULTI_THREAD_OUTPUT, "true");
 
