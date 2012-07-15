@@ -240,4 +240,4 @@ There are a boat load of these
   # Developers are forced to write the update at the time they are working on it.  This saves time.
   # Did I mention they are automatic?
 
-Now go forth and be fruitful with your database updates.  While your here check out this Genormously awesome project :)
+Now go forth and be fruitful with your database updates.  While your here check out this [http://code.google.com/p/genormous/ Genormously] awesome project :)
