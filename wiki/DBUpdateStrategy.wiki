@@ -1,0 +1,243 @@
+#summary Update strategy for databases.
+#labels Featured
+
+= Introduction =
+
+If you have ever worked on a project that has a database then you have faced the problem of how to do DB updates.  The problem is particularly gruesome if you have to maintain branches of your code.
+
+So what is the problem, in case you don't know?  Any growing application that has a database will undergo schema changes.  How do you roll those out to your clients?  Do you write upgrade scripts that are part of the installer?  Now you are dealing with a more complicated install process.  And your developers have to remember to put together the update scripts and QA must test them.  It is just an icky mess.
+
+There are application frameworks that try to alleviate this problem but, I'm going to show you a technique so you can do the database updates automatically from within your code.
+
+Note.  When I say schema changes I'm including any change to the database ie adding indexes, setting default values etc..  Pretty much anything that would be part of an upgrade script and involves changes to the database.
+
+Note 2.  I'm presenting this in Java/MySQL but the idea can be used in pretty much any language.
+
+
+= Automatic Updates =
+
+Basically the database version is checked every time the application starts up.  If the database is out of date then the updates are automatically applied.
+
+Following are the components that make this automagic a reality.
+
+
+== Version Table ==
+
+The first thing you need is a version table in your db
+
+{{{
+CREATE TABLE database_version (
+   `version` INT NULL
+);
+}}}
+
+This table will only ever have one row in it.  The table will be used to track what version the database is at.
+
+
+== Updates Table ==
+
+This table is for managing schema changes to a branch.
+
+{{{
+CREATE TABLE updates (
+   `update_id` VARCHAR(36) NOT NULL
+   PRIMARY KEY (`update_id`)
+);
+}}}
+
+Every update you perform on the database will be assigned a UUID.  That UUID will be stored in the updates table.  If your project is such that you do not maintain branches (a SAS application) you do not need this table and the solution is a bit simpler.
+
+
+== Update Database Code ==
+
+For this I like to put all the updates into one class.  The methods can all be static or part of an instance, it doesn't matter.
+
+At the top you will define your version number as a static member.  In this example the version is set to 2.  I like to put a comment block right above the version that is a log of all version changes and a quick comment on what they change.
+
+Note:  It is important that this class only contains raw SQL code.  Do not be tempted to use any of your ORM objects.  The reason is that this code must be timeless, ORM objects reflect the current state of the schema.
+
+{{{
+public class DBUpdate
+   {
+   /**
+      1 - Created initial schema
+      2 - Added driver column to race_car table
+   */
+   public static final String DB_VERSION = 2;
+}}}
+  
+Next define some static sql scripts that you will use and add some custom utility methods for adding and dropping columns.
+ 
+{{{
+   /**
+      When setting the main version the sub version always goes to zero
+   */
+   private static final String SET_VERSION_SQL = "UPDATE database_version SET main_version = ?";
+   private static final String HAS_UPDATE_SQL = "SELECT update_id FROM updates WHERE update_id = ?";
+   private static final String ADD_UPDATE_SQL = "INSERT INTO updates values (?)";
+   
+   //Add a bunch of utility methods for adding columns, removing columns, etc.
+}}}
+
+You will need to add one utility method to add the UUID's to the updates table.  This one returns true or false depending on whether the add was successful.  If the UUID is already there it returns false.
+   
+{{{
+   /**
+      Returns true if the update is added to the database
+   */
+   private static boolean addUpdate(Connection con, String updateId)
+         throws SQLException
+      {
+      boolean hasUpdate;
+      
+      PreparedStatement ps = con.prepareStatement(HAS_UPDATE_SQL);
+      ps.setString(1, updateId);
+      ResultSet rs = ps.executeQuery();
+      hasUpdate = rs.next();
+      rs.close();
+      ps.close();
+      
+      if (!hasUpdate)
+         {
+         System.out.println("Adding update "+updateId);
+         ps = con.prepareStatement(ADD_UPDATE_SQL);
+         ps.setString(1, updateId);
+         ps.executeUpdate();
+         ps.close();
+         
+         return (true);
+         }
+      else
+         {
+         System.out.println("Skipping update "+updateId);
+         return (false);
+         }
+      }
+}}}
+
+In checkUpdate() you get the version of the database and then run a switch statement to apply the appropriate updates to the database.  The trick is that each case of the switch does not contain a break statement.  So if I have updates 1 - 10 and I'm currently on version 5, the switch will jump down to 5 and run all the code from there till the end.
+
+{{{ 
+   /**
+      This is where all the magic happens.  Somewhere in your startup code
+      you will call this method right after initializing a database connection
+   */
+   public void checkUpdate()
+      {
+      Connection con = ds.getConnection();
+      con.setAutoCommit(false);  //This is important as you want to be in a transaction
+      int version = 0;
+      
+      // Get the database version
+      stmt = con.createStatement();
+      stmt.execute(GET_VERSION_SQL);
+      ResultSet rs = stmt.getResultSet();
+      if (rs.next())
+         version = rs.getInt(1);
+      rs.close();
+      stmt.close();
+      //I like to print out my version durring startup.
+      System.out.println("Database version is "+version);
+      
+      //This prevents running old code on a newer database
+      if (version > DB_VERSION)
+         throw new SQLException("Database is newer then code");
+         
+      try
+         {
+         if (version < DB_VERSION)
+            {
+            switch (version)
+               {
+               case 0:
+                  /*
+                  I like to add this printUpdate method it serves two 
+                  purposes.
+                  1. It informs the user of what update is being ran (maybe to a log)
+                  2. It self documents this code as to what update is really
+                  being ran
+                  */
+                  printUpdate(1);
+                  if (addUpdate(con, "03d6c6bf-129d-41a1-a7e0-fe44f4361236"))
+                     createInitialSchema(con); //method that contains the update
+               
+               case 1:
+                  printUpdate(2);
+                  if (addUpdate(con, "731c84d7-3f13-44a8-b1fe-4866f0079e8a"))
+                     version2Update(con); //method that contains the update
+               }
+               
+            //This sets the main version of the code.
+            PreparedStatement ps = con.prepareStatement(SET_VERSION_SQL);
+            ps.setInt(1, DB_VERSION);
+            ps.executeUpdate();
+            }
+            
+         //Branch updates go here.
+         
+         //End branch updates
+         
+         con.commit();
+         }
+      catch (SQLException e)
+         {
+         //Log what happened
+         con.rollback();
+         }
+      finally
+         {
+         con.close();
+         }
+      }
+   }
+}}}
+
+== Managing Updates to a Branch ==
+
+To make updates to a branch possible we have wrapped each update in the switch with a call to addUpdate.  to illustrate lets use an example with the above code:
+
+Lets say I add a version 3 update to the trunk and version 3 adds an index to speed up the application.  So I change DB_VERSION to 3 and add the following case statement
+
+{{{
+case 2:
+   printUpdate(3);
+   if (addUpdate(con, "46568b39-4174-4d25-bec9-6eb0db1f18ae"))
+      version3Update(con);
+}}}
+
+Now I have a customer that is using our last shipping branch and they need that new index.  The customer is on database version 1 and I do not want them to get update 2 as that is tied to new untested features.  To solve this problem I go to the branch code only and add the following in the area commented above.
+
+{{{
+//Branch updates go here.
+
+if (addUpdate(con, "46568b39-4174-4d25-bec9-6eb0db1f18ae"))
+   version3Update(con);
+         
+//End branch updates
+}}}
+
+I will also have to add the version3Update method that adds the index.
+
+So now what happens when the branch code starts up.  The database version has not changed so the switch statement is skipped.  The application will then hit the new update and call addUpdate.  The first time through it will add the index and add the UUID to the updates table.  Every time after the addUpdate will return false and the update will be skipped.
+
+Now the customer Updates to the latest code from trunk that has the new feature that required update 2.  The switch jumps down and applies update 2 and then tries 3 but it has already been applied so it is skipped.
+
+
+== Drawbacks ==
+
+What are the downsides to this strategy.
+  # When an update is added to a branch the updates table is checked every time on startup for each of the updates.  This only lasts until the client updates to the latest trunk release.
+  # The DBUpdates class can get rather large.  As older versions of the code are not supported the updates can be trimmed down.  I like to add my new update methods right below checkUpdate so the most recent updates are first.
+  # You have to make sure only one developer works on an update at a time.  Merging updates can get a bit smelly.
+
+
+== Benefits ==
+
+There are a boat load of these
+  # Updates are automatic.  Holy crap isn't that enough by itself?!?
+  # Better tested updates.  Now all the developers are testing each update instead of blowing away the database and recreating it each time an update occurs.
+  # Developers can store up data they test with in stead of relying on scripts to load it after they clear it each time an update occurs.
+  # Developers are forced to write the update at the time they are working on it.  This saves time.
+  # Did I mention they are automatic?
+
+Now go forth and be fruitful with your database updates.  While your here check out this Genormously awesome project :)
