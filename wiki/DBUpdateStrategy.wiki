@@ -31,7 +31,7 @@ CREATE TABLE database_version (
 );
 }}}
 
-This table will only ever have one row in it.  The table will be used to track what version the database is at.
+This table will only ever have one row in it.  The database_version table will be used to track what version the database is at.
 
 
 == Updates Table ==
@@ -45,7 +45,7 @@ CREATE TABLE updates (
 );
 }}}
 
-Every update you perform on the database will be assigned a UUID.  That UUID will be stored in the updates table.  If your project is such that you do not maintain branches (a SAS application) you do not need this table and the solution is a bit simpler.
+Every update you perform on the database will be assigned a UUID.  That UUID will be stored in the updates table.  If your project is such that you do not maintain branches (a SAS application) you do not need the updates table and the solution is a bit simpler.
 
 
 == Update Database Code ==
@@ -167,7 +167,7 @@ In checkUpdate() you get the version of the database and then run a switch state
                      version2Update(con); //method that contains the update
                }
                
-            //This sets the main version of the code.
+            //This sets the database version to be current.
             PreparedStatement ps = con.prepareStatement(SET_VERSION_SQL);
             ps.setInt(1, DB_VERSION);
             ps.executeUpdate();
@@ -182,6 +182,7 @@ In checkUpdate() you get the version of the database and then run a switch state
       catch (SQLException e)
          {
          //Log what happened
+         //Roll back in case of a problem.
          con.rollback();
          }
       finally
@@ -194,7 +195,7 @@ In checkUpdate() you get the version of the database and then run a switch state
 
 == Managing Updates to a Branch ==
 
-To make updates to a branch possible we have wrapped each update in the switch with a call to addUpdate.  to illustrate lets use an example with the above code:
+To make updates to a branch possible we have wrapped each update in the switch with a call to addUpdate.  To illustrate how this works lets use an example with the above code:
 
 Lets say I add a version 3 update to the trunk and version 3 adds an index to speed up the application.  So I change DB_VERSION to 3 and add the following case statement
 
@@ -205,7 +206,7 @@ case 2:
       version3Update(con);
 }}}
 
-Now I have a customer that is using our last shipping branch and they need that new index.  The customer is on database version 1 and I do not want them to get update 2 as that is tied to new untested features.  To solve this problem I go to the branch code only and add the following in the area commented above.
+Now I have a customer that is using our last shipping branch and they need that new index.  The customer is on database version 1 and I do not want them to get update 2 as that is tied to new untested features.  To solve this problem I go to the branch code only and add the following in the area commented for branch updates.
 
 {{{
 //Branch updates go here.
@@ -218,7 +219,7 @@ if (addUpdate(con, "46568b39-4174-4d25-bec9-6eb0db1f18ae"))
 
 I will also have to add the version3Update method that adds the index.
 
-So now what happens when the branch code starts up.  The database version has not changed so the switch statement is skipped.  The application will then hit the new update and call addUpdate.  The first time through it will add the index and add the UUID to the updates table.  Every time after the addUpdate will return false and the update will be skipped.
+So now what happens when the branch code starts up?  The database version has not changed so the switch statement is skipped.  The application will then hit the new update and call addUpdate.  The first time through it will add the index and add the UUID to the updates table.  Every time after the addUpdate will return false and the update will be skipped.
 
 Now the customer Updates to the latest code from trunk that has the new feature that required update 2.  The switch jumps down and applies update 2 and then tries 3 but it has already been applied so it is skipped.
 
@@ -236,7 +237,7 @@ What are the downsides to this strategy.
 There are a boat load of these
   # Updates are automatic.  Holy crap isn't that enough by itself?!?
   # Better tested updates.  Now all the developers are testing each update instead of blowing away the database and recreating it each time an update occurs.
-  # Developers can store up data they test with in stead of relying on scripts to load it after they clear it each time an update occurs.
+  # Developers can store up data they test with instead of relying on scripts to load it after they clear it each time an update occurs.
   # Developers are forced to write the update at the time they are working on it.  This saves time.
   # Did I mention they are automatic?
 
