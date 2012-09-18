@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Brian Hawkins
+ * Copyright (c) 2012, Brian Hawkins
  * Permission is granted to use this code without restriction as long
  * as this copyright notice appears in all source files.
  */
@@ -13,7 +13,7 @@ print("===============================================================");
 //source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
 make.includeDefinitionFile("definitions.xml");
 
-version = "1.4.3";
+version = "1.4.4";
 
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
@@ -35,7 +35,7 @@ testsrc = "test/src";
 testbuilddir = bldoutdir+"/test";
 
 //Check java version for setting jdbc
-print(System.getProperties());
+//print(System.getProperties());
 javaVersion = System.getProperty("java.version");
 print(javaVersion);
 if (javaVersion.startsWith("1.5"))
