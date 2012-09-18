@@ -30,6 +30,7 @@ public class TranslactionlessTests
 	public void testObject()
 		{
 		UniqueSentence us = UniqueSentence.factory.create(123);
+		us.flush();
 		}
 		
 	//---------------------------------------------------------------------------

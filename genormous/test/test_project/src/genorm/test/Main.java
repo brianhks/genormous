@@ -1,5 +1,6 @@
 package genorm.test;
 
+import $package$.GenOrmDataSource;
 import genorm.runtime.GenOrmDataSource;
 import genorm.test.orm.*;
 import org.hsqldb.jdbc.*;
