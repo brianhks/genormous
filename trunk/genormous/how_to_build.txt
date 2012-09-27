@@ -8,4 +8,4 @@ ex.
 Then from the root directory type
 >java make
 
-
+That is all
