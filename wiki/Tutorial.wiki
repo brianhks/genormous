@@ -55,5 +55,5 @@ To generate the ORM code you need to specify three things:
 
 In the sample project we will generate the code into the genorm.test.orm package.  The command looks like this:
 {{{
-java -cp <classpath> genorm.Genormous -o tables.xml -d src/genorm/test/orm -p genorm.test.orm
+java -cp <classpath> genorm.Genormous -s tables.xml -d src/genorm/test/orm -p genorm.test.orm
 }}}
