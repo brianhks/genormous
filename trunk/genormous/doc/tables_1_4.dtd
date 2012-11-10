@@ -1,4 +1,4 @@
-<!ELEMENT tables (configuration?,global?,table+,view*,query*)>
+<!ELEMENT tables (configuration?,global?,table+,view*,queries?)>
 <!ELEMENT configuration (option*,type_map?,plugin*)>
 
 <!ELEMENT option EMPTY>
@@ -91,6 +91,8 @@
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
 	>
+	
+<!ELEMENT queries (query*)>
 
 <!ELEMENT query (comment?,input?,replace?,return?,sql)>
 <!ATTLIST query

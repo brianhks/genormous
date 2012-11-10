@@ -30,6 +30,6 @@ CREATE TABLE $table.name$ (
 	$endif$$if(table.hasUniqueColumns)$,
 	$table.uniqueColumnSets:{colset | UNIQUE ($colset:{col | `$col.name$`}; separator=", "$)}; separator=",\n"$
 	$endif$
-	)
+	) $mysql_table_option$
 
 >>

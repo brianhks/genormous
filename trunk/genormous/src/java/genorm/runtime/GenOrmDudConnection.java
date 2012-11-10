@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 /**
-	This class if for transactionless connections to the db
+	This class is for transactionless connections to the db
 	All connections are associated with the statements and closed
 	when the statement is closed
 */

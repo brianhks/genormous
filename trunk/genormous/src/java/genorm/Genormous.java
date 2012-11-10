@@ -109,10 +109,10 @@ public class Genormous extends GenUtil
 	private static void printHelp()
 		{
 		out.println("GenORMous version X");
-		out.println("Usage: java -jar genormous.jar -o <source xml> -[d <dest dir>] [-p <package>]");
+		out.println("Usage: java -jar genormous.jar -s <source xml> -[d <dest dir>] [-p <package>]");
 		out.println("      [-s] [-c <custom type properties>] [-b <custom db properties>]");
 		out.println("      [-t <database type>] [-g <graphViz file>] [-?]");
-		out.println("  -o: Source xml containing table definitions.");
+		out.println("  -s: Source xml containing table definitions.");
 		out.println("  -d: Destination dir to write generated files to.");
 		out.println("  -p: Package name of generated files.");
 		//out.println("  -s: .");
@@ -157,7 +157,7 @@ public class Genormous extends GenUtil
 			
 		try
 			{
-			Genormous gen = new Genormous(cl.source); /* , cl.destination, cl.targetPackage,
+			Genormous gen = new Genormous(cl.source, cl.verbose); /* , cl.destination, cl.targetPackage,
 					cl.includeStringSets, cl.graphVizFile); */
 					
 			if (cl.destination != null)
@@ -197,10 +197,10 @@ public class Genormous extends GenUtil
 
 		
 //==============================================================================
-	public Genormous(String source)
+	public Genormous(String source, boolean verbose)
 			throws ConfigurationException
 		{
-		super(source);
+		super(source, verbose);
 		
 		/* super.setDestinationDir(destDir);
 		m_source = source;
@@ -323,13 +323,18 @@ public class Genormous extends GenUtil
 				globalColumns.add(col);
 				}
 			
+			if (m_verbose)
+				System.out.println("Reading table definitions");
+				
 			Iterator tableit = m_source.selectNodes("/tables/table").iterator();
 			while (tableit.hasNext())
 				{
 				int dirtyFlag = 0;
 				Element e = (Element) tableit.next();
 				String tableName = e.attribute(NAME).getValue();
-				//System.out.println("Table "+tableName);
+				if (m_verbose)
+					System.out.println("  Table "+tableName);
+					
 				Table table = new Table(tableName, formatter);
 				table.setComment(e.elementText(COMMENT));
 				

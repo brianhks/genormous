@@ -100,6 +100,17 @@ public $table.className$ set$foreignKeys.methodName$($foreignKeys.table.classNam
 
 >>
 
+addQueryInterfaceMethods(query) ::= <<
+/**
+	$query.comment$
+*/
+$if(query.noneResult)$
+public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$);
+$else$
+public $if(query.singleResult)$$table.className$$else$ResultSet$endif$ get$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$);
+$endif$
+>>
+
 addQueryMethods(query) ::= <<
 //---------------------------------------------------------------------------
 /**
@@ -325,17 +336,25 @@ public class $table.className$_base extends GenOrmRecord
 	$endif$
 		
 	//===========================================================================
-	public static $table.className$Factory factory = new $table.className$Factory();
+	public static $table.className$FactoryImpl factory = new $table.className$FactoryImpl();
 	
-	public static class $table.className$Factory //Inherit interfaces
-			implements GenOrmRecordFactory
+	public static interface $table.className$Factory extends GenOrmRecordFactory
+		{
+		public boolean delete($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
+		public $table.className$ find($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
+		public $table.className$ findOrCreate($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
+		$table.queries:addQueryInterfaceMethods()$
+		}
+	
+	public static class $table.className$FactoryImpl //Inherit interfaces
+			implements $table.className$Factory 
 		{
 		public static final String CREATE_SQL = "$createSQL$";
 
 		private ArrayList<GenOrmFieldMeta> m_fieldMeta;
 		private ArrayList<GenOrmConstraint> m_foreignKeyConstraints;
 		
-		protected $table.className$Factory()
+		protected $table.className$FactoryImpl()
 			{
 			m_fieldMeta = new ArrayList<GenOrmFieldMeta>();
 			$columns:{col | m_fieldMeta.add($col.nameCaps$_FIELD_META);

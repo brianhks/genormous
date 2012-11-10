@@ -13,7 +13,7 @@ print("===============================================================");
 //source(new URL("jar:file:lib/test_only/depunit.jar!/cpmake_plugin.bsh"));
 make.includeDefinitionFile("definitions.xml");
 
-version = "1.4.4";
+version = "1.5.0";
 
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
@@ -205,6 +205,9 @@ void doUnitTests(Rule rule)
 			.set("styleSheet", "junitreport.xsl");
 			/* .set("testClasses", testClassFiles); */
 			
+	if (make.getProperty("jacoco", "false").equals("true"))
+		depunitDefinition.set("jacoco");
+		
 	//depunitDefinition.set("debug");
 	make.exec(depunitDefinition.getCommand());
 	}

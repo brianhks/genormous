@@ -22,5 +22,9 @@ import java.io.IOException;
 public interface ORMPlugin extends GenPlugin
 	{
 	public Set<String> getImplements(Map<String, Object> attributes);
+	
+	/**
+		Returns code that is added to the body of the generated ORM base class
+	*/
 	public String getBody(Map<String, Object> attributes) throws IOException;
 	}

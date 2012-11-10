@@ -54,6 +54,17 @@ public class GenUtil extends TemplateHelper
 	*/
 	public static final String PROP_DATASOURCE_PACKAGE = "genorm.datasourcePackage";
 	
+	/**
+	*/
+	public static final String PROP_BASE_CLASS_PACKAGE = "";
+	
+	/**
+	*/
+	public static final String PROP_BASE_CLASS_DESTINATION = "";
+	
+	/**
+	*/
+	
 	
 	
 
@@ -63,6 +74,7 @@ public class GenUtil extends TemplateHelper
 	protected Properties m_config;
 	protected Document m_source;
 	private Format m_formatter;
+	protected boolean m_verbose;
 	
 	/**
 		This class is used for the java and db type maps.  If the value
@@ -86,10 +98,11 @@ public class GenUtil extends TemplateHelper
 			}
 		}
 	
-	public GenUtil(String source)
+	public GenUtil(String source, boolean verbose)
 			throws ConfigurationException
 		{
 		super();
+		m_verbose = verbose;
 		m_config = new Properties();
 		
 		m_javaTypeMap = new DefaultMap();

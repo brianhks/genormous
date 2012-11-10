@@ -24,4 +24,6 @@ public interface Format
 	//public String formatStaticNameRef(String columnName);
 	public String formatForeignKeyMethod(ForeignKeySet fks);
 	public String formatParameterName(String columnName);
+	
+	//public String formatBaseClassName(String tableName);
 	}

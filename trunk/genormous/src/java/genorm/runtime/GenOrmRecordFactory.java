@@ -31,5 +31,6 @@ public interface GenOrmRecordFactory
 	public GenOrmRecord createWithGeneratedKey();
 	public GenOrmResultSet select(String where);
 	public GenOrmResultSet select(String where, String orderBy);
+	public void testQueryMethods();
 	}
 	
