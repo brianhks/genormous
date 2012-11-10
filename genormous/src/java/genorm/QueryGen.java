@@ -120,7 +120,7 @@ public class QueryGen extends GenUtil
 	public QueryGen(String source)
 			throws ConfigurationException
 		{
-		super(source);
+		super(source, false);
 		}
 		
 //------------------------------------------------------------------------------
@@ -131,11 +131,11 @@ public class QueryGen extends GenUtil
 		} */
 		
 //------------------------------------------------------------------------------
-	public QueryGen(String source, String destDir, String packageName)
+	/* public QueryGen(String source, String destDir, String packageName)
 			throws ConfigurationException
 		{
-		super(source);
-		}
+		super(source, false);
+		} */
 
 
 

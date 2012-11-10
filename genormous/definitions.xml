@@ -9,6 +9,10 @@
 			-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=5656
 		</option>
 		
+		<option name="jacoco">
+			-javaagent:lib/test_only/jacocoagent.jar=destfile=build/jacoco.exec
+		</option>
+		
 		<option name="classpath"
 				pattern="(.+)">-cp $1</option>
 		<option name="MANDATORY">org.depunit.DepUnit</option>

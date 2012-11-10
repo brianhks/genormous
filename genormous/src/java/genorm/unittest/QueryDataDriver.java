@@ -47,7 +47,7 @@ public class QueryDataDriver extends DataDriver
 			{
 			m_queries = new ArrayList<Map<String, ? extends Object>>();
 			
-			GenUtil genUtil = new GenUtil(file);
+			GenUtil genUtil = new GenUtil(file, false);
 			
 			SAXReader reader = new SAXReader();
 			Document xmldoc = reader.read(new File(file));
