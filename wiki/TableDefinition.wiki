@@ -4,43 +4,43 @@
 
 The following is a layout of the tags that are and can be present in the definition xml.  The definition xml is used by Genormous to generate the ORM files as well as the create.sql file.
 
-  * [TableDefinition#tables tables]<br/>
+  * [TableDefinition#tables tables]
 
-  * [TableDefinition#configuration configuration?]<br/>
-    * [TableDefinition#option option*]<br/>
-    * [TableDefinition#type_map type_map?]<br/>
-      * [TableDefinition#type type+]<br/>
-    * [TableDefinition#plugin plugin*]<br/>
+  * [TableDefinition#configuration configuration?]
+    * [TableDefinition#option option*]
+    * [TableDefinition#type_map type_map?]
+      * [TableDefinition#type type+]
+    * [TableDefinition#plugin plugin*]
 
-  * [TableDefinition#global global?]<br/>
-    * [TableDefinition#col col+]<br/>
+  * [TableDefinition#global global?]
+    * [TableDefinition#col col+]
 
-  * [TableDefinition#table table+]<br/>
-    * [TableDefinition#comment comment?]<br/>
-    * [TableDefinition#property property*]<br/>
-    * [TableDefinition#col col+]<br/>
-      * [TableDefinition#comment comment?]<br/>
-      * [TableDefinition#property property*]<br/>
-      * [TableDefinition#reference reference?]<br/>
-    * [TableDefinition#primary_key primary_key?]<br/>
-      * [TableDefinition#colref colref+]<br/>
-    * [TableDefinition#unique unique*]<br/>
-      * [TableDefinition#colref colref+]<br/>
-    * [TableDefinition#table_query table_query*]<br/>
-      * [TableDefinition#comment comment?]<br/>
-      * [TableDefinition#input input?]<br/>
-      * [TableDefinition#replace replace?]<br/>
-      * [TableDefinition#sql sql]<br/>
+  * [TableDefinition#table table+]
+    * [TableDefinition#comment comment?]
+    * [TableDefinition#property property*]
+    * [TableDefinition#col col+]
+      * [TableDefinition#comment comment?]
+      * [TableDefinition#property property*]
+      * [TableDefinition#reference reference?]
+    * [TableDefinition#primary_key primary_key?]
+      * [TableDefinition#colref colref+]
+    * [TableDefinition#unique unique*]
+      * [TableDefinition#colref colref+]
+    * [TableDefinition#table_query table_query*]
+      * [TableDefinition#comment comment?]
+      * [TableDefinition#input input?]
+      * [TableDefinition#replace replace?]
+      * [TableDefinition#sql sql]
 
-  * [TableDefinition#query query*]<br/>
-    * [TableDefinition#comment comment?]<br/>
-    * [TableDefinition#input input?]<br/>
-      * [TableDefinition#param param*]<br/>
-    * [TableDefinition#replace replace?]<br/>
-      * [TableDefinition#param param*]<br/>
-    * [TableDefinition#return return?]<br/>
-      * [TableDefinition#param param*]<br/>
-    * [TableDefinition#sql sql]<br/>
+  * [TableDefinition#query query*]
+    * [TableDefinition#comment comment?]
+    * [TableDefinition#input input?]
+      * [TableDefinition#param param*]
+    * [TableDefinition#replace replace?]
+      * [TableDefinition#param param*]
+    * [TableDefinition#return return?]
+      * [TableDefinition#param param*]
+    * [TableDefinition#sql sql]
 
 
 
@@ -74,11 +74,11 @@ Specifies Genormous options used during code generations
 
 === Possible options ===
 
-genorm.package:  defines the package name to be placed in the generated code
+_genorm.package_:  defines the package name to be placed in the generated code
 
-genorm.destination:  destination folder to place generated orm files into.
+_genorm.destination_:  destination folder to place generated orm files into.
 
-genorm.graphvizFile:  name of the graphviz dot file to create
+_genorm.graphvizFile_:  name of the graphviz dot file to create
 
 {{{
 <option name="genorm.package" value="test.orm"/>
