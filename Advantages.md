@@ -1,0 +1,78 @@
+# Speed #
+
+A big complaint I've heard of any ORM is the speed issue.  If your project only accesses single tables at a time you can be perfectly happy with using ORM.  But lets say you have 30 tables in your database and for the main user page you need to aggregate data from 15 of those tables.  Collecting this data using strait ORM will result in 15 queries to the database returning way more information then you probably need.  Multi table queries are what databases are good at, why not let them do their job?
+
+GenORMous has a two prong approach to solving ORM  The first is to generate ORM objects for each table.  The second is to create objects from custom SQL queries.  All database queries are placed in a simple XML file.  Here is an example of one of those queries:
+```
+<query name="project_list">
+  <input>
+    <param name="client_id" type="int" test="1"/>
+  </input>
+  <return>
+    <param name="project_id" type="int"/>
+    <param name="project_name" type="String"/>
+  </return>
+  <sql>
+    select p.project_id, p.name as project_name
+    from project p, project_assignment pa
+    where pa.client_id = ? and
+    pa.project_id = p.project_id
+  </sql>
+</query>
+```
+
+From this GenORMous creates an object that represents this query.  The SQL is unrestricted.  You can put in anything the database can handle.  Just define what the inputs and return types are and that's it.  Now you can take advantage of the full speed query capabilities of your DBMS solution.
+
+# Database Changes #
+
+In an ideal world the database would be designed perfect the first time and never need to be changes.  Unfortunately requirements change along with customer needs that require changes to the database.
+
+Why are database changes so bad?  Database changes break code.  Even worse it breaks code in a way that is only runtime detectable.  The testing required to find such breakages are costly to any organization.  The reason these breakages are so insidious is because of SQL strings in the code.  Because all access to the database is done via strings of SQL queries embedded in the code the compiler cannot detect them automatically.  They only fail during runtime when the query string is sent to the database and fails.
+
+## How does GenORMous fix this problem? ##
+
+By now you should know GenORMous generates ORM objects to access your database.  These objects are generated at pre-compile time.  The objects are generated off of your database design.  When you change the database you simply regenerate the ORM objects.  Because now the ORM objects reflect the database changes your code will break at compile time instead of run time.
+
+What about the queries mentioned above in the Speed section?  Unfortunately breakages here cannot be identified at compile time.  But because all of your queries are placed in a single file GenORMous creates a unit test for you to call from your favorite unit test framework to test all the queries against the changed database.  The queries that are affected will fail.
+
+So lets review what steps are required to detect and fix database changes in the code:
+  1. Change the databse.
+  1. Change the the GenORMous XML file to reflect the database changes.
+  1. Regenerate ORM objects.
+  1. Compile code and fix problems.
+  1. Run unit tests to detect query problems.
+  1. Fix queries and regenerate query objects.
+  1. Again recompile to detect code breakages from query changes.
+
+OK so this is not a short list but, you don't see anywhere in this list the following "Hunt through code looking for effected SQL."
+
+The above steps are mostly automated so the computer tells you where the problems are so you can quickly fix them.
+
+
+# Simplicity #
+
+The idea of GenORMous had it origins in SimpleORM.  SimpleORM is easy to use but the setup is a bit tedious.  The other drawback of SimpleORM is that it used generic parameters and return types so a lot of casting is required to use it.  These are not serous flaws but, it can be done better.
+
+GenORMous generates the ORM code from an XML file that defines the tables like this one:
+```
+<table name="segment">
+  <comment></comment>
+  <property key="hsqldb_tableType" value="CACHED"/>
+  <col name="segment_id" type="integer" primary_key="true">
+    <comment></comment>
+  </col>
+  <col name="source" type="string" primary_key="false">
+    <comment></comment>
+  </col>
+  <col name="next_segment" type="integer" primary_key="false">
+    <comment></comment>
+    <reference table="segment" column="segment_id"/>
+    </col>
+  <col name="prev_segment" type="integer" primary_key="false">
+    <comment></comment>
+    <reference table="segment" column="segment_id"/>
+  </col>
+</table>
+```
+
+To be continued...

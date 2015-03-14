@@ -1,0 +1,56 @@
+**Genormous Frequently Asked Questions**
+
+
+# I call flush but the data is not available to another thread? #
+
+Calling flush on a GenOrmRecord behaves differently depending on the type of connection on the thread.
+  * If no open connection exists on the thread, a new connection is started and the data is flushed and committed.
+  * If a connection exists and it is within a transaction the data is just flushed to the db but only available to future queries on the same connection until the connection is committed.
+
+So if you have flushed data but it is not immediately available to a second thread then the most likely cause is that the connection has not been committed yet.  The obvious solution is to commit the transaction before starting or notifying the other thread to get the data.
+
+If you are in a situation where the transaction cannot be committed then you can start and commit an inner transaction:
+
+```
+//This represents code I may not have control over
+GenOrmDataSource.begin();
+...
+callMyStuff();
+...
+GenOrmDataSource.commit();
+GenOrmDataSource.close();
+
+
+
+public void callMyStuff()
+{
+   MyData data = MyData.factory.create("foo");
+   data.flush();
+   Thread t = new Thread();
+   t.start();
+   //If code in 't' tries to access 'data' it may or may not be available
+   //depending on if the current thread can commit before 't'
+   //can try to access it.
+}
+
+//Solution
+public void callMySutff()
+{
+   //Genormous can stack connections on the same thread
+   GenOrmDataSource.begin();
+   try
+   {
+      MyData data = MyData.factory.create("foo");
+      data.flush();
+      GenOrmDataSource.commit();
+   }
+   finally
+   {
+      GenOrmDataSource.close();
+   }
+
+   //Now the data will be available to 't'
+   Thread t = new Thread();
+   t.start();
+}
+```

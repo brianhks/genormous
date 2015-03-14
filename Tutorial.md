@@ -1,0 +1,57 @@
+(This is getting a bit old, look at the test\_project for more up to date example)
+
+# Introduction #
+
+This tutorial is designed to show you how simple Genormous is to use.  In this tutorial we will setup a simple data base application that will keep track of authors and books.  The code used for this tutorial is in the source tree under [test/test\_project](http://code.google.com/p/genormous/source/browse/trunk/genormous/test/test_project/tables.xml).
+
+
+# Setting up the tables.xml #
+
+The magic of Genormous all comes from an XML file that defines what your database looks like.  This part can be a bit tedious but, I promise it is the only part.  One technique I've used in the past is to generate this file from a graphical tool such as Umbrello.  Also a future feature I want to add is a tool that will generate this file from an existing database.
+
+## Database Design ##
+
+For our sample project we want two tables.  The first is the author table.  Here is the definition for it:
+
+```
+<table name="author">
+  <property key="hsqldb_tableType" value="CACHED"/>
+  <col name="author_id" type="integer" primary_key="true"/>
+  <col name="name" type="string"/>
+</table>
+```
+
+Every thing should be pretty straight forward except for the `<property>` tag.  This allows for custom values to be passed into the code generator.  One of the things the generator will produce is SQL for creating the table.  In our case we are using the HSQLDB project and one of the parameters it needs is to know what kind of table to create.  Here we are going to create a "CACHED" table.  (To see where this is used have a look at templates/hsqldb\_create.st)
+
+The _type_ attribute on each column is mapped to both the java type and the database type.  The mapping is done in some property files but, I'm currently moving that into the XML.
+
+The second table we want to create is the book table.  Here is the XML for that table:
+
+```
+<table name="book">
+  <property key="hsqldb_tableType" value="CACHED"/>
+  <col name="author" type="integer">
+    <reference table="author" column="author_id"/>
+  </col>
+  <col name="title" type="string"/>
+  <col name="isbn" type="string"/>
+</table>
+```
+
+Again this should be pretty self explanatory.  All of the data types can be whatever you want.  They get mapped to a java type using the typeToJavaTypeMap that is found in templates/data\_type\_maps.st.  In the future I want to make this customizable so you can pass in your own mapping and use whatever you want.
+
+There that was it.  That wasn't so bad now was it?
+
+Next up generating the code...
+
+# Generating Code #
+
+To generate the ORM code you need to specify three things:
+  1. The XML file that contains the table definition
+  1. The directory to where the code will be placed
+  1. The name of the package into which the code will be placed.
+
+In the sample project we will generate the code into the genorm.test.orm package.  The command looks like this:
+```
+java -cp <classpath> genorm.Genormous -s tables.xml -d src/genorm/test/orm -p genorm.test.orm
+```

@@ -1,0 +1,26 @@
+# Supported Java Data Types #
+
+When mapping custom database types, the following Java types are supported:
+  * int
+  * boolean
+  * String
+  * double
+  * byte[.md](.md)
+  * java.math.BigDecimal
+  * java.sql.Date
+  * java.sql.Timestamp
+
+
+When defining custom types in your XML file you would do so like this
+```
+<queries>
+  <configuration>
+    <querygen>
+      <typeMap>
+        <type custom="myBinary" java="byte[]"/>
+      </typeMap>
+    </querygen>
+  </configuration>
+  ...
+</queries>
+```
