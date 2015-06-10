@@ -1,0 +1,3982 @@
+<tables>
+	<table name="audit_table">
+		<comment></comment>
+		<col name="action_type" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="entity_id" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_name" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ip_address" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="module_id" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="new_value" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="previous_value" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reason_code" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="timestamp" type="timestamp" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_id" type="int" allow_null="true">
+			<comment></comment>
+			<reference table="users" column="user_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="camaexport">
+		<comment></comment>
+		<col name="batch_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_run" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="collection_assignment">
+		<comment></comment>
+		<col name="collection_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="collection_fields">
+		<comment></comment>
+		<col name="collection_field_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="collection_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="display_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_name" type="char(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_order" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_status" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="field_types" column="field_type_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="collection_library_fields">
+		<comment></comment>
+		<col name="collection_field_id" type="int" default_value="0" allow_null="true">
+			<comment></comment>
+			<reference table="collection_fields" column="collection_field_id"/>
+		</col>
+		<col name="collection_id" type="int" default_value="0" allow_null="true">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="library_field_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="library_fields" column="field_id"/>
+		</col>
+		<col name="library_id" type="int" default_value="0" allow_null="true">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="collection_privileges">
+		<comment></comment>
+		<col name="collection_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="privilege_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+			<reference table="lists" column="item_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="collections">
+		<comment></comment>
+		<col name="collection_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="collection_name" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="display_order" type="tinyint" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="droplist_label" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="configuration">
+		<comment></comment>
+		<col name="configuration_description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="configuration_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="configuration_value" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="county_school_tax_codes">
+		<comment></comment>
+		<col name="county_code" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="county_name" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="local_tax_district_code" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="manatron_township_code" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="school_corporation_code" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="school_corporation_name" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_district_code" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_district_name" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township_code" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township_name" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="database_info">
+		<comment></comment>
+		<col name="db_version" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_10_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_10" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_11_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_11" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_12_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_12" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_13_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_13" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_14_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_14" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_1_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_1" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_2_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_2" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_3_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_3" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_4_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_4" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_5_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_5" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_6_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_6" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_7_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_7" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_8_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_8" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="document_9_objects">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_9" column="document_id"/>
+		</col>
+		<col name="object_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_1">
+		<comment></comment>
+		<col name="adjustments" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avimprovements" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avland" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avtotal" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="batchdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyeraddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyercity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyerprimaryresidence" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyerstate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyerzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportdate" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportsuccessful" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="circumstances" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="condosale" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="dateofsale" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="duplicator" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="exemptionnumber" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="exempttransaction" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="existingrelationship" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field1" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field2" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="includeinsalesratio" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="legaldescription" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lrsn" type="varchar(11)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="mobilehome" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="multiparcel_import" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhood" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhoodcode" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="netsalesprice" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyincluded" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyvalue" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertycity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyclasscode" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertystate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="purchaseadjoiningland" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="salesprice" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="schoolcorporation" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_id" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_number" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_total" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="selleraddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellercity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerpaidpointsamount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerprovidedfinancing" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerstate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="significantphysicalchanges" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sourcename" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="splits" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbilladdress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="trade" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="transferentireparcel" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="vacantland" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="validsale" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationmethod" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verified" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verifiedby" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="warrantydeed" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_10">
+		<comment></comment>
+		<col name="assessmentyear" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="av1" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="av2" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="av3" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="location1" type="varchar(100)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="location2" type="varchar(100)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="location3" type="varchar(100)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="make1" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="make2" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="make3" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="owner_name" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="street" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="year1" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="year2" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="year3" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_11">
+		<comment></comment>
+		<col name="address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="effective_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_12">
+		<comment></comment>
+		<col name="bank" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="case_number" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="court_name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="decendents_name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="estate_attorney" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="social_security" type="varchar(11)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_13">
+		<comment></comment>
+		<col name="assessmentyear" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="petition_number" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="petitioner" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="property_owner" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="type_of_property" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_14">
+		<comment></comment>
+		<col name="av_improvements" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="av_land" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="av_persprop_exempt" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_of_hearing" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="exempt_classification" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="exempt_granted" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="filing_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="filingyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ic_codes" type="decimal" default_value="-1" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lease_term" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="leasee_address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="leasee_city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="leasee_name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="leasee_state" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="leasee_zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="legal_authority" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lessor_reported" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="org_address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="org_city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="org_name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="org_state" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="org_zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="percent_approved_improve" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="percent_approved_land" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="percent_approved_persprop" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertynumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyclasscode" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ptaboa_request_audit" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_present" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_state" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tax_rep_zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayer_present" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_2">
+		<comment></comment>
+		<col name="active" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businesscode" type="varchar(6)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businessname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="effective_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="extensiongranted" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="extensionyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="financialinstitution" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="formtype" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sendform" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="spouse" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" default_value="0" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="typeofoperation" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="yearadded" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="yearchanged" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="yeardeleted" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_3">
+		<comment></comment>
+		<col name="113created" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualboatcount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualvehiclecount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="appealstatus" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessmentyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="excludedreturn" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="incomplete" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="is113" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="latefiling" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="penaltyassessed" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="personalproperty" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedboatcount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedvehiclecount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="spouse" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ssn" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportsuccessful" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="totalav" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ttvbeforedeductions" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="underappeal" type="varchar(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="undervalued" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="waivepenalty" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_3_detail_1">
+		<comment></comment>
+		<col name="actualttv" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="bodytype" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_3" column="document_id"/>
+		</col>
+		<col name="item_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lengthwidth" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertymake" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertymodel" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertytype" type="varchar(7)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="purchasedate" type="varchar(10)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="purchaseprice" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reported" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedttv" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_4">
+		<comment></comment>
+		<col name="113created" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualgrain" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actuallivestock" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_equipment" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_obsol" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_retired" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="appealstatus" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessmentyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businesscode" type="varchar(6)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businessname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="deductiontype" type="tinyint unsigned" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="endingdate" type="varchar(8)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="excludedreturn" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="incomplete" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="inventorydeduction" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="is113" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="latefiling" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="matherror" type="char(3)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="penaltyassessed" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_10_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_10_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_11_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_11_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_8_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_9_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_9_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_10_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_10_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_11_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_11_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_12_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_12_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_13_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_13_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_8_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_9_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_9_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedgrain" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedlivestock" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportelection" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportsuccessful" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="totalav" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ttvbeforedeductions" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="typeofoperation" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="underappeal" type="varchar(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="undervalued" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="waivepenalty" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_5">
+		<comment></comment>
+		<col name="113created" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="appealstatus" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessmentyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businesscode" type="varchar(6)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businessname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="deductiontype" type="tinyint unsigned" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="endingdate" type="varchar(8)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="excludedreturn" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="financialinstitution" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="incomplete" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="inventorydeduction" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="is113" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="latefiling" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="matherror" type="char(3)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="penaltyassessed" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_10_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_11_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool_year_9_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportelection" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportsuccessful" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="totalav" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ttvbeforedeductions" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="typeofoperation" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="underappeal" type="varchar(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="undervalued" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="waivepenalty" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_6">
+		<comment></comment>
+		<col name="103wfiled" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="103wline19" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="103wline3" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="103wratio" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="113created" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualera" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_equipment" type="decimal" default_value="0.00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="adj_fleet" type="decimal" default_value="0.00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="adj_fleetttv" type="decimal" default_value="0.00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_obsol" type="decimal" default_value="0.00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="adj_retired" type="decimal" default_value="0.00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="adj_retiredttv" type="decimal" default_value="0.00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adj_tooling" type="decimal" default_value="0.00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="adj_toolingttv" type="decimal" default_value="0.00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="appealstatus" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessmentyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businesscode" type="varchar(6)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businessname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="endingdate" type="varchar(8)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="excludedreturn" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="financialinstitution" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="incomplete" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="inventorydeduction" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="is113" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="latefiling" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="matherror" type="char(3)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="outdoor_record" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="penaltyassessed" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool1_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool2_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_10_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_10_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_11_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_11_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_8_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_9_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool3_year_9_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_date" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_10_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_10_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_11_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_11_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_12_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_12_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_13_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_13_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_8_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_9_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool4_year_9_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_ac" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_ttv" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_0_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_0_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_1_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_1_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_2_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_2_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_3_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_3_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_4_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_4_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_5_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_5_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_6_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_6_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_7_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_7_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_8_ad" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="pool5_year_8_tc" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedera" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportelection" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportsuccessful" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="totalav" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ttvbeforedeductions" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="typeofoperation" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="underappeal" type="varchar(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="undervalued" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="waivepenalty" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_6_detail_1">
+		<comment></comment>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="documents_6" column="document_id"/>
+		</col>
+		<col name="item_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="numberfaces" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="signttv" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="signtype" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_7">
+		<comment></comment>
+		<col name="113created" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualera" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="actualschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="actualudid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="addressline1" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="addressline2" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="appealstatus" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessmentyear" type="varchar(4)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="attention" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="barcode" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businesscode" type="varchar(6)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="businessname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="excludedreturn" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="federaltaxid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="incomplete" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="inventorydeduction" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="is113" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="latefiling" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="locationzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lock_record" type="varchar(35)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="matherror" type="char(3)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="penaltyassessed" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="phoneextension" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedera" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedppid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="reportedschedulea" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedscheduleb" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="reportedudid" type="decimal" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxexportsuccessful" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxpayername" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="telephone" type="varchar(14)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="tif_district" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="totalav" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="ttvbeforedeductions" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="typeofoperation" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="underappeal" type="varchar(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="undervalued" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="uniqueid" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="waivepenalty" type="char(3)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="zip" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_8">
+		<comment></comment>
+		<col name="acreage" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adjacentpropertyowner" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adjustments" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessorsignificant" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avimprovements" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avland" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avtotal" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="batchdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyerprimaryresidence" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportdate" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportsuccessful" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="changeinuse" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="circumstances" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="contractdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="deedtype" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="duplicator" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="easement" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="existingrelationship" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field1" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field2" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="foreclosure" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="includeinsalesratio" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="landcontract" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="landcontractdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="leases" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="legaldescription" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lrsn" type="varchar(11)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="mergers" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="multiparcel_import" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhood" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhoodcode" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="noconsideration" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="nonwarrantydeed" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="numberofparcels" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="partialinterest" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="partitiondocuments" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyamount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyincluded" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertycity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyclasscode" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertystate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="quitclaimdeeds" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="rerecording" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="salesprice" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_id" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_number" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_total" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="securityinterest" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerpaidpoints" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerpaidpointsamount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="significantphysicalchange" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sourcename" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="split" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbilladdress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillstate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="titlecompanyname" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="titlecompanytelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="trade" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="transfertocharity" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="vacantland" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="validsale" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationmethod" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verified" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verifiedby" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="documents_9">
+		<comment></comment>
+		<col name="acreage" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adjacentpropertyowner" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="adjustments" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="alternateid" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="assessorsignificant" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avimprovements" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avland" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="avtotal" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="batchdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer1zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyer2zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyerprimaryresidence" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="buyertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportbatchid" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportdate" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="camaexportsuccessful" type="char(1)" default_value="N" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="changeinuse" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="circumstances" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="contractdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_deleted" type="datetime" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="datefiled" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="deedtype" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="document_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="duplicator" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="easement" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="existingrelationship" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field1" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field2" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="foreclosure" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="includeinsalesratio" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="landcontract" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="landcontractdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="last_edited" type="timestamp" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="leases" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="legaldescription" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="lrsn" type="varchar(11)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="mergers" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="multiparcel_import" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhood" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="neighborhoodcode" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="noconsideration" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="nonwarrantydeed" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="notes" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="numberofparcels" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="parcelnumber" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="partialinterest" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="partitiondocuments" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyamount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="personalpropertyincluded" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="preparername" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="preparertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyaddress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertycity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyclasscode" type="char(3)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertystate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="propertyzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="quitclaimdeeds" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="rerecording" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="salesprice" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_id" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_number" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="scope_transaction_record_total" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="securityinterest" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller1zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2address" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2city" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2name" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2state" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="seller2zipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerpaidpoints" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellerpaidpointsamount" type="decimal" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sellertelephone" type="varchar(12)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="significantphysicalchange" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="sourcename" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="split" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbilladdress" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillcity" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillstate" type="char(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxbillzipcode" type="varchar(10)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="taxdistrict" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township" type="varchar(5)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="trade" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="transfertocharity" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_created" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_deleted" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="vacantland" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="validsale" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationdate" type="date" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verificationmethod" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verified" type="char(1)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="verifiedby" type="varchar(150)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="field_types">
+		<comment></comment>
+		<col name="data_edit_display_tag" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="data_length" type="varchar(25)" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="data_type" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="data_view_display_tag" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="display_height" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="display_width" type="int" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="error_msg" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_format" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_format_expression" type="varchar(100)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_mask" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_type_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_type_name" type="varchar(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="list_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="group_collections">
+		<comment></comment>
+		<col name="collection_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="group_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+			<reference table="groups" column="group_id"/>
+		</col>
+		<col name="privilege_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="group_membership">
+		<comment></comment>
+		<col name="group_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="groups" column="group_id"/>
+		</col>
+		<col name="user_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="users" column="user_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="group_reports">
+		<comment></comment>
+		<col name="group_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+			<reference table="groups" column="group_id"/>
+		</col>
+		<col name="report_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="group_townships">
+		<comment></comment>
+		<col name="group_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="groups" column="group_id"/>
+		</col>
+		<col name="township_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="lists" column="item_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="groups">
+		<comment></comment>
+		<col name="group_description" type="varchar(255)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="group_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="group_name" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="libraries">
+		<comment></comment>
+		<col name="data_edit" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="data_view" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="description" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="display_order" type="tinyint" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="index_table" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="library_name" type="varchar(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_table" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="redacted_objects" type="char(1)" default_value="N" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="library_fields">
+		<comment></comment>
+		<col name="column_name" type="varchar(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="default_value" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="field_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_name" type="varchar(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_order" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_status" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="field_types" column="field_type_id"/>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<col name="long_description" type="varchar(35)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="library_fields_detail">
+		<comment></comment>
+		<col name="column_name" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="datetime" default_value="0000-00-00 00:00:00" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="detail_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="display_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_name" type="varchar(50)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_order" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_status" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="field_type_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="field_types" column="field_type_id"/>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="lists">
+		<comment></comment>
+		<col name="display_value" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="item_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="item_order" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="item_value" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="list_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="multiselect_list">
+		<comment></comment>
+		<col name="item_id" type="int" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="multiselect_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="object_types">
+		<comment></comment>
+		<col name="extension" type="varchar(5)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="object_type_id" type="int unsigned" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="paths">
+		<comment></comment>
+		<col name="path" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_description" type="varchar(255)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="path_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="printable_custom_message">
+		<comment></comment>
+		<col name="apply_all" type="varchar(2)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="custom_message" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="printable_files">
+		<comment></comment>
+		<col name="file_name" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="file_size" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="library_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<col name="township_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="lists" column="item_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="printable_status">
+		<comment></comment>
+		<col name="creation_dt" type="timestamp" default_value="CURRENT_TIMESTAMP" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="library_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="libraries" column="library_id"/>
+		</col>
+		<col name="num_records" type="int" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="status" type="varchar(15)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="township_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="lists" column="item_id"/>
+		</col>
+		<col name="township_name" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="type" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="year" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="report_categories">
+		<comment></comment>
+		<col name="category_id" type="int unsigned" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="name" type="varchar(25)" allow_null="true">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="reports">
+		<comment></comment>
+		<col name="category_id" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="report_categories" column="category_id"/>
+		</col>
+		<col name="file_name" type="varchar(20)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="module" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="name" type="varchar(40)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="report_id" type="int unsigned" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="saved_search">
+		<comment></comment>
+		<col name="collection_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="collections" column="collection_id"/>
+		</col>
+		<col name="name" type="varchar(50)" primary_key="true" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="search" type="text" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_id" type="int" primary_key="true" default_value="0" allow_null="false">
+			<comment></comment>
+			<reference table="users" column="user_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="user_township">
+		<comment></comment>
+		<col name="township_id" type="int" allow_null="true">
+			<comment></comment>
+			<reference table="lists" column="item_id"/>
+		</col>
+		<col name="user_id" type="int" allow_null="true">
+			<comment></comment>
+			<reference table="users" column="user_id"/>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<table name="users">
+		<comment></comment>
+		<col name="company" type="varchar(50)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="date_created" type="timestamp" default_value="CURRENT_TIMESTAMP" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="email" type="varchar(51)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="firstname" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="lastname" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="login" type="varchar(25)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="password" type="varchar(30)" default_value="" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="title" type="varchar(30)" allow_null="true">
+			<comment></comment>
+		</col>
+		<col name="user_id" type="int" primary_key="true" allow_null="false">
+			<comment></comment>
+		</col>
+		<col name="user_status" type="int" default_value="0" allow_null="false">
+			<comment></comment>
+		</col>
+		<!-- Table queries go here -->
+	</table>
+
+	<queries>
+	<!-- Cross table queries go here -->
+	</queries>
+</tables>

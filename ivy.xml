@@ -1,0 +1,24 @@
+<ivy-module version="2.0">
+	<info organisation="org.agileclick.genorm" module="genormous"/>
+	<configurations defaultconf="compile" defaultconfmapping="compile->*;provided->*">
+		<conf name="provided"/>
+		<conf name="compile" extends="provided"/>
+	</configurations>
+
+	<dependencies>
+		<dependency org="org.antlr" name="stringtemplate" rev="3.2.1"/>
+		<dependency org="org.agileclick.slickxml" name="slickxml" rev="1.0.1" conf="provided"/>
+		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false"/>
+		<dependency org="jaxen" name="jaxen" rev="1.1.6" transitive="false">
+			<artifact name="jaxen" type="jar"/>
+		</dependency>
+		 <dependency org="org.agileclick.ultramc" name="ultramc" rev="0.5" conf="provided"/>
+		 <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="provided"/>
+		 <dependency org="log4j" name="log4j" rev="1.2.17" conf="provided">
+		 	<artifact name="log4j" type="jar"/>
+		 </dependency>
+	</dependencies>
+	
+	
+	
+</ivy-module>

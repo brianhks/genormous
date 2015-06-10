@@ -1,0 +1,252 @@
+/*
+ * Copyright (c) 2012, Brian Hawkins
+ * Permission is granted to use this code without restriction as long
+ * as this copyright notice appears in all source files.
+ */
+ 
+import tablesaw.*;
+import tablesaw.rules.*;
+import tablesaw.addons.ivy.*;
+import tablesaw.addons.java.*;
+
+print("===============================================================");
+
+//source(new URL("jar:file:lib/test_only/depunit.jar!/tablesaw_plugin.bsh"));
+saw.includeDefinitionFile("definitions.xml");
+
+version = "1.6.3";
+
+bldoutdir = "build";
+//javadocdir = bldoutdir+"/doc";
+jaroutdir = bldoutdir+"/jar";
+gendir = bldoutdir+"/gen";
+gensrcdir = gendir+"/src";
+genbuilddir = gendir+"/build";
+gentestdir = gensrcdir+"/test";
+javadocGenSrcDir = bldoutdir+"/javadocgen";
+srcdir = "src/java";
+//targetjar = jaroutdir+"/genormous-"+version+".jar";
+extdir = "lib";
+distdir = bldoutdir+"/dist";
+templatedir = "templates";
+jdbcdir = "";
+
+testsrc = "test/src";
+testbuilddir = bldoutdir+"/test";
+
+saw.setProperty(JavaProgram.SOURCE_DIRECTORY_PROPERTY, srcdir);
+
+//Check java version for setting jdbc
+//print(System.getProperties());
+javaVersion = System.getProperty("java.version");
+print(javaVersion);
+if (javaVersion.startsWith("1.5"))
+	{
+	print("Configuring for JDBC 3");
+	jdbcdir = "jdbc3";
+	}
+else if (javaVersion.startsWith("1.6"))
+	{
+	print("Configuring for JDBC 4");
+	jdbcdir = "jdbc4";
+	}
+else
+	{
+	print("Configuring for JDBC 4.1");
+	jdbcdir = "jdbc41";
+	}
+
+saw.setProperty(JavaProgram.PROGRAM_VERSION_PROPERTY, version+"."+jdbcdir);
+//saw.setProperty(saw.PROP_MULTI_THREAD_OUTPUT, "true");
+
+extJarFiles = new RegExFileSet(extdir, ".*\\.jar").recurse().getFullFilePaths(); 
+templateFiles = new RegExFileSet(templatedir, ".*").getFullFilePaths();
+propertyFiles = new RegExFileSet(srcdir, ".*\\.properties").getFileNames();
+
+jp = new JavaProgram()
+		.setLibraryJars(extJarFiles)
+		.setup();
+
+//-------------------------------------------------------------------
+//==-- SETUP RULE FOR COMPILING --==		
+jc = jp.getCompileRule()
+		.addSourceDir("src/"+jdbcdir);
+
+classpath = jc.getClasspath();		
+
+//-------------------------------------------------------------------
+//==-- SETUP JAR FILE --==		
+jf = jp.getJarRule()
+		.setManifest("manifest.txt")
+		.addFiles(templateFiles)
+		.addFiles(srcdir, propertyFiles)
+		.addFiles("etc", new RegExFileSet("etc", ".*").getFileNames())
+		.addDepends(templateFiles)
+		.addDepends(propertyFiles);
+		
+targetjar = jf.getTarget();
+
+
+//-------------------------------------------------------------------
+//==-- SETUP IVY --==
+ivy = new IvyAddon()
+		.setSettingsFile("ivysettings.xml")
+		.setup();
+
+jc.addDepend(ivy.getResolveRule("compile"));
+
+
+pomRule = ivy.createPomRule("build/jar/pom.xml")
+		.addDepend(jp.getJarRule())
+		.addLicense("The Apache Software License, Version 2.0", "http://www.apache.org/licenses/LICENSE-2.0.txt", "repo")
+		.addDeveloper("brianhks", "Brian", "brianhks1+genorm@gmail.com");
+		
+//------------------------------------------------------------------------------
+//==-- Maven Artifacts --==
+mavenArtifactsRule = new SimpleRule("maven-artifacts").setDescription("Create maven artifacts for maven central")
+		.addSource(jp.getJarRule().getTarget())
+		.addSource(jp.getJavaDocJarRule().getTarget())
+		.addSource(jp.getSourceJarRule().getTarget())
+		.addSource("build/jar/pom.xml")
+		.setMakeAction("signArtifacts");
+
+void signArtifacts(Rule rule)
+{
+	for (String source : rule.getSources())
+	{
+		cmd = "gpg -ab "+source;
+		saw.exec(cmd);
+	}
+}
+
+new JarRule("maven-bundle", "build/bundle.jar").setDescription("Create bundle for uploading to maven central")
+		.addDepend(mavenArtifactsRule)
+		.addFileSet(new RegExFileSet(saw.getProperty(JavaProgram.JAR_DIRECTORY_PROPERTY), ".*"));
+
+
+//-------------------------------------------------------------------
+//==-- SET SEARCH PATHS --==
+//saw.addSearchPath(srcdir);
+saw.addSearchPath(".*\\.java", testsrc);
+
+//-------------------------------------------------------------------
+//==-- RULE FOR CREATING DIRECTORIES --==
+new DirectoryRule(bldoutdir);
+//new DirectoryRule(jaroutdir);
+new DirectoryRule(distdir);
+new DirectoryRule(gentestdir);
+new DirectoryRule(genbuilddir);
+new DirectoryRule(gensrcdir);
+new DirectoryRule(javadocGenSrcDir);
+
+
+//-------------------------------------------------------------------
+//==-- CREATE JAVADOCS --==
+genJavaDocRule = new SimpleRule().setMakeAction("genJavaDoc")
+		.addDepend(jp.getJarRule())
+		.addDepend(javadocGenSrcDir);
+void genJavaDoc(Rule rule)
+	{
+	print("Generating GenORM source");
+	//saw.exec("java -cp "+targetjar+File.pathSeparator+classpath+" genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
+	saw.exec("java -cp "+targetjar+File.pathSeparator+classpath+" org.agileclick.genorm.Genormous -s test/javadoctables.xml");
+	}
+
+new SimpleRule("javadoc_NOT").setMakeAction("javadoc").setDescription("Create javadocs")
+		.addDepend(genJavaDocRule);
+void javadoc(Rule rule)
+	{
+	cmd = "javadoc -public -d doc/javadoc -sourcepath "+srcdir+":"+javadocGenSrcDir+
+			" -subpackages org.agileclick.genorm:test";
+	saw.exec(cmd);
+	//saw.exec(srcdir, "javadoc -public -d ../doc "+saw.arrayToString(sourceFiles), true);
+	}
+
+//-------------------------------------------------------------------
+//==-- TEST GENERATOR --==
+new SimpleRule("gensrc_test").setMakeAction("genSrc")
+		.setDescription("Test code generator")
+		.addDepend(jp.getJarRule())
+		.addDepend(gentestdir);
+void genSrc(Rule rule)
+	{
+	print("Generating GenORM source");
+	//saw.exec("java -cp "+targetjar+File.pathSeparator+classpath+" org.agileclick.genorm.Genormous -o test/tables.xml -d "+gentestdir+" -p test -s -g build/tables.dot");
+	saw.exec("java -cp "+targetjar+File.pathSeparator+classpath+" org.agileclick.genorm.Genormous -s test/tables.xml -d "+gentestdir+" -p test -g build/tables.dot");
+	
+	print("Generating Query source");
+	saw.exec("java -cp "+targetjar+File.pathSeparator+classpath+" org.agileclick.genorm.QueryGen -s test/queries.xml -d "+gentestdir);
+	}
+
+//-------------------------------------------------------------------
+//==-- COMPILE GEN TEST --==
+new SimpleRule("compile_gen").setMakeAction("compileGen")
+		.addDepend("gensrc_test")
+		.addDepend(genbuilddir);
+void compileGen(Rule rule)
+	{
+	print("Compiling generated source");
+	compilerDef = saw.getDefinition("sun_javac");
+	compilerDef.setMode("debug");
+	compilerDef.set("class_dir", genbuilddir);
+	compilerDef.set("classpath", classpath.getFormattedPath());
+	
+	sourcesFiles = new RegExFileSet(gensrcdir, ".*\\.java").recurse();
+	
+	compilerDef.add("sourcefile", sourcesFiles.getFullFilePaths());
+	
+	cmd = compilerDef.getCommand();
+	saw.exec(cmd, true);
+	}
+
+//-------------------------------------------------------------------
+//==-- COMPILE TEST FILES --==
+classpath.addPath(genbuilddir);
+jctest = new JavaCRule("compile_tests", testbuilddir)
+		.setDescription("Compile Depunit test files")
+		.addClasspath(classpath)
+		.addSourceDir(testsrc)
+		.addDepend("compile_gen");
+
+
+
+//-------------------------------------------------------------------
+//==-- TEST --==
+new SimpleRule("test").setMakeAction("doUnitTests")
+		.addDepend(jctest);
+	
+depunitDefinition = saw.getDefinition("depunit");
+		
+void doUnitTests(Rule rule)
+	{
+	saw.copy("test/log4j.properties", testbuilddir);
+	classpath.addPath(testbuilddir);
+	classpath.addPath(".");
+	depunitDefinition.set("classpath", classpath.toString())
+			.set("xmlInput", "test/test.xml")
+			.set("reportFile", "build/report.xml")
+			.set("styleSheet", "junitreport.xsl");
+			/* .set("testClasses", testClassFiles); */
+			
+	if (saw.getProperty("jacoco", "false").equals("true"))
+		depunitDefinition.set("jacoco");
+		
+	//depunitDefinition.set("debug");
+	saw.exec(depunitDefinition.getCommand());
+	}
+
+
+//------------------------------------------------------------------------------
+//==-- SLICK PARSE --==
+testRule = new SimpleRule("genparser").setMakeAction("doSlickGen").setDescription("Generate SlickXML Parser")
+		.alwaysRun();
+void doSlickGen(Rule rule)
+	{
+	classpath.addPath(".");
+	saw.exec("java -cp "+classpath+" slickxml.SlickParser slickparse.xml");
+	}
+
+
+saw.setDefaultTarget("jar");
+
+

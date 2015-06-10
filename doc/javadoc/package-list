@@ -1,0 +1,9 @@
+genorm
+genorm.parser
+genorm.plugins.dbsupport
+genorm.plugins.memcached
+genorm.plugins.web
+genorm.runtime
+genorm.servlet
+genorm.unittest
+test

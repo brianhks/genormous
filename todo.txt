@@ -1,0 +1,5 @@
+Stuff I need to do:
+
+Put all unit test calls into GenOrmUnitTest
+Put GenOrmDataSource into generated code
+Key generator for multi instances accessing the same DB
