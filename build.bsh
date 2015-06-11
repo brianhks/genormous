@@ -90,13 +90,13 @@ targetjar = jf.getTarget();
 //-------------------------------------------------------------------
 //==-- SETUP IVY --==
 ivy = new IvyAddon()
-		.setSettingsFile("ivysettings.xml")
+		.addSettingsFile("ivysettings.xml")
 		.setup();
 
 jc.addDepend(ivy.getResolveRule("compile"));
 
 
-pomRule = ivy.createPomRule("build/jar/pom.xml")
+pomRule = ivy.createPomRule("build/jar/pom.xml", ivy.getResolveRule("compile"))
 		.addDepend(jp.getJarRule())
 		.addLicense("The Apache Software License, Version 2.0", "http://www.apache.org/licenses/LICENSE-2.0.txt", "repo")
 		.addDeveloper("brianhks", "Brian", "brianhks1+genorm@gmail.com");
@@ -122,6 +122,28 @@ void signArtifacts(Rule rule)
 new JarRule("maven-bundle", "build/bundle.jar").setDescription("Create bundle for uploading to maven central")
 		.addDepend(mavenArtifactsRule)
 		.addFileSet(new RegExFileSet(saw.getProperty(JavaProgram.JAR_DIRECTORY_PROPERTY), ".*"));
+
+//------------------------------------------------------------------------------
+//==-- Publish Artifacts --==
+if (version.contains("SNAPSHOT"))
+	defaultResolver = "local-m2-publish-snapshot";
+else
+	defaultResolver = "local-m2-publish";
+
+PublishRule publishRule = ivy.createPublishRule(saw.getProperty("ivy.publish_resolver", defaultResolver),
+			ivy.getResolveRule("compile"))
+		.setName("publish")
+		.setDescription("Publish pom and jar to maven snapshot repo")
+		.publishMavenMetadata()
+		.setOverwrite(true);
+
+publishRule.addArtifact(pomRule.getTarget())
+		.setType("pom")
+		.setExt("pom")
+		.setIsMetadata();
+publishRule.addArtifact(jp.getJarRule().getTarget())
+		.setType("jar")
+		.setExt("jar");
 
 
 //-------------------------------------------------------------------
