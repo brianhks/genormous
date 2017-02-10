@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.agileclick.genorm.runtime;
 
+import org.slf4j.Logger;
+
 import java.util.*;
 import java.sql.*;
 import java.io.Serializable;
@@ -375,7 +377,7 @@ public abstract class GenOrmRecord implements Serializable
 			throws SQLException
 		{
 		boolean ret = false;
-		if (m_logger != null && m_logger.isDebug())
+		if (m_logger != null && m_logger.isDebugEnabled())
 			{
 			m_logger.debug("SQL Query: "+statement);
 			}
@@ -387,7 +389,7 @@ public abstract class GenOrmRecord implements Serializable
 			{
 			for (int I = 0; I < m_queryFields.size(); I++)
 				{
-				if (m_logger != null && m_logger.isDebug())
+				if (m_logger != null && m_logger.isDebugEnabled())
 					{
 					GenOrmField field = m_queryFields.get(I).field;
 					m_logger.debug(field.getFieldMeta().getFieldName()+" : "+field.toString());
