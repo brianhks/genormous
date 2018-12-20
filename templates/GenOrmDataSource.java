@@ -29,14 +29,14 @@ import org.agileclick.genorm.runtime.*;
 	
 	<p>The thread local storage is used so the developer does not have to pass the
 	database connection around.  If your application has one database you can set
-	set the default data source by calling {@link #setDataSource(GenOrmDataSource)}, 
+	set the default data source by calling {@link #setDataSource(GenOrmDSEnvelope)},
 	which sets the static member <code>s_dsEnvelope</code>.  Then throughout your
 	application you can call <code>GenOrmDataSource.begin()</code> to begin a 
 	transaction.  A connection will be created from the default data source and 
 	the connection will be placed on the thread.</p>
 	
 	<p>You can also provide the connection or data source when you call begin by using
-	either {@link #begin(GenOrmDSEnvelope)} or {@link #begin(Connection)}.</p>
+	either {@link #attachAndBegin(GenOrmDSEnvelope)} or {@link #attachAndBegin(Connection)}.</p>
 	
 	<p>Only one connection can be the current one at a time but, you can nest connections</p>
 	<pre>
@@ -70,6 +70,7 @@ public class GenOrmDataSource
 			
 		/**
 			Adds a connection to the thread
+		 	@param connection Connection to add to thread
 		*/
 		public void addConnection(GenOrmConnection connection)
 			{
@@ -78,6 +79,7 @@ public class GenOrmDataSource
 			
 		/**
 			Gets the current connection on the thread or null if none
+		 	@return GenOrmConnection on the thread if any
 		*/
 		public GenOrmConnection getConnection()
 			{
@@ -89,6 +91,7 @@ public class GenOrmDataSource
 			Removes the connection from the thread.
 			If it is the last connection on the stack the thread local data is 
 			removed.
+			@return GenOrmConnection on the thread if any
 		*/
 		public GenOrmConnection removeConnection()
 			{
@@ -121,6 +124,7 @@ public class GenOrmDataSource
 	
 	/**
 		Gets the default data source
+		@return GenOrmDSEnvelope
 	*/
 	public static GenOrmDSEnvelope getDataSource()
 		{
@@ -129,7 +133,9 @@ public class GenOrmDataSource
 		
 	/**
 		Gets the data source for the particular key
-	*/
+		@param key Key the datasource is associated with
+		@return GenOrmDSEnvelope
+	 */
 	public static GenOrmDSEnvelope getDataSource(String key)
 		{
 		return (s_dataSourceMap.get(key));
@@ -146,7 +152,7 @@ public class GenOrmDataSource
 		
 	/**
 		Associates a datasource with a key.  Later you can call 
-		{@link #begin(String)} and pass the key associated with the datasource
+		{@link #attachAndBegin(String)} and pass the key associated with the datasource
 		@param key Key to store the data source under
 		@param ds Data source envelope
 	*/
@@ -190,7 +196,7 @@ public class GenOrmDataSource
 	//---------------------------------------------------------------------------
 	/**
 		Begin a transaction using the default data source that was set using
-		{@link #setDataSource(GenOrmDataSource)}
+		{@link #setDataSource(GenOrmDSEnvelope)}
 	*/
 	public static void attachAndBegin()
 		{
@@ -295,6 +301,7 @@ public class GenOrmDataSource
 		the thread
 		@return Returns a Statement or null if there is not a current connection set
 		on the thread
+		@throws SQLException if the an error occurs on the connection
 	*/
 	public static Statement createStatement()
 			throws SQLException
@@ -306,8 +313,10 @@ public class GenOrmDataSource
 	/**
 		Creates a <code>java.sql.PreparedStatement</code> using the current connection on 
 		the thread
+		@param sql SQL to prepare a statement for
 		@return Returns a PreparedStatement or null if there is not a current connection set
 		on the thread
+		@throws SQLException if an error occurs preparing the statement
 	*/
 	public static PreparedStatement prepareStatement(String sql)
 			throws SQLException
@@ -323,6 +332,8 @@ public class GenOrmDataSource
 		stmt.executeUpdate(sql);
 		stmt.close();</code>
 		@param sql SQL update to process
+		@return number of rows updated
+		@throws SQLException if an error occurs running the sql statement
 	*/
 	public static int rawUpdate(String sql)
 			throws SQLException

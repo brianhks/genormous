@@ -1,20 +1,21 @@
 <ivy-module version="2.0">
 	<info organisation="org.agileclick.genorm" module="genormous"/>
-	<configurations defaultconf="compile" defaultconfmapping="compile->*;provided->*">
-		<conf name="provided"/>
+	<configurations defaultconf="compile" defaultconfmapping="compile->default;provided->default;runtime->default">
+		<conf name="runtime"/>
+		<conf name="provided" extends="runtime"/>
 		<conf name="compile" extends="provided"/>
 	</configurations>
 
 	<dependencies>
-		<dependency org="org.antlr" name="stringtemplate" rev="3.2.1"/>
-		<dependency org="org.agileclick.slickxml" name="slickxml" rev="1.0.1" conf="provided"/>
-		<dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false"/>
-		<dependency org="jaxen" name="jaxen" rev="1.1.6" transitive="false">
+		<dependency org="org.antlr" name="stringtemplate" rev="3.2.1" conf="runtime"/>
+		<dependency org="org.agileclick.slickxml" name="slickxml" rev="1.0.1" conf="compile"/>
+		<dependency org="dom4j" name="dom4j" rev="1.6.1" conf="compile"/>
+		<dependency org="jaxen" name="jaxen" rev="1.1.6" conf="runtime">
 			<artifact name="jaxen" type="jar"/>
 		</dependency>
 		<dependency org="org.agileclick.ultramc" name="ultramc" rev="0.5" conf="provided"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="provided"/>
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.22"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.22" conf="runtime"/>
 	</dependencies>
 	
 	

@@ -22,6 +22,8 @@ setAndGetMethods(col) ::= <<
 //---------------------------------------------------------------------------
 /**
 	$col.comment$
+
+ 	@return $col.type$
 */
 public $col.type$ get$col.methodName$() { return (m_$col.parameterName$.getValue()); }
 public $table.className$ set$col.methodName$($col.type$ data)
@@ -103,6 +105,14 @@ public $table.className$ set$foreignKeys.methodName$($foreignKeys.table.classNam
 addQueryInterfaceMethods(query) ::= <<
 /**
 	$query.comment$
+
+$if(query.noneResult)$
+ $[query.inputs,query.replacements]:{ p | @param $p.parameterName$ $p.type$}; separator="\n"$
+	@return int Number of rows updated
+$else$
+	$[query.inputs,query.replacements]:{ p | @param $p.parameterName$ $p.type$}; separator="\n"$
+	@return Results
+$endif$
 */
 $if(query.noneResult)$
 public int run$query.className$($[query.inputs,query.replacements]:{ p | $p.type$ $p.parameterName$}; separator=", "$);
@@ -378,6 +388,7 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Returns a list of the feild meta for the class that this is a factory of
+			@return List of GenOrmFieldMeta
 		*/
 		public List<GenOrmFieldMeta> getFields()
 			{
@@ -387,6 +398,7 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Returns a list of foreign key constraints
+			@return List of GenOrmConstraint
 		*/
 		public List<GenOrmConstraint> getForeignKeyConstraints()
 			{
@@ -396,6 +408,7 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Returns the SQL create statement for this table
+			@return SQL create statement
 		*/
 		public String getCreateStatement()
 			{
@@ -406,6 +419,8 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Creates a new entry with the specified primary keys.
+			$primaryKeys:{key | @param $key.parameterName$ $key.type$}; separator="\n"$
+			@return new $table.className$
 		*/
 		public $table.className$ create($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 			{
@@ -421,6 +436,7 @@ public class $table.className$_base extends GenOrmRecord
 		//---------------------------------------------------------------------------
 		/**
 			Creates a new entry that is empty
+			@return new blank $table.className$
 		*/
 		public $table.className$ createRecord()
 			{
@@ -589,6 +605,7 @@ public class $table.className$_base extends GenOrmRecord
 			Convenience method for selecting records.  Ideally this should not be use, 
 			instead a custom query for this table should be used.
 			@param where sql where statement.
+			@return {@link ResultSet}
 		*/
 		public ResultSet select(String where)
 			{
@@ -601,6 +618,7 @@ public class $table.className$_base extends GenOrmRecord
 			instead a custom query for this table should be used.
 			@param where sql where statement.
 			@param orderBy sql order by statement
+			@return {@link ResultSet}
 		*/
 		public ResultSet select(String where, String orderBy)
 			{
