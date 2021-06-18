@@ -15,7 +15,7 @@
 		</dependency>
 		<dependency org="org.agileclick.ultramc" name="ultramc" rev="0.5" conf="provided"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="provided"/>
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.22" conf="runtime"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.30" conf="runtime"/>
 	</dependencies>
 	
 	

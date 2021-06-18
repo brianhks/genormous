@@ -93,9 +93,7 @@ public abstract class ParameterDef
 	/**
 	 * Get text of parameter description.
 	 *
-	 * @param file file to be read
 	 * @return array of bytes containing all data from file
-	 * @throws IOException on file access error
 	 */
 
 	public String getDescription() {

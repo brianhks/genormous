@@ -14,7 +14,7 @@ print("===============================================================");
 //source(new URL("jar:file:lib/test_only/depunit.jar!/tablesaw_plugin.bsh"));
 saw.includeDefinitionFile("definitions.xml");
 
-version = "1.6.5-SNAPSHOT";
+version = "1.6.5";
 
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
@@ -93,7 +93,8 @@ ivy = new IvyAddon()
 		.addSettingsFile("ivysettings.xml")
 		.setup();
 
-jc.addDepend(ivy.getResolveRule("compile"));
+compileResolveRule = ivy.getResolveRule("compile");
+jc.addDepend(compileResolveRule);
 
 
 pomRule = ivy.createPomRule("build/jar/pom.xml", ivy.getResolveRule("provided"))
@@ -261,11 +262,13 @@ void doUnitTests(Rule rule)
 //------------------------------------------------------------------------------
 //==-- SLICK PARSE --==
 testRule = new SimpleRule("genparser").setMakeAction("doSlickGen").setDescription("Generate SlickXML Parser")
+		.addDepend(compileResolveRule)
 		.alwaysRun();
 void doSlickGen(Rule rule)
 	{
+	classpath = compileResolveRule.getClasspath();
 	classpath.addPath(".");
-	saw.exec("java -cp "+classpath+" slickxml.SlickParser slickparse.xml");
+	saw.exec("java -cp "+classpath+" org.agileclick.slickxml.SlickParser slickparse.xml");
 	}
 
 

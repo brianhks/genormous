@@ -1,4 +1,4 @@
-<slickxml package="org.agileclick.genorm.parser" destination="src/java/genorm/parser">
+<slickxml package="org.agileclick.genorm.parser" destination="src/java/org/agileclick/genorm/parser">
 	<parser name="GenOrmParser">
 		<object tag="configuration" name="Configuration">
 		

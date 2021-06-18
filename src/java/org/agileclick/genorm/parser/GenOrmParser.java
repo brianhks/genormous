@@ -1,18 +1,3 @@
-/* 
-Copyright 2012 Brian Hawkins
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package org.agileclick.genorm.parser;
 
 import java.util.*;
@@ -26,93 +11,97 @@ import org.xml.sax.helpers.DefaultHandler;
 	
 	The following is the configuration used to create this file
 	
-<parser name="GenOrmParser">
-		<object tag="configuration" name="Configuration">
-		
-			<object tag="option" name="Option">
-				<property name="Name">
-					<attribute>name</attribute>
-				</property>
-				<property name="Value">
-					<attribute>value</attribute>
-				</property>
-			</object>
+	<pre>
+	{@code
+	<parser name="GenOrmParser">
+			<object tag="configuration" name="Configuration">
 			
-			<object tag="type" name="TypeMap">
-				<property name="Custom">
-					<attribute>custom</attribute>
-				</property>
-				<property name="JavaType">
-					<attribute>java</attribute>
-				</property>
-				<property name="DBType">
-					<attribute>db</attribute>
-				</property>
-			</object>
-			
-			<object tag="plugin" name="Plugin">
-				<property name="PluginClass">
-					<attribute>class</attribute>
-				</property>
-			</object>
-			
-		</object>
-		
-		<object tag="global" name="Global">
-			<object tag="col" name="Column">
-				<property name="Comment">
-					<element>comment</element>
-				</property>
-				<property name="Name">
-					<attribute>name</attribute>
-				</property>
-				<property name="Type">
-					<attribute>type</attribute>
-				</property>
-				<property name="PrimaryKey">
-					<attribute>primary_key</attribute>
-				</property>
-				<property name="DefaultValue">
-					<attribute>default_value</attribute>
-				</property>
-				<property name="AllowNull">
-					<attribute>allow_null</attribute>
-				</property>
-				<property name="Unique">
-					<attribute>unique</attribute>
-				</property>
-				<property name="AutoSet">
-					<attribute>auto_set</attribute>
-				</property>
-				
-				<object tag="property" name="Property">
-					<property name="Key">
-						<attribute>key</attribute>
+				<object tag="option" name="Option">
+					<property name="Name">
+						<attribute>name</attribute>
 					</property>
 					<property name="Value">
-						<attribute>Value</attribute>
+						<attribute>value</attribute>
 					</property>
 				</object>
-				<object tag="reference" name="Reference">
-					<property name="Table">
-						<attribute>table</attribute>
+				
+				<object tag="type" name="TypeMap">
+					<property name="Custom">
+						<attribute>custom</attribute>
 					</property>
-					<property name="Column">
-						<attribute>column</attribute>
+					<property name="JavaType">
+						<attribute>java</attribute>
 					</property>
+					<property name="DBType">
+						<attribute>db</attribute>
+					</property>
+				</object>
+				
+				<object tag="plugin" name="Plugin">
+					<property name="PluginClass">
+						<attribute>class</attribute>
+					</property>
+				</object>
+				
+			</object>
+			
+			<object tag="global" name="Global">
+				<object tag="col" name="Column">
+					<property name="Comment">
+						<element>comment</element>
+					</property>
+					<property name="Name">
+						<attribute>name</attribute>
+					</property>
+					<property name="Type">
+						<attribute>type</attribute>
+					</property>
+					<property name="PrimaryKey">
+						<attribute>primary_key</attribute>
+					</property>
+					<property name="DefaultValue">
+						<attribute>default_value</attribute>
+					</property>
+					<property name="AllowNull">
+						<attribute>allow_null</attribute>
+					</property>
+					<property name="Unique">
+						<attribute>unique</attribute>
+					</property>
+					<property name="AutoSet">
+						<attribute>auto_set</attribute>
+					</property>
+					
+					<object tag="property" name="Property">
+						<property name="Key">
+							<attribute>key</attribute>
+						</property>
+						<property name="Value">
+							<attribute>Value</attribute>
+						</property>
+					</object>
+					<object tag="reference" name="Reference">
+						<property name="Table">
+							<attribute>table</attribute>
+						</property>
+						<property name="Column">
+							<attribute>column</attribute>
+						</property>
+					</object>
 				</object>
 			</object>
-		</object>
-		
-		<object tag="table" name="Table">
-			<property name="Type">
-				<element>comment</element>
-			</property>
-			<object reference="Property"/>
-			<object reference="Column"/>
-		</object>
-		
-	</parser>
+			
+			<object tag="table" name="Table">
+				<property name="Type">
+					<element>comment</element>
+				</property>
+				<object reference="Property"/>
+				<object reference="Column"/>
+			</object>
+			
+		</parser>
+}
+	</pre>
 */
 public class GenOrmParser extends DefaultHandler
 	{
@@ -153,16 +142,57 @@ public class GenOrmParser extends DefaultHandler
 		
 
 	//========================================================================
-	public class Property
+	public class Table
 		{
 		private boolean _firstCall = true;
 		
-		private String m_Key;
-		private String m_Value;
+		private StringBuilder m_Type;
 
-		public String getKey() { return (m_Key); }
-		public String getValue() { return (m_Value); }
+		private List<String> m_TypeList = new ArrayList<String>();
 
+		private List<Property> m_PropertyList = new ArrayList<Property>();
+		private Property m_Property;
+		private int m_PropertyRef = 0;
+		private List<Column> m_ColumnList = new ArrayList<Column>();
+		private Column m_Column;
+		private int m_ColumnRef = 0;
+
+
+		public String getType()
+			{
+			return (m_TypeList.size() == 0 ? null : m_TypeList.get(0));
+			}
+			
+		public List<String> getTypeList()
+			{
+			return (m_TypeList);
+			}
+
+
+		public List<Property> getPropertyList() { return (m_PropertyList); }
+		/**
+			Convenience function for getting a single value
+		*/
+		public Property getProperty() 
+			{
+			if (m_PropertyList.size() == 0)
+				return (null);
+			else
+				return (m_PropertyList.get(0));
+			}
+			
+		public List<Column> getColumnList() { return (m_ColumnList); }
+		/**
+			Convenience function for getting a single value
+		*/
+		public Column getColumn() 
+			{
+			if (m_ColumnList.size() == 0)
+				return (null);
+			else
+				return (m_ColumnList.get(0));
+			}
+			
 
 
 		//------------------------------------------------------------------------
@@ -170,21 +200,85 @@ public class GenOrmParser extends DefaultHandler
 			{
 			if (_firstCall)
 				{
-				m_Key = attrs.getValue("key");
-				m_Value = attrs.getValue("Value");
-
 				_firstCall = false;
 				return;
 				}
 				
+			if (m_Property != null) 
+				{
+				if (localName.equals("property"))
+					m_PropertyRef ++;
+					
+				m_Property.startElement(uri, localName, qName, attrs);
+				return;
+				}
+				
+			if (m_Column != null) 
+				{
+				if (localName.equals("col"))
+					m_ColumnRef ++;
+					
+				m_Column.startElement(uri, localName, qName, attrs);
+				return;
+				}
+				
+
+
+			if (localName.equals("") )
+				{
+				m_Type = new StringBuilder();
+				_characterGrabber = m_Type;
+				}
 
 				
+			if (localName.equals("property"))
+				{
+				m_Property = new Property();
+				m_PropertyList.add(m_Property);
+				m_PropertyRef = 1;
+				
+				m_Property.startElement(uri, localName, qName, attrs);
+				}
+
+			if (localName.equals("col"))
+				{
+				m_Column = new Column();
+				m_ColumnList.add(m_Column);
+				m_ColumnRef = 1;
+				
+				m_Column.startElement(uri, localName, qName, attrs);
+				}
+
+
 			}
 
 		//------------------------------------------------------------------------
 		protected void endElement(String uri, String localName, String qName)
 				throws SAXException
 			{
+			if (m_Type != null)
+				{
+				m_TypeList.add(m_Type.toString());
+				m_Type = null;
+				}
+				
+
+			if ((localName.equals("property")) && ((--m_PropertyRef) == 0))
+				{
+				m_Property = null;
+				}
+					
+			if (m_Property != null)
+				m_Property.endElement(uri, localName, qName);
+
+			if ((localName.equals("col")) && ((--m_ColumnRef) == 0))
+				{
+				m_Column = null;
+				}
+					
+			if (m_Column != null)
+				m_Column.endElement(uri, localName, qName);
+
 
 			}
 		}
@@ -340,219 +434,6 @@ public class GenOrmParser extends DefaultHandler
 					
 			if (m_Plugin != null)
 				m_Plugin.endElement(uri, localName, qName);
-
-
-			}
-		}
-
-	//========================================================================
-	public class Plugin
-		{
-		private boolean _firstCall = true;
-		
-		private String m_PluginClass;
-
-		public String getPluginClass() { return (m_PluginClass); }
-
-
-
-		//------------------------------------------------------------------------
-		protected void startElement(String uri, String localName, String qName, Attributes attrs)
-			{
-			if (_firstCall)
-				{
-				m_PluginClass = attrs.getValue("class");
-
-				_firstCall = false;
-				return;
-				}
-				
-
-				
-			}
-
-		//------------------------------------------------------------------------
-		protected void endElement(String uri, String localName, String qName)
-				throws SAXException
-			{
-
-			}
-		}
-
-	//========================================================================
-	public class Option
-		{
-		private boolean _firstCall = true;
-		
-		private String m_Name;
-		private String m_Value;
-
-		public String getName() { return (m_Name); }
-		public String getValue() { return (m_Value); }
-
-
-
-		//------------------------------------------------------------------------
-		protected void startElement(String uri, String localName, String qName, Attributes attrs)
-			{
-			if (_firstCall)
-				{
-				m_Name = attrs.getValue("name");
-				m_Value = attrs.getValue("value");
-
-				_firstCall = false;
-				return;
-				}
-				
-
-				
-			}
-
-		//------------------------------------------------------------------------
-		protected void endElement(String uri, String localName, String qName)
-				throws SAXException
-			{
-
-			}
-		}
-
-	//========================================================================
-	public class Table
-		{
-		private boolean _firstCall = true;
-		
-		private StringBuilder m_Type;
-
-		private List<String> m_TypeList = new ArrayList<String>();
-
-		private List<Property> m_PropertyList = new ArrayList<Property>();
-		private Property m_Property;
-		private int m_PropertyRef = 0;
-		private List<Column> m_ColumnList = new ArrayList<Column>();
-		private Column m_Column;
-		private int m_ColumnRef = 0;
-
-
-		public String getType()
-			{
-			return (m_TypeList.size() == 0 ? null : m_TypeList.get(0));
-			}
-			
-		public List<String> getTypeList()
-			{
-			return (m_TypeList);
-			}
-
-
-		public List<Property> getPropertyList() { return (m_PropertyList); }
-		/**
-			Convenience function for getting a single value
-		*/
-		public Property getProperty() 
-			{
-			if (m_PropertyList.size() == 0)
-				return (null);
-			else
-				return (m_PropertyList.get(0));
-			}
-			
-		public List<Column> getColumnList() { return (m_ColumnList); }
-		/**
-			Convenience function for getting a single value
-		*/
-		public Column getColumn() 
-			{
-			if (m_ColumnList.size() == 0)
-				return (null);
-			else
-				return (m_ColumnList.get(0));
-			}
-			
-
-
-		//------------------------------------------------------------------------
-		protected void startElement(String uri, String localName, String qName, Attributes attrs)
-			{
-			if (_firstCall)
-				{
-				_firstCall = false;
-				return;
-				}
-				
-			if (m_Property != null) 
-				{
-				if (localName.equals("property"))
-					m_PropertyRef ++;
-					
-				m_Property.startElement(uri, localName, qName, attrs);
-				return;
-				}
-				
-			if (m_Column != null) 
-				{
-				if (localName.equals("col"))
-					m_ColumnRef ++;
-					
-				m_Column.startElement(uri, localName, qName, attrs);
-				return;
-				}
-				
-
-
-			if (localName.equals("") )
-				{
-				m_Type = new StringBuilder();
-				_characterGrabber = m_Type;
-				}
-
-				
-			if (localName.equals("property"))
-				{
-				m_Property = new Property();
-				m_PropertyList.add(m_Property);
-				m_PropertyRef = 1;
-				
-				m_Property.startElement(uri, localName, qName, attrs);
-				}
-
-			if (localName.equals("col"))
-				{
-				m_Column = new Column();
-				m_ColumnList.add(m_Column);
-				m_ColumnRef = 1;
-				
-				m_Column.startElement(uri, localName, qName, attrs);
-				}
-
-
-			}
-
-		//------------------------------------------------------------------------
-		protected void endElement(String uri, String localName, String qName)
-				throws SAXException
-			{
-			if (m_Type != null)
-				{
-				m_TypeList.add(m_Type.toString());
-				m_Type = null;
-				}
-				
-
-			if ((localName.equals("property")) && ((--m_PropertyRef) == 0))
-				{
-				m_Property = null;
-				}
-					
-			if (m_Property != null)
-				m_Property.endElement(uri, localName, qName);
-
-			if ((localName.equals("col")) && ((--m_ColumnRef) == 0))
-				{
-				m_Column = null;
-				}
-					
-			if (m_Column != null)
-				m_Column.endElement(uri, localName, qName);
 
 
 			}
@@ -760,6 +641,43 @@ public class GenOrmParser extends DefaultHandler
 		}
 
 	//========================================================================
+	public class Option
+		{
+		private boolean _firstCall = true;
+		
+		private String m_Name;
+		private String m_Value;
+
+		public String getName() { return (m_Name); }
+		public String getValue() { return (m_Value); }
+
+
+
+		//------------------------------------------------------------------------
+		protected void startElement(String uri, String localName, String qName, Attributes attrs)
+			{
+			if (_firstCall)
+				{
+				m_Name = attrs.getValue("name");
+				m_Value = attrs.getValue("value");
+
+				_firstCall = false;
+				return;
+				}
+				
+
+				
+			}
+
+		//------------------------------------------------------------------------
+		protected void endElement(String uri, String localName, String qName)
+				throws SAXException
+			{
+
+			}
+		}
+
+	//========================================================================
 	public class TypeMap
 		{
 		private boolean _firstCall = true;
@@ -782,6 +700,43 @@ public class GenOrmParser extends DefaultHandler
 				m_Custom = attrs.getValue("custom");
 				m_JavaType = attrs.getValue("java");
 				m_DBType = attrs.getValue("db");
+
+				_firstCall = false;
+				return;
+				}
+				
+
+				
+			}
+
+		//------------------------------------------------------------------------
+		protected void endElement(String uri, String localName, String qName)
+				throws SAXException
+			{
+
+			}
+		}
+
+	//========================================================================
+	public class Property
+		{
+		private boolean _firstCall = true;
+		
+		private String m_Key;
+		private String m_Value;
+
+		public String getKey() { return (m_Key); }
+		public String getValue() { return (m_Value); }
+
+
+
+		//------------------------------------------------------------------------
+		protected void startElement(String uri, String localName, String qName, Attributes attrs)
+			{
+			if (_firstCall)
+				{
+				m_Key = attrs.getValue("key");
+				m_Value = attrs.getValue("Value");
 
 				_firstCall = false;
 				return;
@@ -869,6 +824,40 @@ public class GenOrmParser extends DefaultHandler
 			if (m_Column != null)
 				m_Column.endElement(uri, localName, qName);
 
+
+			}
+		}
+
+	//========================================================================
+	public class Plugin
+		{
+		private boolean _firstCall = true;
+		
+		private String m_PluginClass;
+
+		public String getPluginClass() { return (m_PluginClass); }
+
+
+
+		//------------------------------------------------------------------------
+		protected void startElement(String uri, String localName, String qName, Attributes attrs)
+			{
+			if (_firstCall)
+				{
+				m_PluginClass = attrs.getValue("class");
+
+				_firstCall = false;
+				return;
+				}
+				
+
+				
+			}
+
+		//------------------------------------------------------------------------
+		protected void endElement(String uri, String localName, String qName)
+				throws SAXException
+			{
 
 			}
 		}

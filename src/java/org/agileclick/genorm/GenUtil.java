@@ -23,7 +23,7 @@ import java.io.*;
 public class GenUtil extends TemplateHelper
 	{
 	/**
-		Genorm property to not inherit global column definitions.<br/>
+		Genorm property to not inherit global column definitions.
 		Value must be 'true' or 'false'
 	*/
 	public static final String PROP_INHERIT = "genorm.inherit";

@@ -74,7 +74,7 @@ public class ArgumentProcessor
 	/**
 	 * Constructor from array of parameter definitions.
 	 *
-	 * @param set head parameter set in possible chain of sets defined
+	 * @param defs head parameter set in possible chain of sets defined
 	 */
 	
 	public ArgumentProcessor(ParameterDef[] defs) {
@@ -354,7 +354,7 @@ public class ArgumentProcessor
 	 * access using other methods after the return from this call.
 	 *
 	 * @param args command line argument string array
-	 * @param parm data object for parameter values
+	 * @param parms data object for parameter values
 	 * @param target application object defining parameter fields
 	 * @return index of first command line argument not consumed by processing
 	 * @throws ArgumentErrorException on error in data

@@ -21,7 +21,7 @@ import javax.sql.*;
 /**
 	<p>One of the classes generated is a class called <code>DSEnvelope</code>.
 	<code>DSEnvelope</code> implements this interface and can be used to pass the 
-	data source to the {@link GenOrmDataSource} methods.</p>
+	data source to the <code>GenOrmDataSource</code> methods.</p>
 	
 	<p>Here is some code from one of the unit tests that sets up the data source</p>
 	<pre>
@@ -40,7 +40,7 @@ import javax.sql.*;
 	</pre>
 	
 	<p>You can override what key generator is returned by subclassing DSEnvelope
-	and passing your subclass to {@link GenOrmDataSource}</p>
+	and passing your subclass to <code>GenOrmDataSource</code></p>
 */
 public interface GenOrmDSEnvelope
 	{
