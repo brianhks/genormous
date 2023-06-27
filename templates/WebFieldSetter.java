@@ -56,23 +56,23 @@ class() ::= <<
 	This class provides a means to automatically set field data from a web post
 */
 public static class WebFieldSetter
-	{
+{
 	java.util.BitSet m_setFields = new java.util.BitSet();
 	java.util.Map<String, String> m_fieldNames = new java.util.HashMap<String, String>();
 	org.agileclick.genorm.plugins.web.WebFieldConverter m_converter;
 	
 	protected void init()
-		{
+	{
 		m_converter = new org.agileclick.genorm.plugins.web.DefaultWebFieldConverter();
 		$columns:{col | m_fieldNames.put(COL_$col.nameCaps$, COL_$col.nameCaps$);
 }$
-		}
+	}
 		
 	/**
 		You can override this method if you want to set default values
 	*/
 	protected String getFieldValue($table.className$ obj, String col, java.util.Map<String, String[]> data)
-		{
+	{
 		String[] values = data.get(m_fieldNames.get(col));
 		String value = null;
 		
@@ -80,13 +80,13 @@ public static class WebFieldSetter
 			value = values[0];
 			
 		return (value);
-		}
+	}
 	
 	public WebFieldSetter()
-		{
+	{
 		init();
 		m_setFields.set(0, NUMBER_OF_COLUMNS);
-		}
+	}
 		
 	/**
 		Use this constructor to provide a list of field data meta.  The list of 
@@ -94,11 +94,11 @@ public static class WebFieldSetter
 		set.
 	*/
 	public WebFieldSetter(GenOrmFieldMeta... metaList)
-		{
+	{
 		init();
 		for (GenOrmFieldMeta meta : metaList)
 			m_setFields.set(meta.getDirtyFlag());
-		}
+	}
 		
 	/**
 		Sets the field converter to be used to convert string values from a post
@@ -108,21 +108,21 @@ public static class WebFieldSetter
 		@param converter Converter to use when setting fields.
 	*/
 	public WebFieldSetter setWebFieldConverter(org.agileclick.genorm.plugins.web.WebFieldConverter converter)
-		{
+	{
 		m_converter = converter;
 		return (this);
-		}
+	}
 		
 	$columns:{col | /**
-	Sets the paramter name for the column $col.name$.  This name will be the expected
+	Sets the parameter name for the column $col.name$.  This name will be the expected
 	key in data map in the call to setFields.
 	The default is '$col.name$'
 */
 public WebFieldSetter set$col.methodName$Field(String fieldName)
-	{
+{
 	m_fieldNames.put(COL_$col.nameCaps$, fieldName);
 	return (this);
-	}
+}
 		
 }$
 	
@@ -131,18 +131,18 @@ public WebFieldSetter set$col.methodName$Field(String fieldName)
 		that was specified in the constructor.
 	*/
 	public $table.className$ setFields($table.className$ obj, java.util.Map<String, String[]> data)
-		{
-		$columns:{col | if (m_setFields.get($col.nameCaps$_FIELD_META.getDirtyFlag()))
 	{
+		$columns:{col | if (m_setFields.get($col.nameCaps$_FIELD_META.getDirtyFlag()))
+{
 	String value = getFieldValue(obj, COL_$col.nameCaps$, data);
 
 	obj.set$col.methodName$(m_converter.to$convertMap.(col.type)$(COL_$col.nameCaps$, value));
-	}
+}
 			
 }$
 		return (obj);
-		}
 	}
+}
 
 
 >>
