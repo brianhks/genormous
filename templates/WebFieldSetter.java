@@ -55,7 +55,7 @@ class() ::= <<
 	Class added by WebFieldSetterPlugin
 	This class provides a means to automatically set field data from a web post
 */
-public static class WebFieldSetter
+public static class $table.className$WebFieldSetter implements org.agileclick.genorm.plugins.web.WebFieldSetter<$table.className$>
 {
 	java.util.BitSet m_setFields = new java.util.BitSet();
 	java.util.Map<String, String> m_fieldNames = new java.util.HashMap<String, String>();
@@ -82,7 +82,7 @@ public static class WebFieldSetter
 		return (value);
 	}
 	
-	public WebFieldSetter()
+	public $table.className$WebFieldSetter()
 	{
 		init();
 		m_setFields.set(0, NUMBER_OF_COLUMNS);
@@ -93,7 +93,7 @@ public static class WebFieldSetter
 		field meta is used as a filter, only meta listed will have their fields
 		set.
 	*/
-	public WebFieldSetter(GenOrmFieldMeta... metaList)
+	public $table.className$WebFieldSetter(GenOrmFieldMeta... metaList)
 	{
 		init();
 		for (GenOrmFieldMeta meta : metaList)
@@ -107,7 +107,7 @@ public static class WebFieldSetter
 		
 		@param converter Converter to use when setting fields.
 	*/
-	public WebFieldSetter setWebFieldConverter(org.agileclick.genorm.plugins.web.WebFieldConverter converter)
+	public org.agileclick.genorm.plugins.web.WebFieldSetter<$table.className$> setWebFieldConverter(org.agileclick.genorm.plugins.web.WebFieldConverter converter)
 	{
 		m_converter = converter;
 		return (this);
@@ -118,7 +118,7 @@ public static class WebFieldSetter
 	key in data map in the call to setFields.
 	The default is '$col.name$'
 */
-public WebFieldSetter set$col.methodName$Field(String fieldName)
+public $table.className$WebFieldSetter set$col.methodName$Field(String fieldName)
 {
 	m_fieldNames.put(COL_$col.nameCaps$, fieldName);
 	return (this);

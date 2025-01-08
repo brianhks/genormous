@@ -14,7 +14,7 @@ print("===============================================================");
 //source(new URL("jar:file:lib/test_only/depunit.jar!/tablesaw_plugin.bsh"));
 saw.includeDefinitionFile("definitions.xml");
 
-version = "1.6.5";
+version = "1.6.6";
 
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
