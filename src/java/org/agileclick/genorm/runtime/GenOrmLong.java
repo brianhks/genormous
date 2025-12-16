@@ -100,7 +100,7 @@ public class GenOrmLong extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Long(m_value).hashCode());
+		return (Long.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ public class GenOrmLong extends GenOrmField
 			return (false);
 			
 		GenOrmLong other = (GenOrmLong)obj;
-		return (new Long(m_value).equals(other.m_value));
+		return (Long.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

@@ -101,7 +101,7 @@ public class GenOrmBoolean extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Boolean(m_value).hashCode());
+		return (Boolean.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public class GenOrmBoolean extends GenOrmField
 			return (false);
 			
 		GenOrmBoolean other = (GenOrmBoolean)obj;
-		return (new Boolean(m_value).equals(other.m_value));
+		return (Boolean.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

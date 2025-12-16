@@ -172,7 +172,7 @@ public class IntDef extends ParameterDef
 		} else if (value < m_min || value > m_max) {
 			proc.reportArgumentError(m_char, "Value out of range");
 		} else {
-			proc.setValue(new Integer((int)value), m_field);
+			proc.setValue((int) value, m_field);
 		}
 	}
 }

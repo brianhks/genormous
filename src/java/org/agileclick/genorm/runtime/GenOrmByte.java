@@ -94,7 +94,7 @@ public class GenOrmByte extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Byte(m_value).hashCode());
+		return (Byte.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public class GenOrmByte extends GenOrmField
 			return (false);
 			
 		GenOrmByte other = (GenOrmByte)obj;
-		return (new Byte(m_value).equals(other.m_value));
+		return (Byte.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

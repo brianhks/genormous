@@ -101,7 +101,7 @@ public class GenOrmInt extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Integer(m_value).hashCode());
+		return (Integer.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public class GenOrmInt extends GenOrmField
 			return (false);
 			
 		GenOrmInt other = (GenOrmInt)obj;
-		return (new Integer(m_value).equals(other.m_value));
+		return (Integer.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

@@ -101,7 +101,7 @@ public class GenOrmShort extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Short(m_value).hashCode());
+		return (Short.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public class GenOrmShort extends GenOrmField
 			return (false);
 			
 		GenOrmShort other = (GenOrmShort)obj;
-		return (new Short(m_value).equals(other.m_value));
+		return (Short.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

@@ -365,15 +365,15 @@ public class $table.className$_base extends GenOrmRecord
 	{
 		public static final String CREATE_SQL = "$createSQL$";
 
-		private ArrayList<GenOrmFieldMeta> m_fieldMeta;
-		private ArrayList<GenOrmConstraint> m_foreignKeyConstraints;
+		private final ArrayList<GenOrmFieldMeta> m_fieldMeta;
+		private final ArrayList<GenOrmConstraint> m_foreignKeyConstraints;
 		
 		protected $table.className$FactoryImpl()
 		{
-			m_fieldMeta = new ArrayList<GenOrmFieldMeta>();
+			m_fieldMeta = new ArrayList<>();
 			$columns:{col | m_fieldMeta.add($col.nameCaps$_FIELD_META);
 }$
-			m_foreignKeyConstraints = new ArrayList<GenOrmConstraint>();
+			m_foreignKeyConstraints = new ArrayList<>();
 			$constraints:{con | m_foreignKeyConstraints.add(new GenOrmConstraint("$con.foreignTable$", "$con.constraintName$", "$con.sql$"));
 }$
 		}
@@ -381,7 +381,7 @@ public class $table.className$_base extends GenOrmRecord
 		protected $table.className$ new$table.className$(java.sql.ResultSet rs)
 		{
 			$table.className$ rec = new $table.className$();
-			(($table.className$_base)rec).initialize(rs);
+			rec.initialize(rs);
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 		}
 	
@@ -427,7 +427,7 @@ public class $table.className$_base extends GenOrmRecord
 			$table.className$ rec = new $table.className$();
 			rec.m_isNewRecord = true;
 			
-			$primaryKeys:{key | (($table.className$_base)rec).set$key.methodName$($key.parameterName$);
+			$primaryKeys:{key | rec.set$key.methodName$($key.parameterName$);
 }$
 			
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
@@ -507,10 +507,10 @@ public class $table.className$_base extends GenOrmRecord
 		*/
 		public boolean delete($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
 		{
-			boolean ret = false;
+			boolean ret;
 			$table.className$ rec = new $table.className$();
 			
-			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
+			rec.initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
 			GenOrmConnection con = GenOrmDataSource.getGenOrmConnection();
 			$table.className$ cachedRec = ($table.className$)con.getCachedRecord(rec.getRecordKey());
 			
@@ -540,7 +540,7 @@ public class $table.className$_base extends GenOrmRecord
 			$table.className$ rec = new $table.className$();
 			
 			//Create temp object and look in cache for it
-			(($table.className$_base)rec).initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
+			rec.initialize($primaryKeys:{key | $key.parameterName$}; separator=", "$);
 			rec = ($table.className$)GenOrmDataSource.getGenOrmConnection().getCachedRecord(rec.getRecordKey());
 			
 			java.sql.PreparedStatement genorm_statement = null;
@@ -622,7 +622,7 @@ public class $table.className$_base extends GenOrmRecord
 		*/
 		public ResultSet select(String where, String orderBy)
 		{
-			ResultSet rs = null;
+			ResultSet rs;
 			java.sql.Statement stmnt = null;
 			
 			try
@@ -692,9 +692,9 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 	private static class SQLResultSet 
 			implements ResultSet
 	{
-		private java.sql.ResultSet m_resultSet;
-		private java.sql.Statement m_statement;
-		private String m_query;
+		private final java.sql.ResultSet m_resultSet;
+		private final java.sql.Statement m_statement;
+		private final String m_query;
 		private boolean m_onFirstResult;
 		
 		//------------------------------------------------------------------------
@@ -733,7 +733,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		*/
 		public ArrayList<$table.className$> getArrayList(int maxRows)
 		{
-			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
+			ArrayList<$table.className$> results = new ArrayList<>();
 			int count = 0;
 			
 			try
@@ -755,7 +755,6 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 			}
 			catch (java.sql.SQLException sqle)
 			{
-				sqle.printStackTrace();
 				throw new GenOrmException(sqle);
 			}
 				
@@ -770,7 +769,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		*/
 		public ArrayList<$table.className$> getArrayList()
 		{
-			ArrayList<$table.className$> results = new ArrayList<$table.className$>();
+			ArrayList<$table.className$> results = new ArrayList<>();
 			
 			try
 			{
@@ -782,7 +781,6 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 			}
 			catch (java.sql.SQLException sqle)
 			{
-				sqle.printStackTrace();
 				throw new GenOrmException(sqle);
 			}
 				
@@ -841,7 +839,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		*/
 		public boolean next()
 		{
-			boolean ret = false;
+			boolean ret;
 			m_onFirstResult = true;
 			try
 			{
@@ -860,7 +858,7 @@ $if(!query.singleResult)$rs.close();$endif$$endif$$endif$
 		
 	$columns:{col | protected $javaToGenOrmMap.(col.type)$ m_$col.parameterName$;$\n$}$
 	
-	private List<GenOrmRecordKey> m_foreignKeys;
+	private final List<GenOrmRecordKey> m_foreignKeys;
 	
 	public List<GenOrmRecordKey> getForeignKeys() { return (m_foreignKeys); }
 
@@ -902,7 +900,7 @@ m_$col.parameterName$.setPrevValue($col.parameterName$);$\n$}$
 	{
 		super(TABLE_NAME);
 		m_logger = s_logger;
-		m_foreignKeys = new ArrayList<GenOrmRecordKey>();
+		m_foreignKeys = new ArrayList<>();
 		m_dirtyFlags = new java.util.BitSet(NUMBER_OF_COLUMNS);
 		
 		$columns:{col | 

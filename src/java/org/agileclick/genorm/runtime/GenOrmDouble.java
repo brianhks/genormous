@@ -101,7 +101,7 @@ public class GenOrmDouble extends GenOrmField
 	//---------------------------------------------------------------------------
 	public int hashCode()
 		{
-		return (new Double(m_value).hashCode());
+		return (Double.valueOf(m_value).hashCode());
 		}
 		
 	//---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public class GenOrmDouble extends GenOrmField
 			return (false);
 			
 		GenOrmDouble other = (GenOrmDouble)obj;
-		return (new Double(m_value).equals(other.m_value));
+		return (Double.valueOf(m_value).equals(other.m_value));
 		}
 	
 	//---------------------------------------------------------------------------

@@ -56,7 +56,8 @@ else
 	jdbcdir = "jdbc41";
 	}
 
-saw.setProperty(JavaProgram.PROGRAM_VERSION_PROPERTY, version+"."+jdbcdir);
+version = version+"."+jdbcdir+"-SNAPSHOT";
+saw.setProperty(JavaProgram.PROGRAM_VERSION_PROPERTY, version);
 //saw.setProperty(saw.PROP_MULTI_THREAD_OUTPUT, "true");
 
 extJarFiles = new RegExFileSet(extdir, ".*\\.jar").recurse().getFullFilePaths(); 

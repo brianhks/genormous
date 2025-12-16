@@ -174,7 +174,7 @@ public class FloatDef extends ParameterDef
 		if (value < m_min || value > m_max) {
 			proc.reportArgumentError(m_char, "Value out of range");
 		} else {
-			proc.setValue(new Float(value), m_field);
+			proc.setValue(value, m_field);
 		}
 	}
 }

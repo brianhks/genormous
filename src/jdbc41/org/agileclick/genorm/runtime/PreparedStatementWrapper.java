@@ -39,7 +39,7 @@ public class PreparedStatementWrapper extends StatementWrapper
 		implements PreparedStatement
 	{
 	protected PreparedStatement m_statement;
-	
+
 	public PreparedStatementWrapper(PreparedStatement statement)
 		{
 		super(statement);

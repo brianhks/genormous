@@ -115,11 +115,11 @@ public class QueryDataDriver extends DataDriver
 							
 						testParams.add(test);
 						if (type.equals("int"))
-							inputList.add(new Integer(test));
+							inputList.add(Integer.valueOf(test));
 						else if (type.equals("String"))
 							inputList.add(test);
 						else if (type.equals("boolean"))
-							inputList.add(new Boolean(test));
+							inputList.add(Boolean.valueOf(test));
 						else if (type.equals("java.sql.Timestamp"))
 							inputList.add(java.sql.Timestamp.valueOf(test));
 						else if (type.equals("java.util.UUID"))
