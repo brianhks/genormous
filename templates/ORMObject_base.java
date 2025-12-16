@@ -356,6 +356,8 @@ public class $table.className$_base extends GenOrmRecord
 		boolean delete($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
 		$table.className$ find($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
 		$table.className$ findOrCreate($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
+		$table.className$ create($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
+		$table.className$ update($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$);
 		$endif$
 		$table.queries:addQueryInterfaceMethods()$
 	}
@@ -430,6 +432,22 @@ public class $table.className$_base extends GenOrmRecord
 			$primaryKeys:{key | rec.set$key.methodName$($key.parameterName$);
 }$
 			
+			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
+		}
+
+		/**
+		 Creates a new entry with the specified primary keys for purpose of updating an existing table entry.
+		 This will not try to create the entry before updating it.
+		 $primaryKeys:{key | @param $key.parameterName$ $key.type$}; separator="\n"$
+		 @return new $table.className$
+		*/
+		public $table.className$ update($primaryKeys:{key | $key.type$ $key.parameterName$}; separator=", "$)
+		{
+			$table.className$ rec = new $table.className$();
+
+			$primaryKeys:{key | rec.set$key.methodName$($key.parameterName$);
+			}$
+
 			return (($table.className$)GenOrmDataSource.getGenOrmConnection().getUniqueRecord(rec));
 		}
 		$endif$
