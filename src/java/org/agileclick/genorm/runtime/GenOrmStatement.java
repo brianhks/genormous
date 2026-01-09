@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.agileclick.genorm.runtime;
 
+import org.agileclick.genorm.runtime.jdbc.StatementWrapper;
+
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.SQLException;

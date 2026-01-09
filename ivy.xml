@@ -8,9 +8,9 @@
 
 	<dependencies>
 		<dependency org="org.antlr" name="stringtemplate" rev="3.2.1" conf="runtime"/>
-		<dependency org="org.agileclick.slickxml" name="slickxml" rev="1.0.1" conf="compile"/>
-		<dependency org="dom4j" name="dom4j" rev="1.6.1" conf="compile"/>
-		<dependency org="jaxen" name="jaxen" rev="1.1.6" conf="runtime">
+		<dependency org="org.agileclick.slickxml" name="slickxml" rev="1.2.0" conf="compile"/>
+		<dependency org="org.dom4j" name="dom4j" rev="2.2.0" conf="compile"/>
+		<dependency org="jaxen" name="jaxen" rev="1.2.0" conf="runtime">
 			<artifact name="jaxen" type="jar"/>
 		</dependency>
 		<dependency org="org.agileclick.ultramc" name="ultramc" rev="0.5" conf="provided"/>

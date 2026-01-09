@@ -102,8 +102,6 @@
 		<input>
 			<param name="language_code" type="String" test="en"/>
 		</input>
-		<return>
-		</return>
 		<sql>
 			delete from language
 			where "language_code" = ?

@@ -16,8 +16,13 @@ limitations under the License.
 package org.agileclick.genorm;
 
 import java.io.*;
+
+import org.agileclick.genorm.parser.GenOrmParser;
+import org.agileclick.genorm.runtime.Formatter;
 import org.dom4j.*;
 import java.util.*;
+import java.util.function.Consumer;
+
 import org.jargp.*;
 import org.antlr.stringtemplate.*;
 import org.agileclick.genorm.runtime.GenOrmConstraint;
@@ -27,40 +32,11 @@ import static java.lang.System.out;
 
 public class Genormous extends GenUtil
 	{
-	//XML elements and attribute names
-	public static final String NAME = "name";
-	public static final String COMMENT = "comment";
-	public static final String TYPE = "type";
-	public static final String PRIMARY_KEY = "primary_key";
-	public static final String UNIQUE = "unique";
-	public static final String UNIQUE_SET = "unique_set";
-	public static final String AUTO_INCREMENT = "auto_increment";
-	public static final String COL = "col";
-	public static final String COL_REF = "colref";
-	public static final String TABLE = "table";
-	public static final String GLOBAL = "global";
-	public static final String COLUMN = "column";
-	public static final String REF_TABLE = "reftable";
-	public static final String REFERENCE = "reference";
-	public static final String PROPERTY = "property";
-	public static final String KEY = "key";
-	public static final String VALUE = "value";
-	public static final String QUERY = "query";
+
 	public static final String DEFAULT_VALUE = "default_value";
 	public static final String DEFAULT_VALUE_NO_QUOTE = "default_value_no_quote";
-	public static final String ALLOW_NULL = "allow_null";
-	public static final String AUTO_SET = "auto_set";
-	public static final String ON_UPDATE = "on_update";
-	public static final String ON_DELETE = "on_delete";
+
 	
-	
-	//private String m_destDir;
-	//private Map<String, String> m_typeMap;
-	//private Format m_formatter;
-	//private String m_packageName;
-	//private boolean m_includeStringSets;
-	//private String m_graphVizFile;
-	//private String m_databaseType;
 	private List<ORMPlugin> m_ormPlugins = new ArrayList<ORMPlugin>();
 	
 	
@@ -125,23 +101,6 @@ public class Genormous extends GenUtil
 		}
 		
 	
-//==============================================================================
-	
-		
-/* //------------------------------------------------------------------------------
-	private String getCreateCommands(Iterator<String> it)
-		{
-		StringBuffer sb = new StringBuffer();
-		
-		while (it.hasNext())
-			{
-			sb.append("\t\tsb.append("+m_formatter.formatClassName(it.next())+".s_meta.createTableSQL());\n");
-			sb.append("\t\tsb.append(\";\");\n");
-			}
-			
-		return (sb.toString());
-		} */
-
 //------------------------------------------------------------------------------
 	public static void main(String[] args)
 		{
@@ -202,15 +161,6 @@ public class Genormous extends GenUtil
 			throws ConfigurationException
 		{
 		super(source, verbose);
-		
-		/* super.setDestinationDir(destDir);
-		m_source = source;
-		m_typeMap = readPropertiesFile(new PropertiesFile("types.properties"));
-		m_formatter = new DefaultFormat();
-		m_packageName = packageName;
-		m_includeStringSets = includeStringSets;
-		m_graphVizFile = graphVizFile;
-		m_databaseType = "hsqldb"; */
 		}
 		
 		
@@ -220,7 +170,54 @@ public class Genormous extends GenUtil
 		{
 		m_config.setProperty(PROP_GRAPHVIZ_FILE, graphvizFile);
 		}
-		
+
+	public static void setValueIfNotNull(String value, Consumer<String> setter)
+		{
+		if (value != null)
+			setter.accept(value);
+		}
+
+	private Column parseColumn(GenOrmParser.Column column, Format formatter) throws ConfigurationException
+		{
+		String type = column.getType();
+		Column col = new Column(column.getName(), m_javaTypeMap.get(type), type,
+				formatter, m_dbTypeMap.get(type));
+
+		col.setAllowNull(!"false".equals(column.getAllowNull()));
+
+		if (column.getDefaultValue() != null && column.getDefaultValueNoQuote() != null)
+			throw new ConfigurationException(column.getName(), "On column definition: "+column.getName()+", do not set "+DEFAULT_VALUE+" and "+DEFAULT_VALUE_NO_QUOTE+" on the same column definition");
+
+		setValueIfNotNull(column.getDefaultValue(), col::setDefault);
+
+		setValueIfNotNull(column.getDefaultValueNoQuote(), s -> {
+			col.setDefault(s);
+			col.setQuoteDefault(false);
+			});
+
+		if ("true".equals(column.getUnique()))
+			col.setUnique();
+
+		if ("true".equals(column.getPrimaryKey()))
+			col.setPrimaryKey();
+
+		setValueIfNotNull(column.getAutoSet(), col::setAutoSet);
+
+		GenOrmParser.Reference reference = column.getReference();
+		if (reference != null)
+			{
+			col.setForeignKey();
+			col.setForeignTableName(reference.getTable());
+			col.setForeignTableColumnName(reference.getColumn());
+			setValueIfNotNull(reference.getOnDelete(), col::setOnDelete);
+			setValueIfNotNull(reference.getOnUpdate(), col::setOnUpdate);
+			}
+
+		setValueIfNotNull(column.getComment(), col::setComment);
+
+		return col;
+		}
+
 		
 //------------------------------------------------------------------------------
 	public void generateClasses()
@@ -268,152 +265,49 @@ public class Genormous extends GenUtil
 			
 			//Read in global column definitions
 			ArrayList<Column> globalColumns = new ArrayList<Column>();
-			Iterator globColIt = m_source.selectNodes("/tables/global/col").iterator();
-			while (globColIt.hasNext())
+			//Iterator globColIt = m_source.selectNodes("/tables/global/col").iterator();
+			if (m_globalColumns != null)
 				{
-				Element cole = (Element)globColIt.next();
-				String colName = cole.attribute(NAME).getValue();
-				String type = cole.attribute(TYPE).getValue();
-				Column col = new Column(colName, m_javaTypeMap.get(type), type, formatter,
-						m_dbTypeMap.get(type));
-				
-				if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
-					col.setAllowNull(false);
-					
-				if (cole.attribute(DEFAULT_VALUE) != null && cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
-					throw new Exception("On global column definition: "+colName+", do not set "+DEFAULT_VALUE+" and "+DEFAULT_VALUE_NO_QUOTE+" on the same column definition");
-					
-				if (cole.attribute(DEFAULT_VALUE) != null)
-					col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
-					
-				if (cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
+				for (GenOrmParser.Column column : m_globalColumns.getColumnList())
 					{
-					col.setDefault(cole.attribute(DEFAULT_VALUE_NO_QUOTE).getValue());
-					col.setQuoteDefault(false);
+					Column col = parseColumn(column, formatter);
+
+					globalColumns.add(col);
 					}
-				
-				if ((cole.attribute(UNIQUE) != null) && (cole.attribute(UNIQUE).getValue().equals("true")))
-					col.setUnique();
-					
-				/* if (cole.attribute(UNIQUE_SET) != null)
-					col.setUniqueSet(cole.attribute(UNIQUE_SET).getValue()); */
-				
-				if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
-					col.setPrimaryKey();
-					
-				if (cole.attribute(AUTO_SET) != null)
-					col.setAutoSet(cole.attribute(AUTO_SET).getValue());
-					
-				//Attribute refTable = cole.attribute(REF_TABLE);
-				Element refTable = cole.element(REFERENCE);
-				if (refTable != null)
-					{
-					col.setForeignKey();
-					col.setForeignTableName(refTable.attributeValue(TABLE));
-					col.setForeignTableColumnName(refTable.attributeValue(COLUMN));
-					
-					if (refTable.attribute(ON_DELETE) != null)
-						col.setOnDelete(refTable.attribute(ON_DELETE).getValue());
-						
-					if (refTable.attribute(ON_UPDATE) != null)
-						col.setOnUpdate(refTable.attribute(ON_UPDATE).getValue());
-					}
-					
-				col.setComment(cole.elementText(COMMENT));
-				
-				globalColumns.add(col);
 				}
-			
+
+
 			if (m_verbose)
 				System.out.println("Reading table definitions");
-				
-			Iterator tableit = m_source.selectNodes("/tables/table").iterator();
-			while (tableit.hasNext())
+
+			for (GenOrmParser.Table parseTable: m_tables)
 				{
 				int dirtyFlag = 0;
-				Element e = (Element) tableit.next();
-				String tableName = e.attribute(NAME).getValue();
 				if (m_verbose)
-					System.out.println("  Table "+tableName);
-					
-				Table table = new Table(tableName, formatter);
-				table.setComment(e.elementText(COMMENT));
-				
-				Iterator props = e.elementIterator(PROPERTY);
-				while (props.hasNext())
+					System.out.println("  Table "+parseTable.getName());
+
+				Table table = new Table(parseTable.getName(), formatter);
+				setValueIfNotNull(parseTable.getComment(), table::setComment);
+
+				for (GenOrmParser.Property property : parseTable.getPropertyList())
+					table.addProperty(property.getKey(), property.getValue());
+
+				for (GenOrmParser.Column parseColumn : parseTable.getColumnList())
 					{
-					Element prop = (Element)props.next();
-					table.addProperty(prop.attributeValue(KEY), prop.attributeValue(VALUE));
-					}
-				
-				Iterator cols = e.elementIterator(COL);
-				while (cols.hasNext())
-					{
-					Element cole = (Element)cols.next();
-					String colName = cole.attribute(NAME).getValue();
-					String type = cole.attribute(TYPE).getValue();
-					Column col = new Column(colName, m_javaTypeMap.get(type), type, 
-							formatter, m_dbTypeMap.get(type));
+					Column col = parseColumn(parseColumn, formatter);
+
 					col.setDirtyFlag(dirtyFlag);
 					dirtyFlag ++;
-					
-					
-					if ((cole.attribute(ALLOW_NULL) != null)  && (cole.attribute(ALLOW_NULL).getValue().equals("false")))
-						col.setAllowNull(false);
-						
-					if (cole.attribute(DEFAULT_VALUE) != null && cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
-						throw new Exception("On table "+tableName+" column definition: "+colName+", do not set "+DEFAULT_VALUE+" and "+DEFAULT_VALUE_NO_QUOTE+" on the same column definition");
-					
-					if (cole.attribute(DEFAULT_VALUE) != null)
-						col.setDefault(cole.attribute(DEFAULT_VALUE).getValue());
-						
-					if (cole.attribute(DEFAULT_VALUE_NO_QUOTE) != null)
-						{
-						col.setDefault(cole.attribute(DEFAULT_VALUE_NO_QUOTE).getValue());
-						col.setQuoteDefault(false);
-						}
-					
-					if ((cole.attribute(UNIQUE) != null)  && (cole.attribute(UNIQUE).getValue().equals("true")))
-						col.setUnique();
 
-					if ((cole.attribute(AUTO_INCREMENT) != null) && (cole.attribute(AUTO_INCREMENT).getValue().equals("true")))
-						col.setAutoIncrement();
-						
-					/* if (cole.attribute(UNIQUE_SET) != null)
-						col.setUniqueSet(cole.attribute(UNIQUE_SET).getValue()); */
-					
-					if ((cole.attribute(PRIMARY_KEY) != null) && (cole.attribute(PRIMARY_KEY).getValue().equals("true")))
-						col.setPrimaryKey();
-						
-					if (cole.attribute(AUTO_SET) != null)
-						col.setAutoSet(cole.attribute(AUTO_SET).getValue());
-						
-					//Attribute refTable = cole.attribute(REF_TABLE);
-					Element refTable = cole.element(REFERENCE);
-					if (refTable != null)
-						{
-						col.setForeignKey();
-						col.setForeignTableName(refTable.attributeValue(TABLE));
-						col.setForeignTableColumnName(refTable.attributeValue(COLUMN));
-						
-						if (refTable.attribute(ON_DELETE) != null)
-							col.setOnDelete(refTable.attribute(ON_DELETE).getValue());
-						
-						if (refTable.attribute(ON_UPDATE) != null)
-							col.setOnUpdate(refTable.attribute(ON_UPDATE).getValue());
-						}
-						
-					col.setComment(cole.elementText(COMMENT));
-					
 					if ("mts".equals(col.getAutoSet()))
 						table.setMTColumn(col);
-						
+
 					if ("cts".equals(col.getAutoSet()))
 						table.setCTColumn(col);
-						
+
 					table.addColumn(col);
 					}
-					
+
 				//Add global columns to table
 				if (!"false".equals(table.getProperties().get(PROP_INHERIT)))
 					{
@@ -423,23 +317,23 @@ public class Genormous extends GenUtil
 						Column col = globCols.next().getCopy();
 						col.setDirtyFlag(dirtyFlag);
 						dirtyFlag ++;
-						
+
 						if ("mts".equals(col.getAutoSet()))
 							table.setMTColumn(col);
-							
+
 						if ("cts".equals(col.getAutoSet()))
 							table.setCTColumn(col);
-						
+
 						table.addColumn(col);
 						}
 					}
-					
+
 				//Add Queries for foreign keys
 				for (ForeignKeySet fkeySet : table.getForeignKeys())
 					{
 					StringBuilder sqlQuery = new StringBuilder();
 					ArrayList<Parameter> params = new ArrayList<Parameter>();
-					
+
 					sqlQuery.append("FROM ");
 					sqlQuery.append(table.getName());
 					sqlQuery.append(" this WHERE ");
@@ -452,51 +346,40 @@ public class Genormous extends GenUtil
 						sqlQuery.append(c.getName());
 						sqlQuery.append(createPlugin.getFieldEscapeString()).append(" = ?");
 						first = false;
-						
+
 						params.add(new Parameter(c.getName(), c.getType(), formatter));
 						}
-						
+
 					String queryName = "by_"+fkeySet.getTableName();
-						
+
 					Query query = new Query(formatter, queryName, params, sqlQuery.toString());
 					query.setEscape(false);
 					table.addQuery(query);
 					}
-					
+
 				//Get Unique definitions
-				Iterator uniques = e.elementIterator(UNIQUE);
-				while (uniques.hasNext())
+				for (GenOrmParser.Unique unique : parseTable.getUniqueList())
 					{
-					Iterator uniqueRefs = ((Element)uniques.next()).elementIterator(COL_REF);
-					Set<Column> uniqueSet = new HashSet<Column>();
-					while (uniqueRefs.hasNext())
+					Set<Column> uniqueSet = new HashSet<>();
+					for (GenOrmParser.ColumnRef columnRef : unique.getColumnRefList())
 						{
-						uniqueSet.add(table.getColumn(
-								((Element)uniqueRefs.next()).attribute(NAME).getValue()));
+						uniqueSet.add(table.getColumn(columnRef.getColumnName()));
 						}
-						
+
 					table.getUniqueColumnSets().add(uniqueSet);
 					}
-					
-				Iterator queries = e.elementIterator(Query.TABLE_QUERY);
-				while (queries.hasNext())
+
+				for (GenOrmParser.TableQuery tableQuery : parseTable.getTableQueryList())
 					{
-					Query q = new Query((Element)queries.next(), formatter, m_javaTypeMap);
+					Query q = new Query(tableQuery, formatter, m_javaTypeMap);
 					table.addQuery(q);
 					}
-				
-				//This is grandfather in older table setups
-				queries = e.elementIterator(Query.QUERY);
-				while (queries.hasNext())
-					{
-					Query q = new Query((Element)queries.next(), formatter, m_javaTypeMap);
-					table.addQuery(q);
-					}
-					
-				tableNames.put(tableName, table);
+
+				tableNames.put(parseTable.getName(), table);
 				tables.offer(table);
 				}
-			
+				
+
 			//PrintWriter dotFile = new PrintWriter(new FileWriter("tables.dot"));
 			
 			Iterator<Table> it = tables.iterator();
@@ -669,30 +552,6 @@ public class Genormous extends GenUtil
 			writeTemplate("GenOrmUnitTest.java", attributes);
 			
 			writeTemplate("GenOrmDataSource.java", attributes);
-			
-			
-			/* writeTemplate("GenOrmKeyGenerator.java", attributes);
-			writeTemplate("GenOrmConnection.java", attributes);
-			writeTemplate("GenOrmDataSource.java", attributes);
-			writeTemplate("GenOrmField.java", attributes);
-			writeTemplate("GenOrmFieldMeta.java", attributes);
-			writeTemplate("GenOrmInt.java", attributes);
-			writeTemplate("GenOrmRecord.java", attributes);
-			writeTemplate("GenOrmString.java", attributes);
-			writeTemplate("GenOrmTimestamp.java", attributes);
-			writeTemplate("GenOrmRecordFactory.java", attributes);
-			writeTemplate("GenOrmDate.java", attributes);
-			writeTemplate("GenOrmBoolean.java", attributes);
-			writeTemplate("GenOrmBinary.java", attributes);
-			writeTemplate("GenOrmBigDecimal.java", attributes);
-			writeTemplate("GenOrmDouble.java", attributes);
-			writeTemplate("Pair.java", attributes);
-			
-			writeTemplate("GenOrmException.java", attributes);
-			writeTemplate("GenOrmResultSet.java", attributes);
-			writeTemplate("GenOrmQueryResultSet.java", attributes);
-			writeTemplate("GenOrmQueryRecord.java", attributes);
-			 */
 			
 			if (m_config.getProperty(PROP_GRAPHVIZ_FILE) != null)
 				writeTemplate(m_config.getProperty(PROP_GRAPHVIZ_FILE), "templates/tables.dot", attributes);

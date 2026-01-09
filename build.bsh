@@ -14,8 +14,6 @@ print("===============================================================");
 //source(new URL("jar:file:lib/test_only/depunit.jar!/tablesaw_plugin.bsh"));
 saw.includeDefinitionFile("definitions.xml");
 
-version = "1.6.6";
-
 bldoutdir = "build";
 //javadocdir = bldoutdir+"/doc";
 jaroutdir = bldoutdir+"/jar";
@@ -25,7 +23,6 @@ genbuilddir = gendir+"/build";
 gentestdir = gensrcdir+"/test";
 javadocGenSrcDir = bldoutdir+"/javadocgen";
 srcdir = "src/java";
-//targetjar = jaroutdir+"/genormous-"+version+".jar";
 extdir = "lib";
 distdir = bldoutdir+"/dist";
 templatedir = "templates";
@@ -35,29 +32,6 @@ testsrc = "test/src";
 testbuilddir = bldoutdir+"/test";
 
 saw.setProperty(JavaProgram.SOURCE_DIRECTORY_PROPERTY, srcdir);
-
-//Check java version for setting jdbc
-//print(System.getProperties());
-javaVersion = System.getProperty("java.version");
-print(javaVersion);
-if (javaVersion.startsWith("1.5"))
-	{
-	print("Configuring for JDBC 3");
-	jdbcdir = "jdbc3";
-	}
-else if (javaVersion.startsWith("1.6"))
-	{
-	print("Configuring for JDBC 4");
-	jdbcdir = "jdbc4";
-	}
-else
-	{
-	print("Configuring for JDBC 4.1");
-	jdbcdir = "jdbc41";
-	}
-
-version = version+"."+jdbcdir+"-SNAPSHOT";
-saw.setProperty(JavaProgram.PROGRAM_VERSION_PROPERTY, version);
 //saw.setProperty(saw.PROP_MULTI_THREAD_OUTPUT, "true");
 
 extJarFiles = new RegExFileSet(extdir, ".*\\.jar").recurse().getFullFilePaths(); 
@@ -70,8 +44,10 @@ jp = new JavaProgram()
 
 //-------------------------------------------------------------------
 //==-- SETUP RULE FOR COMPILING --==		
-jc = jp.getCompileRule()
-		.addSourceDir("src/"+jdbcdir);
+jc = jp.getCompileRule();
+
+jc.getDefinition().set("source", "11");
+jc.getDefinition().set("target", "11");
 
 classpath = jc.getClasspath();		
 
@@ -105,29 +81,17 @@ pomRule = ivy.createPomRule("build/jar/pom.xml", ivy.getResolveRule("provided"))
 		
 //------------------------------------------------------------------------------
 //==-- Maven Artifacts --==
-mavenArtifactsRule = new SimpleRule("maven-artifacts").setDescription("Create maven artifacts for maven central")
-		.addSource(jp.getJarRule().getTarget())
-		.addSource(jp.getJavaDocJarRule().getTarget())
-		.addSource(jp.getSourceJarRule().getTarget())
-		.addSource("build/jar/pom.xml")
-		.setMakeAction("signArtifacts");
+new BundleRule(jp, pomRule).setSignCallback("signArtifacts").setup();
 
-void signArtifacts(Rule rule)
-{
-	for (String source : rule.getSources())
+void signArtifacts(file)
 	{
-		cmd = "gpg -ab "+source;
-		saw.exec(cmd);
+	cmd = "gpg -ab "+file;
+	saw.exec(cmd);
 	}
-}
-
-new JarRule("maven-bundle", "build/bundle.jar").setDescription("Create bundle for uploading to maven central")
-		.addDepend(mavenArtifactsRule)
-		.addFileSet(new RegExFileSet(saw.getProperty(JavaProgram.JAR_DIRECTORY_PROPERTY), ".*"));
 
 //------------------------------------------------------------------------------
 //==-- Publish Artifacts --==
-if (version.contains("SNAPSHOT"))
+if (saw.getProperty(JavaProgram.PROGRAM_VERSION_PROPERTY).contains("SNAPSHOT"))
 	defaultResolver = "local-m2-publish-snapshot";
 else
 	defaultResolver = "local-m2-publish";

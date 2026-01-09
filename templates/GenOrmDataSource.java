@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.io.Closeable;
 import org.agileclick.genorm.runtime.*;
 
 /**
@@ -166,9 +167,11 @@ public class GenOrmDataSource
 		data source with the <code>source</code> parameter.
 		@param source Key used to lookup the data source to use to create the connection.
 	*/
-	public static void attachAndBegin(String source)
+	public static Closeable attachAndBegin(String source)
 	{
 		attach(s_dataSourceMap.get(source)).begin();
+
+		return GenOrmDataSource::close;
 	}
 		
 	//---------------------------------------------------------------------------
@@ -176,9 +179,11 @@ public class GenOrmDataSource
 		Begin a transaction using the data source passed into the method
 		@param source Data source used to create a connection.
 	*/
-	public static void attachAndBegin(GenOrmDSEnvelope source)
+	public static Closeable attachAndBegin(GenOrmDSEnvelope source)
 	{
 		attach(source).begin();
+
+		return GenOrmDataSource::close;
 	}
 		
 	//---------------------------------------------------------------------------
@@ -186,11 +191,13 @@ public class GenOrmDataSource
 		Begin a transaction using the Connection passed in.
 		@param con Connection to use
 	*/
-	public static void attachAndBegin(Connection con)
+	public static Closeable attachAndBegin(Connection con)
 	{
 		GenOrmTransactionConnection gcon = attach(s_dsEnvelope);
 		gcon.setConnection(con);
 		gcon.begin();
+
+		return GenOrmDataSource::close;
 	}
 		
 	//---------------------------------------------------------------------------
@@ -198,9 +205,11 @@ public class GenOrmDataSource
 		Begin a transaction using the default data source that was set using
 		{@link #setDataSource(GenOrmDSEnvelope)}
 	*/
-	public static void attachAndBegin()
+	public static Closeable attachAndBegin()
 	{
 		attach().begin();
+
+		return GenOrmDataSource::close;
 	}
 		
 	//---------------------------------------------------------------------------

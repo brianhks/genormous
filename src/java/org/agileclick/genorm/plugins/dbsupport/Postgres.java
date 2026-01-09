@@ -28,7 +28,7 @@ public class Postgres implements CreatePlugin
 	{
 	private TemplateHelper m_helper;
 	
-	public void init(Element pluginElement, Properties config)
+	public void init(Properties config)
 		{
 		m_helper = new TemplateHelper();
 		}

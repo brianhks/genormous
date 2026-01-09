@@ -13,12 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.agileclick.genorm.runtime;
+package org.agileclick.genorm.runtime.jdbc;
 
-import java.sql.BatchUpdateException;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLFeatureNotSupportedException;
-import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.ResultSet;

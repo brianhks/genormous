@@ -15,10 +15,11 @@ limitations under the License.
 
 package org.agileclick.genorm.runtime;
 
+import org.agileclick.genorm.runtime.jdbc.DataSourceWrapper;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.*;
-import java.io.PrintWriter;
 
 public class LeakDetectorDataSource extends DataSourceWrapper
 	{

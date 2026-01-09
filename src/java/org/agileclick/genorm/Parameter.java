@@ -62,9 +62,21 @@ public class Parameter
 		}
 		
 	//---------------------------------------------------------------------------
+
+
+	public void setTag(String tag)
+		{
+		m_tag = tag;
+		}
+
+	public void setTestParam(String testParam)
+		{
+		m_testParam = testParam;
+		}
+
 	/*
-		Creates a reference parameter
-	*/
+				Creates a reference parameter
+			*/
 	public Parameter(Parameter other)
 		{
 		m_formatter = other.m_formatter;

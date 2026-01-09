@@ -34,7 +34,7 @@
 		<object tag="global" name="Global">
 			<object tag="col" name="Column">
 				<property name="Comment">
-					<element>comment</element>
+					<element name="comment"/>
 				</property>
 				<property name="Name">
 					<attribute>name</attribute>
@@ -47,6 +47,9 @@
 				</property>
 				<property name="DefaultValue">
 					<attribute>default_value</attribute>
+				</property>
+				<property name="DefaultValueNoQuote">
+					<attribute>default_value_no_quote</attribute>
 				</property>
 				<property name="AllowNull">
 					<attribute>allow_null</attribute>
@@ -63,7 +66,7 @@
 						<attribute>key</attribute>
 					</property>
 					<property name="Value">
-						<attribute>Value</attribute>
+						<attribute>value</attribute>
 					</property>
 				</object>
 				<object tag="reference" name="Reference">
@@ -73,16 +76,85 @@
 					<property name="Column">
 						<attribute>column</attribute>
 					</property>
+					<property name="Id">
+						<attribute>id</attribute>
+					</property>
+					<property name="OnDelete">
+						<attribute>on_delete</attribute>
+					</property>
+					<property name="OnUpdate">
+						<attribute>on_update</attribute>
+					</property>
 				</object>
 			</object>
 		</object>
 		
 		<object tag="table" name="Table">
-			<property name="Type">
-				<element>comment</element>
+			<property name="Name">
+				<attribute>name</attribute>
+			</property>
+			<property name="Comment">
+				<element name="comment"/>
 			</property>
 			<object reference="Property"/>
 			<object reference="Column"/>
+			<object tag="primary_key" name="PrimaryKey">
+				<object tag="colref" name="ColumnRef">
+					<property name="ColumnName">
+						<attribute>name</attribute>
+					</property>
+				</object>
+			</object>
+			<object tag="unique" name="Unique">
+				<object reference="ColumnRef"/>
+			</object>
+
+			<object tag="table_query" name="TableQuery" implements="org.agileclick.genorm.ParsedQuery">
+				<property name="Name">
+					<attribute>name</attribute>
+				</property>
+				<property name="ResultType">
+					<attribute>result_type</attribute>
+				</property>
+				<property name="Comment">
+					<element name="comment"/>
+				</property>
+				<object tag="sql" name="Sql" body="Query">
+					<property name="Parse">
+						<attribute>parse</attribute>
+					</property>
+				</object>
+				<object tag="input" name="Input">
+					<object tag="param" name="Param">
+						<property name="Name"><attribute>name</attribute></property>
+						<property name="Type"><attribute>type</attribute></property>
+						<property name="Test"><attribute>test</attribute></property>
+						<property name="Tag"><attribute>tag</attribute></property>
+						<property name="Ref"><attribute>ref</attribute></property>
+					</object>
+				</object>
+				<object tag="replace" name="Replace">
+					<object reference="Param"/>
+				</object>
+			</object>
+		</object>
+
+		<object tag="query" name="Query" implements="org.agileclick.genorm.ParsedQuery">
+			<property name="Name">
+				<attribute>name</attribute>
+			</property>
+			<property name="ResultType">
+				<attribute>result_type</attribute>
+			</property>
+			<property name="Comment">
+				<element name="comment"/>
+			</property>
+			<object reference="Input"/>
+			<object reference="Replace"/>
+			<object tag="return" name="Return">
+				<object reference="Param"/>
+			</object>
+			<object reference="Sql"/>
 		</object>
 		
 	</parser>

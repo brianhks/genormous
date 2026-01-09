@@ -15,33 +15,27 @@ limitations under the License.
 
 package org.agileclick.genorm;
 
+import org.agileclick.genorm.parser.GenOrmParser;
 import org.dom4j.*;
 import java.util.*;
 import java.util.regex.*;
 
+import static org.agileclick.genorm.Genormous.setValueIfNotNull;
+
 public class Query
 	{
 	//XML elements and attribute names
-	public static final String NAME = "name";
-	public static final String QUERY = "query";
-	public static final String TABLE_QUERY = "table_query";
-	public static final String INPUT = "input";
-	public static final String REPLACE = "replace";
-	public static final String RETURN = "return";
-	public static final String PARAM = "param";
-	public static final String RESULT_TYPE = "result_type";
 	public static final String RESULT_NONE = "none";
 	public static final String RESULT_SINGLE = "single";
 	public static final String RESULT_MULTI = "multi";
-	public static final String COMMENT = "comment";
-	
+
 	
 	private Format m_formatter;
 	private String m_queryName;
-	private ArrayList<Parameter> m_inputs;
-	private ArrayList<Parameter> m_queryInputs;
-	private ArrayList<Parameter> m_replacements;
-	private ArrayList<Parameter> m_outputs;
+	private ArrayList<Parameter> m_inputs = new ArrayList<>();
+	private ArrayList<Parameter> m_queryInputs = new ArrayList<>();
+	private ArrayList<Parameter> m_replacements = new ArrayList<>();
+	private ArrayList<Parameter> m_outputs = new ArrayList<>();
 	private String m_sqlQuery;
 	private String m_comment;
 	private boolean m_resultTypeNone;
@@ -57,119 +51,112 @@ public class Query
 		m_queryName = name;
 		m_inputs = params;
 		m_queryInputs = params;
-		m_replacements = new ArrayList<Parameter>();
-		m_outputs = new ArrayList<Parameter>();
 		m_sqlQuery = sql;
 		m_comment = "";
 		m_resultTypeSingle = false;
 		m_skipTest = true;
 		}
 	
-	public Query(Element queryRoot, Format formatter)
-			throws QueryConfigException
-		{
-		this(queryRoot, formatter, null);
-		}
-	
-	public Query(Element queryRoot, Format formatter, Map<String, String> typeMap)
+
+	public Query(ParsedQuery parsedQuery, Format formatter, Map<String, String> typeMap)
 			throws QueryConfigException
 		{
 		m_skipTest = false;
-		m_inputs = new ArrayList<Parameter>();
 		m_comment = "";
 		m_typeMap = typeMap;
 		m_formatter = formatter;
-		m_queryName = queryRoot.attributeValue(NAME);
-		String resultType = queryRoot.attributeValue(RESULT_TYPE);
+		m_queryName = parsedQuery.getName();
+		String resultType = parsedQuery.getResultType();
 		if ((resultType != null) && (!resultType.equals(RESULT_SINGLE)) &&
 				(!resultType.equals(RESULT_MULTI)) && (!resultType.equals(RESULT_NONE)))
 			{
 			System.out.println("result_type value \""+resultType+"\" must be \"none\", \"single\" or \"multi\"");
 			}
-			
+
 		m_resultTypeNone = RESULT_NONE.equals(resultType);
 		m_resultTypeSingle = RESULT_SINGLE.equals(resultType);
 		m_resultTypeMulti = RESULT_MULTI.equals(resultType);
-		
-		try
+
+		if (parsedQuery.getInput() != null)
+			m_queryInputs = getParameters(parsedQuery.getInput().getParamList());
+
+		for (Parameter p : m_queryInputs)
 			{
-			m_queryInputs = getParameters(queryRoot.element(INPUT));
-			for (Parameter p : m_queryInputs)
-				{
-				if (!p.isReference())
-					m_inputs.add(p);
-				}
-			m_replacements = getParameters(queryRoot.element(REPLACE));
-			m_outputs = getParameters(queryRoot.element(RETURN));
-			
-			//Validate the outputs with what is in the select
-			Pattern selectPattern = Pattern.compile("select(.+?)from.*", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-			Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
-			
-			//m_sqlQuery = queryRoot.elementTextTrim("sql");
-			m_sqlQuery = queryRoot.elementText("sql").trim();
-			m_comment = queryRoot.elementTextTrim(COMMENT);
-			
-			//Option to not parse sql
-			boolean parse = queryRoot.element("sql").attributeValue("parse", "yes").equals("yes");
-			//The rest of this is just to sanity check the query to make sure 
-			//the parameters match up with the query
-			Matcher m = selectPattern.matcher(queryRoot.elementTextTrim("sql"));
-			if (parse && m.matches())
-				{
-				String select = m.group(1).trim();
-				
-				String split[] = splitSelect(select);
-				
-				// Check split length with m_outputs length to make sure they match
-				if (split.length != m_outputs.size())
-					{
-					System.out.println("Warning, in query \""+m_queryName+"\" output parameter count does not match the select statement");
-					
-					System.out.println("Select parameters:");
-					for (int I = 0; I < split.length; I++)
-						System.out.println("  "+split[I].trim());
-						
-					System.out.println("Declared parameters:");
-					for (Parameter par : m_outputs)
-						System.out.println("  "+par.getName());
-					}
-				else
-					{
-					for (int I = 0; I < split.length; I++)
-						{
-						String param = split[I];
-						m = paramPattern.matcher(param.trim());
-						if (m.matches())
-							{
-							int group;
-							for (group = 1; group <= 3; group++)
-								if (m.group(group) != null)
-									break;
-							
-							String paramName = m_outputs.get(I).getName();
-							String selectParam = m.group(group);
-							if ((selectParam.startsWith("\"") && selectParam.endsWith("\"")))
-								selectParam = selectParam.substring(1, selectParam.length() -1);
-								
-							if (!paramName.equals(selectParam))
-								{
-								System.out.println("Query "+m_queryName+": Param "+paramName+" does not match select statement "+selectParam);
-								}
-							}
-						else
-							System.out.println("Query "+m_queryName+": Select param \""+param+"\" does not match regular expression");
-						}
-					}
-				}
+			if (!p.isReference())
+				m_inputs.add(p);
 			}
-		catch (QueryConfigException qce)
+
+		if (parsedQuery.getReplace() != null)
+			m_replacements = getParameters(parsedQuery.getReplace().getParamList());
+
+		if (parsedQuery.getReturn() != null)
+			m_outputs = getParameters(parsedQuery.getReturn().getParamList());
+
+		//Validate the outputs with what is in the select
+		Pattern selectPattern = Pattern.compile("select(.+?)from.*", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+		m_sqlQuery = parsedQuery.getSql().getQuery().trim();
+		m_comment = parsedQuery.getComment();
+
+		//Option to not parse sql
+		boolean parse = "yes".equals(parsedQuery.getSql().getParse());
+		//The rest of this is just to sanity check the query to make sure
+		//the parameters match up with the query
+		Matcher m = selectPattern.matcher(m_sqlQuery);
+		if (parse && m.matches())
 			{
-			qce.setQuery(m_queryName);
-			throw qce;
+			parseCheckSql(m.group(1).trim());
 			}
 		}
-		
+
+	private void parseCheckSql(String select)
+		{
+		Pattern paramPattern = Pattern.compile(".+as\\s(.+)|.+\\.(.+)|(.+)", Pattern.CASE_INSENSITIVE);
+		String split[] = splitSelect(select);
+
+		// Check split length with m_outputs length to make sure they match
+		if (split.length != m_outputs.size())
+			{
+			System.out.println("Warning, in query \""+m_queryName+"\" output parameter count does not match the select statement");
+
+			System.out.println("Select parameters:");
+			for (int I = 0; I < split.length; I++)
+				System.out.println("  "+split[I].trim());
+
+			System.out.println("Declared parameters:");
+			for (Parameter par : m_outputs)
+				System.out.println("  "+par.getName());
+			}
+		else
+			{
+			for (int I = 0; I < split.length; I++)
+				{
+				String param = split[I];
+				Matcher m = paramPattern.matcher(param.trim());
+				if (m.matches())
+					{
+					int group;
+					for (group = 1; group <= 3; group++)
+						if (m.group(group) != null)
+							break;
+
+					String paramName = m_outputs.get(I).getName();
+					String selectParam = m.group(group);
+					if ((selectParam.startsWith("\"") && selectParam.endsWith("\"")))
+						selectParam = selectParam.substring(1, selectParam.length() -1);
+
+					if (!paramName.equals(selectParam))
+						{
+						System.out.println("Query "+m_queryName+": Param "+paramName+" does not match select statement "+selectParam);
+						}
+					}
+				else
+					System.out.println("Query "+m_queryName+": Select param \""+param+"\" does not match regular expression");
+				}
+			}
+		}
+
+
 	private Pattern m_tickPattern = Pattern.compile("\\'.*?\\'", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 	//private Pattern m_parenPattern = Pattern.compile("\\(.*?,[^\\(]*?\\)", Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 	
@@ -247,48 +234,43 @@ public class Query
 		return (split);
 		}
 		
-		
-	//---------------------------------------------------------------------------
-	private ArrayList<Parameter> getParameters(Element e)
-			throws QueryConfigException
+
+	private ArrayList<Parameter> getParameters(List<GenOrmParser.Param> parserParams) throws QueryConfigException
 		{
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
-		if (e != null)
+		Map<String, Parameter> paramMap = new HashMap<>();
+		for (GenOrmParser.Param parserParam : parserParams)
 			{
-			Map<String, Parameter> paramMap = new HashMap<String, Parameter>();
-			Iterator it = e.elementIterator(PARAM);
-			while (it.hasNext())
+			Parameter param;
+
+			if (parserParam.getRef() != null)
 				{
-				Element p = (Element)it.next();
-				Parameter param;
-				if (p.attributeValue(Parameter.REF) != null)
-					{
-					String refName = p.attributeValue(Parameter.REF);
-					if (paramMap.get(refName) != null)
-						param = new Parameter(paramMap.get(refName));
-					else
-						throw new QueryConfigException(refName, "A reference must reference a parameter previously declared");
-					}
+				String refName = parserParam.getRef();
+				if (paramMap.get(refName) != null)
+					param = new Parameter(paramMap.get(refName));
 				else
-					{
-					param = new Parameter(p, m_formatter, m_typeMap);
-					paramMap.put(param.getName(), param);
-					}
-					
-				params.add(param);
-				/* String type = p.attributeValue(TYPE);
-				if (m_typeMap != null)
-					type = (String)m_typeMap.get(type);
-				if (p.attribute(TAG) != null)
-					params.add(new Parameter(p.attributeValue(NAME), type, p.attributeValue(TAG), m_formatter));
-				else
-					params.add(new Parameter(p.attributeValue(NAME), type, m_formatter)); */
+					throw new QueryConfigException(refName, "A reference must reference a parameter previously declared");
 				}
+			else
+				{
+				String type = m_typeMap.getOrDefault(parserParam.getType(), parserParam.getType());
+
+				param = new Parameter(parserParam.getName(), type, m_formatter);
+
+				setValueIfNotNull(parserParam.getTest(), param::setTestParam);
+				setValueIfNotNull(parserParam.getTag(), param::setTag);
+
+				paramMap.put(param.getName(), param);
+				}
+
+			params.add(param);
 			}
-			
+
+
 		return (params);
 		}
-		
+
+
 	public boolean isSkipTest() { return (m_skipTest); }
 	public void setEscape(boolean escape) {m_escape = escape; }
 		
@@ -311,7 +293,7 @@ public class Query
 	public String getComment() { return (m_comment); }
 	
 	public boolean isNoneResult() { return (m_resultTypeNone); }
-	public boolean isSingleResult() { return (m_resultTypeSingle); }
+	public boolean isSingleResult() { return (m_resultTypeSingle); } //Only used for table queries
 	
 	public boolean isParamQuery()
 		{

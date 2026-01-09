@@ -16,8 +16,16 @@ limitations under the License.
 package org.agileclick.genorm;
 
 import java.util.*;
+
+import org.agileclick.genorm.parser.GenOrmParser;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 
 public class GenUtil extends TemplateHelper
@@ -71,9 +79,6 @@ public class GenUtil extends TemplateHelper
 	/**
 	*/
 	
-	
-	
-
 	protected Map<String, String> m_javaTypeMap;
 	protected Map<String, String> m_dbTypeMap;
 	protected List<GenPlugin> m_pluginList;
@@ -81,6 +86,12 @@ public class GenUtil extends TemplateHelper
 	protected Document m_source;
 	private Format m_formatter;
 	protected boolean m_verbose;
+
+
+	protected GenOrmParser.Configuration m_configuration;
+	protected GenOrmParser.Global m_globalColumns;
+	protected List<GenOrmParser.Table> m_tables = new ArrayList<>();
+	protected List<GenOrmParser.Query> m_queries = new ArrayList<>();
 	
 	/**
 		This class is used for the java and db type maps.  If the value
@@ -111,26 +122,53 @@ public class GenUtil extends TemplateHelper
 		m_verbose = verbose;
 		m_config = new Properties();
 		
-		m_javaTypeMap = new DefaultMap();
-		m_dbTypeMap = new DefaultMap();
-		m_pluginList = new ArrayList<GenPlugin>();
-		
+		m_javaTypeMap = new DefaultMap<>();
+		m_dbTypeMap = new DefaultMap<>();
+		m_pluginList = new ArrayList<>();
+
+
 		try
 			{
-			SAXReader reader = new SAXReader();
-			reader.setValidation(false);
-			reader.setIncludeExternalDTDDeclarations(false);
-			m_source = reader.read(new File(source));
-		
-			Element config = m_source.getRootElement().element("configuration");
-			if (config != null)
-				readConfiguration(m_config, config);
+			GenOrmParser genOrmParser = new GenOrmParser(new GenOrmParser.SlickHandler()
+				{
+				@Override
+				public void parsedConfiguration(GenOrmParser.Configuration entry) throws Exception
+					{
+					m_configuration = entry;
+					}
+
+				@Override
+				public void parsedGlobal(GenOrmParser.Global entry) throws Exception
+					{
+					m_globalColumns = entry;
+					}
+
+				@Override
+				public void parsedTable(GenOrmParser.Table entry) throws Exception
+					{
+					m_tables.add(entry);
+					}
+
+				@Override
+				public void parsedQuery(GenOrmParser.Query entry) throws Exception
+					{
+					m_queries.add(entry);
+					}
+				});
+
+			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setValidating(false);
+			SAXParser saxParser = saxParserFactory.newSAXParser();
+			saxParser.parse(new File(source), genOrmParser);
+
+			if (m_configuration != null)
+				readConfiguration();
 			}
-		catch (DocumentException de)
+		catch (ParserConfigurationException | SAXException | IOException e)
 			{
-			throw new ConfigurationException(de);
+			throw new ConfigurationException(e);
 			}
-			
+
 		}
 		
 //------------------------------------------------------------------------------
@@ -161,7 +199,7 @@ public class GenUtil extends TemplateHelper
 			return (m_formatter);
 			
 		if (m_config.getProperty(PROP_FORMATTER) != null)
-			return ((Format)loadClass(PROP_FORMATTER, m_config.getProperty(PROP_FORMATTER)));
+			return ((Format)loadClass(m_config.getProperty(PROP_FORMATTER)));
 			
 		return (new DefaultFormat());
 		}
@@ -186,7 +224,7 @@ public class GenUtil extends TemplateHelper
 		}
 	
 //------------------------------------------------------------------------------
-	private Object loadClass(String propName, String className)
+	private Object loadClass(String className)
 			throws ConfigurationException
 		{
 		Object ret = null;
@@ -205,59 +243,28 @@ public class GenUtil extends TemplateHelper
 		}
 		
 //------------------------------------------------------------------------------
-	protected void readConfiguration(Properties configProp, Element config)
+	protected void readConfiguration()
 			throws ConfigurationException
 		{
 		//Read in all options
-		Iterator optIt = config.elementIterator("option");
-		while (optIt.hasNext())
+		for (GenOrmParser.Option option : m_configuration.getOptionList())
 			{
-			Element option = (Element)optIt.next();
-			m_config.setProperty(option.attributeValue("name"), option.attributeValue("value"));
+			m_config.setProperty(option.getName(), option.getValue());
 			}
-			
-		//Read in java types
-		Element jtm = config.element("typeMap"); //For compatibility
-		if (jtm == null)
-			jtm = config.element("type_map"); //This is the new name
-			
-		if (jtm != null)
+
+		for (GenOrmParser.TypeMap typeMap : m_configuration.getTypeMapList())
 			{
-			Iterator tIt = jtm.elementIterator("type");
-			while (tIt.hasNext())
-				{
-				Element type = (Element)tIt.next();
-				m_javaTypeMap.put(type.attributeValue("custom"), type.attributeValue("java"));
-				}
+			m_javaTypeMap.put(typeMap.getCustom(), typeMap.getJavaType());
+			m_dbTypeMap.put(typeMap.getCustom(), typeMap.getDBType());
 			}
-		
-		//Read in db types
-		Element dtm = config.element("typeMap"); //For compatibility
-		if (dtm == null)
-				dtm = config.element("type_map"); //This is the new name
-				
-		if (dtm != null)
+
+
+		for (GenOrmParser.Plugin plugin : m_configuration.getPluginList())
 			{
-			Iterator tIt = dtm.elementIterator("type");
-			while (tIt.hasNext())
-				{
-				Element type = (Element)tIt.next();
-				m_dbTypeMap.put(type.attributeValue("custom"), type.attributeValue("db"));
-				}
-			}
-		
-			
-		//Read in plugins
-		Iterator plugins = config.selectNodes("plugin").iterator();
-		while (plugins.hasNext())
-			{
-			Element plugin = (Element)plugins.next();
-			GenPlugin gPlugin = (GenPlugin)loadClass("plugin", plugin.attributeValue("class"));
-			
-			gPlugin.init(plugin, configProp);
+			GenPlugin gPlugin = (GenPlugin)loadClass(plugin.getPluginClass());
+			gPlugin.init(m_config);
 			m_pluginList.add(gPlugin);
 			}
-			
 		}
 		
 //------------------------------------------------------------------------------

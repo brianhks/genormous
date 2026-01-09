@@ -49,7 +49,6 @@
 <!ATTLIST reference
 	table CDATA #REQUIRED
 	column CDATA #REQUIRED
-	id CDATA #IMPLIED
 	on_delete (cascade|null|default) #IMPLIED
 	on_update (cascade|null|default) #IMPLIED
 	>
@@ -70,9 +69,9 @@
 <!ATTLIST param
 	name CDATA #REQUIRED
 	type CDATA #REQUIRED
+	tag CDATA #IMPLIED
 	test CDATA #IMPLIED
 	ref CDATA #IMPLIED 
-	position CDATA #IMPLIED
 	>
 	
 <!ELEMENT sql (#PCDATA)>
@@ -80,18 +79,6 @@
 	parse (yes|no) "yes"
 	>
 
-
-<!ELEMENT view (comment?,view_col+,sql)>
-<!ATTLIST view 
-	name CDATA #REQUIRED
-	>
-	
-<!ELEMENT view_col (comment?,reference?)>
-<!ATTLIST view_col
-	name CDATA #REQUIRED
-	type CDATA #REQUIRED
-	>
-	
 <!ELEMENT queries (query*)>
 
 <!ELEMENT query (comment?,input?,replace?,return?,sql)>

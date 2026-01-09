@@ -34,7 +34,7 @@ public class MemCachePlugin extends TemplateHelper implements QueryPlugin
 		m_templateGroup = loadTemplateGroup("templates/MemCacheTemplate.java");
 		}
 		
-	public void init(Element e, Properties config)
+	public void init(Properties config)
 		{
 		System.out.println("Initialized Plugin");
 		}
