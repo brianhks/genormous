@@ -1,3 +1,35 @@
+- [GenORMous](#genormous)
+    * [Overview](#overview)
+    * [Benefits](#benefits)
+        + [Speed](#speed)
+        + [Database Changes](#database-changes)
+            - [How does GenORMous fix this problem?](#how-does-genormous-fix-this-problem-)
+        + [Simplicity](#simplicity)
+    * [Getting Started](#getting-started)
+        + [Configure tables.xml](#configure-tablesxml)
+            - [Exporting Database Schema](#exporting-database-schema)
+            - [Creating tables.xml](#creating-tablesxml)
+        + [Generating java code](#generating-java-code)
+    * [Database Connections and Transactions](#database-connections-and-transactions)
+    * [Database Compatibility](#database-compatibility)
+    * [Unit Testing](#unit-testing)
+    * [Tables.xml Schema](#tablesxml-schema)
+        + [configuration](#configuration)
+            - [option](#option)
+            - [type_map](#type-map)
+            - [plugins](#plugins)
+        + [global](#global)
+        + [table](#table)
+            - [comment](#comment)
+            - [property](#property)
+            - [col](#col)
+            - [table_query](#table-query)
+        + [queries](#queries)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
+
 # GenORMous
 
 Genormous is an ORM.  The twist is that it generates the ORM classes for you in
